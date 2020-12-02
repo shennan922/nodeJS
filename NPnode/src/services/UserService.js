@@ -7,7 +7,7 @@ export default {
   },
   register (data) {
     return request.post(
-      '/users',
+      'http://localhost:3000/users',
       data
     )
   },

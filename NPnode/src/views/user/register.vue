@@ -63,12 +63,19 @@ export default {
           this.loading = true
           this.error = ''
           try {
-            const response = await UserService.register(
+           /* const response = await UserService.register(
               {
                 email: this.registerForm.email,
                 password: this.registerForm.password
               }
-            )
+            )*/
+            const response = this.$axios.post(
+      'http://localhost:3000/users',
+       {
+                email: this.registerForm.email,
+                password: this.registerForm.password
+              }
+    )
             if (response.data.code !== 200) {
               this.error = response.data.error
             } else {

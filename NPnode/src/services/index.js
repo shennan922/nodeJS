@@ -13,7 +13,7 @@ const request = axios.create({
 })
 NProgress.configure({ showSpinner: false })
 
-request.interceptors.request.use(config => {
+/*request.interceptors.request.use(config => {
   // let loadingInstance = Loading.service()
   // store.dispatch('setLoadingInstance', loadingInstance)
   if (config.headers.showLoading) {
@@ -33,6 +33,6 @@ request.interceptors.response.use(response => {
   // let loadingInstance = store.state.loadingInstance
   // loadingInstance.close()
   return Promise.reject(error)
-})
+})*/
 
 export default request

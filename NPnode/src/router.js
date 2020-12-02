@@ -10,7 +10,7 @@ const router = new Router({
     {
       path: '/',
       name: 'home',
-      redirect: { name: 'movie-list' }
+      redirect: { name: 'login' }
     },
     {
       path: '/about',
@@ -22,16 +22,7 @@ const router = new Router({
     },
     { path: '/users/login', alias: '/login', name: 'login', component: () => import('./views/user/login.vue') },
     { path: '/users/register', alias: '/register', name: 'register', component: () => import('./views/user/register.vue') },
-    {
-      path: '/movies',
-      component: () => import('./views/layout/movie'),
-      children: [
-        { path: 'create', name: 'movie-create', alias: 'edit', component: () => import('./views/movie/create'), meta: { auth: true } },
-        { path: 'detail/:id', name: 'movie-detail', component: () => import('./views/movie/detail') },
-        { path: 'list', name: 'movie-list', component: () => import('./views/movie/list') }
-      ]
-    },
-    { path: '*', redirect: { name: 'movie-list' } }
+    { path: '*', redirect: { name: 'login' } }
   ]
 })
 

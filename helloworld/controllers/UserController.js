@@ -13,7 +13,7 @@ function tokenSign ({ id, email }) {
 module.exports = {
   async register (req, res) {
     try {
-      console.log(req.body)
+      console.log(req.body)  
       const user = await User.User.create(req.body)
       res.status(201).send({
         code: 200,
@@ -38,7 +38,7 @@ module.exports = {
   },
   async getUserById (req, res) {
     try {
-      const user = await User.findByPk(req.params.id)
+      const user = await User.User.findByPk(req.params.id)
       if (user) {
         res.status(200).send({
           user
