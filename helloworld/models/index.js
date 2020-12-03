@@ -52,7 +52,15 @@ const User = sequelize.define('user', {
 
 db.Sequelize = Sequelize
 db.sequelize = sequelize
+User.comparePassword = function (user, password) {
+  return user.password === MD5(password).toString()
+}
 db.User = User
 
-
 module.exports = db
+/*module.exports = {
+  db,
+  comparePassword (user, password) {
+    return user.password === MD5(password).toString()
+  }
+}*/

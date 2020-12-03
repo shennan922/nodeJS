@@ -97,12 +97,12 @@ module.exports = {
   },
   async login (req, res) {
     try {
-      const user = await User.findOne({
+      const user = await User.User.findOne({
         where: {
           email: req.body.email
         }
       })
-      let isValidPassword = user.comparePassword(req.body.password)
+      let isValidPassword = User.User.comparePassword(user,req.body.password)
       if (isValidPassword) {
         res.send({
           code: 200,
