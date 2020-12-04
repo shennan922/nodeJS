@@ -1,6 +1,7 @@
-const User = require('../models/index')
+const db = require('../models/Index')
 const config = require('../config')
 const Jwt = require('jsonwebtoken')
+const MD5 = require('crypto-js/md5')
 
 function tokenSign ({ id, email }) {
   try {
@@ -10,16 +11,22 @@ function tokenSign ({ id, email }) {
   }
 }
 
+function comparePassword (user,password) {
+  return user.password.toString() === MD5(password).toString()
+}
+
+const User = db.User
+
 module.exports = {
   async register (req, res) {
     try {
-      console.log(req.body)  
-      const user = await User.User.create(req.body)
+      console.log(req)  
+      const user = await User.create(req.body)
       res.status(201).send({
         code: 200,
         user: {
           email: user.email,
-          id: user.id
+          password: user.password
         },
         token: tokenSign(user)
       })
@@ -38,7 +45,7 @@ module.exports = {
   },
   async getUserById (req, res) {
     try {
-      const user = await User.User.findByPk(req.params.id)
+      const user = await User.findByPk(req.params.id)
       if (user) {
         res.status(200).send({
           user
@@ -97,12 +104,13 @@ module.exports = {
   },
   async login (req, res) {
     try {
-      const user = await User.User.findOne({
+      const user = await User.findOne({
         where: {
           email: req.body.email
         }
       })
-      let isValidPassword = User.User.comparePassword(user,req.body.password)
+      let isValidPassword = comparePassword(user,req.body.password)
+      console.log('222')
       if (isValidPassword) {
         res.send({
           code: 200,
