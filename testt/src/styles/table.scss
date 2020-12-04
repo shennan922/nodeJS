@@ -1,0 +1,30 @@
+@mixin table_format(){
+    align:center;
+    $border-color: #650EF1;
+    $header-background-color: #C1D4EC;
+   };
+
+@mixin center(){
+    display:center;
+    justify-content:center;
+    align-items:center;
+    font-size: 25;
+    background-color: #9e0909;
+   };
+
+// 设置表头背景颜色
+$border-color: #650EF1;
+// 设置表头背景颜色
+$header-background-color: #C1D4EC;
+// 设置表头字体大小
+$secondary-font-size: 18px;
+// 改变表格数据字体大小（不包含表头字体大小）
+$font-size: 16px;
+// 设置表格默认背景颜色
+$background-color: #F7E2E2;
+// 设置交替行背景颜色
+$odd-row-background-color:#EBF1CF;
+// 设置鼠标所在表格的行背景色
+$hover-color: #dfdfff;
+// 设置字体颜色
+$foreground-color: #F03F17;
