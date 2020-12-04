@@ -4,8 +4,8 @@
       <el-row :gutter="10">
         <el-col :span="5">
           <h3 style="margin-left:30px">{{isEdit?'第'+(index+1)+'条信息编辑':'信息添加'}}</h3>
-          <el-form ref="studentForm" model="studentForm" :rules="rules" label-width="80px">
-            <el-form-item label="姓名" prop="Name" readonly>
+          <el-form ref="studentForm" :model="studentForm" :rules="rules" label-width="80px">
+            <el-form-item label="姓名" prop="Name">
             <el-input v-model="studentForm.Name"></el-input>
           </el-form-item>
           <el-form-item label="年龄" prop="Age">
@@ -151,18 +151,18 @@ export default {
       ],
       columns: [],
        rules: {
-        // Name: [
-        //   { required: true, message: "请输入姓名", trigger: "blur" },
-        //   { min: 2, max: 5, message: "长度在 2 到 5 个字符", trigger: "blur" }
-        // ],
-        // Age: [
-        //   {
-        //     required: true,
-        //     type: "number",
-        //     message: "年龄必须为数字值",
-        //     trigger: "blur"
-        //   }
-        // ],
+        Name: [
+          { required: true, message: "请输入姓名", trigger: "blur" },
+          { min: 2, max: 5, message: "长度在 2 到 5 个字符", trigger: "blur" }
+        ],
+        Age: [
+          {
+            required: true,
+            type: "number",
+            message: "年龄必须为数字值",
+            trigger: "blur"
+          }
+        ],
       },
       isEdit: false,
       index: null
@@ -187,7 +187,7 @@ export default {
         .then((res) => {
           //console.log(res.data.data);
           this.rows = res.data.user;
-
+    
           var temp = this.rows1[0];
           for (var key in temp) {
             this.columns.push({
