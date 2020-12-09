@@ -1,6 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const morgan = require('morgan')
+var logger = require('./logger/accessLogger')
+const log4 = require('./logger/log4')
 const { sequelize } = require('./models')
 
 const app = express()
@@ -16,8 +17,9 @@ app.all('*', function (req, res, next) {
   } else { next() }
 })
 app.use(bodyParser.json())
-app.use(morgan('combined'))
-
+log4.use(app)
+app.use(bodyParser.json())
+app.use(logger('dev'))
 require('./router')(app)
 
 sequelize.sync()

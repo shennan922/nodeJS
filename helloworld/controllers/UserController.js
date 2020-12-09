@@ -1,6 +1,7 @@
 const User = require('../models/index')
 const config = require('../config')
 const Jwt = require('jsonwebtoken')
+const logger = require('../logger/log4')
 
 function tokenSign ({ id, email }) {
   try {
@@ -39,7 +40,9 @@ module.exports = {
   async getUserById (req, res) {
     try {
       const user = await User.User.findByPk(req.params.id)
+     
       if (user) {
+        logger.logger.info("return data"+user.id)
         res.status(200).send({
           user
         })
@@ -50,6 +53,7 @@ module.exports = {
         })
       }
     } catch (error) {
+      logger.logger.error("get user info error: "+error.message)
       res.status(500).send({
         code: 500,
         error: '数据查询失败'
