@@ -7,12 +7,10 @@ function hashPassword (user, options) {
   }
 }
 
+
 module.exports = (sequelize, DataTypes) => {
-  class Model extends Sequelize.Model {
-    comparePassword (password) {
-      return this.password === MD5(password).toString()
-    }
-  }
+  class Model extends Sequelize.Model {}
+  
   Model.init({
     email: {
       type: DataTypes.STRING,
@@ -41,7 +39,9 @@ module.exports = (sequelize, DataTypes) => {
       afterValidate: hashPassword
     },
     sequelize,
-    modelName: 'User'
+    modelName: 'User',
+    timestamps: false,
+
   }
   )
   return Model
