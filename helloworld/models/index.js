@@ -1,16 +1,13 @@
 const path = require('path')
 const fs = require('fs')
 const config = require('../config')
-const user = require('./User')
-const { Sequelize, DataTypes, Model } = require('sequelize');
-const db = {}
 const MD5 = require('crypto-js/md5')
+const { Sequelize, DataTypes, Model } = require('sequelize');
 
-function hashPassword (user, options) {
-  if (user.changed('password')) {
-    user.password = MD5(user.password).toString()
-  }
-}
+
+
+const db = {}
+
 const sequelize = new Sequelize(
   config.db.database,
   config.db.username,
@@ -18,49 +15,30 @@ const sequelize = new Sequelize(
   config.db.options
 )
 
-
-const User = sequelize.define('user', {
-  email: {
-    type: DataTypes.STRING,
-    unique: {
-      msg: '该邮箱地址已被注册，请更换'
-    },
-    validate: {
-      isEmail: {
-        msg: '请输入正确的邮箱地址'
-      }
-    }
-  },
-  password: {
-    type: DataTypes.STRING,
-    validate: {
-      len: {
-        min: 5,
-        max: 20,
-        msg: '密码长度必须大于5小于20'
-      }
-    }
-  }
-}, {
-  hooks: {
-    afterValidate: hashPassword
-  },
-  sequelize,
-  timestamps: false
- 
-})
-
 db.Sequelize = Sequelize
 db.sequelize = sequelize
-User.comparePassword = function (user, password) {
-  return user.password === MD5(password).toString()
-}
-db.User = User
 
+fs.readdirSync(__dirname)
+  .filter(file=>{return file !== 'index.js'})
+  .forEach(file=>{
+    //const model = sequelize.import(path.join(__dirname, file),sequelize,DataTypes)
+    const modelLoad = require('./'+file)
+    const model = modelLoad(sequelize,DataTypes)
+    db[model.name] = model
+    
+  })
+
+
+
+/*
+const user = require('./User')
+const student = require('./Student')
+
+const User = user(sequelize,DataTypes)
+const Student = student(sequelize,DataTypes)
+
+db.User = User
+db.Student = Student
+*/
 module.exports = db
-/*module.exports = {
-  db,
-  comparePassword (user, password) {
-    return user.password === MD5(password).toString()
-  }
-}*/
+
