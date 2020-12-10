@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     Age: {
-      type: Sequelize.INTEGER,
+      type: DataTypes.INTEGER,
       validate: {
         len: {
           min: 7,
@@ -21,10 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     School: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     },
     Remark: {
-      type: Sequelize.STRING
+      type: DataTypes.STRING
     }
   },
   {

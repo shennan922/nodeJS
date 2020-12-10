@@ -18,16 +18,27 @@ const sequelize = new Sequelize(
 db.Sequelize = Sequelize
 db.sequelize = sequelize
 
+fs.readdirSync(__dirname)
+  .filter(file=>{return file !== 'index.js'})
+  .forEach(file=>{
+    //const model = sequelize.import(path.join(__dirname, file),sequelize,DataTypes)
+    const modelLoad = require('./'+file)
+    const model = modelLoad(sequelize,DataTypes)
+    db[model.name] = model
+    
+  })
 
 
+
+/*
 const user = require('./User')
 const student = require('./Student')
 
-const User = user(sequelize,Sequelize)
-const Student = student(sequelize,Sequelize)
+const User = user(sequelize,DataTypes)
+const Student = student(sequelize,DataTypes)
 
 db.User = User
 db.Student = Student
-
+*/
 module.exports = db
 
