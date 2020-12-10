@@ -18,7 +18,6 @@ app.all('*', function (req, res, next) {
 })
 app.use(bodyParser.json())
 log4.use(app)
-app.use(bodyParser.json())
 app.use(logger('dev'))
 require('./router')(app)
 
