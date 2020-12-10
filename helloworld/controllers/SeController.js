@@ -1,4 +1,5 @@
 const db = require('../models/Index')
+const logger = require('../logger/log4')
 
 const Op = require('Sequelize').Op;
 const SeList = db.SeList
@@ -38,7 +39,7 @@ module.exports = {
   async getSeList (req, res) {
     try {
       var data = await SeList.findAll({
-        attributes:['SEID','SeName','Geo.NodeDesc','Department->Hos.NodeDesc','MlList.MlName','Team.TeamName','URL'],
+        attributes:['SEID','SeName','Geo.NodeDesc','Department->Hos.NodeDesc1','MlList.MlName','Team.TeamName','URL'],
         include:[
           {
             model: Geo,
@@ -77,18 +78,21 @@ module.exports = {
         res.status(200).send({
           value:'SeList',
           data:data
-        })
+        })        
+        logger.logger.info('Query SE: '+data.length+' records returned')
       } else {
         res.status(400).send({
           code: 400,
           error: '没有找到对应数据'
         })
+        logger.logger.error('No data found')
       }
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '数据查询失败: ' + error
       })
+      logger.logger('Query SE exception: '+error)
     }
   },
   async createSE (req, res) {
@@ -116,11 +120,13 @@ module.exports = {
         code: 200,
         message: 'SE创建成功'
       })
+      logger.logger.info("Create SE: "+newSE.SEID)
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '程序异常: ' + error
       })
+      logger.logger.fatal("Exception: "+newSE.SEID)
     }
   },
   async updateSE (req, res) {

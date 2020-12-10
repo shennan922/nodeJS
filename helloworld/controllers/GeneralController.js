@@ -86,7 +86,7 @@ module.exports = {
   async getTeam (req, res) {
     try {
       const data = await Team.findAll()
-      if (team) {
+      if (data) {
         res.status(200).send({
           value: 'Team',
           data: data
@@ -100,7 +100,7 @@ module.exports = {
     } catch (error) {
       res.status(500).send({
         code: 500,
-        error: '数据查询失败'
+        error: '数据查询失败: ' + error
       })
     }
   },
