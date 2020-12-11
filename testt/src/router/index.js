@@ -23,6 +23,24 @@ const routes = [
     meta: { auth: true },
     component: () => import('../views/data/demo.vue')
   },
+  {
+    path: '/data/Navigation',
+    name: 'Navigation',
+    meta: { auth: true },
+    component: () => import('../views/data/Navigation.vue'),
+    children:[
+      {
+        path: '/data/MySE',
+        name: 'MySE',
+        component: () => import('../views/data/MySE.vue')
+      },
+      {
+        path: '/data/Test',
+        name: 'Test',
+        component: () => import('../views/data/Test.vue')
+      },
+    ]
+  },
 
   { path: '/users/login', alias: '/login', name: 'login', component: () => import('../views/user/login.vue') },
   { path: '/users/register', alias: '/register', name: 'register', component: () => import('../views/user/register.vue') },
