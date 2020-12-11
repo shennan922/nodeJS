@@ -11,9 +11,9 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       field: 'SEID'
     },
-    SeName: {
+    SEName: {
       type: DataTypes.STRING,
-      field: 'SeName'
+      field: 'SEName'
     },
     TeamID: {
       type: DataTypes.STRING,
@@ -38,7 +38,7 @@ module.exports = (sequelize, DataTypes) => {
   },
   {
     sequelize,
-    modelName: 'SeList',
+    modelName: 'SEList',
     timestamps: false,
     tableName: "SE_Master"
   })

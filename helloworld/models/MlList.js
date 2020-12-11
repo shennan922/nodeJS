@@ -11,15 +11,15 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       field: 'MLID'
     },
-    MlName: {
+    MLName: {
       type: DataTypes.STRING,
-      field: 'MlName'
+      field: 'MLName'
     }
     
   },
   {
     sequelize,
-    modelName: 'MlList',
+    modelName: 'MLList',
     timestamps: false,
     tableName: "ML_Master"
   }

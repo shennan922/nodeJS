@@ -21,7 +21,6 @@ const User = db.User
 module.exports = {
   async register (req, res) {
     try {
-      console.log(req)  
       const user = await User.create(req.body)
       res.status(201).send({
         code: 200,
@@ -114,7 +113,6 @@ module.exports = {
         }
       })
       let isValidPassword = comparePassword(user,req.body.password)
-      console.log('222')
       if (isValidPassword) {
         res.send({
           code: 200,
