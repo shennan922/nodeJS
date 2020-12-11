@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import './plugins/element.js'
 import './registerServiceWorker'
+import './mock'
 
 Vue.config.productionTip = false
 
