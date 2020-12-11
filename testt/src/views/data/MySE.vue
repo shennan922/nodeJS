@@ -3,7 +3,7 @@
       <el-row>
         <el-col :span="24">
           <h3 class="title">Lilly Wechat - SE List
-              <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">+New SE</el-button>
+              <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">New SE</el-button>
           </h3>
           <el-table :model="SEForm" :data="rows1" border style="width: 100%" class="table"
             :row-style="tableRowStyle" :header-cell-style="tableHeaderColor">
@@ -26,27 +26,31 @@
         </el-col>
       </el-row>
        <!--增加SE页面-->
-      <el-dialog title ="New SE" :visible.sync="dialogCreateVisible" style = "text-align:left">
+      <el-dialog title ="New SE" :visible.sync="dialogCreateVisible">
         <!-- style = "background-color:#639eda" -->
-          <el-form ref="AddSEForm" :rules="addSEFormRules" :model="AddSEForm" label-width="90px">
+          <el-form 
+          ref="AddSEForm"
+          :model="AddSEForm" 
+          :rules="addSEFormRules"  
+          label-width="95px">
             <el-row>
               <el-col style="width:48%;padding-left:10px">
                 <h3>General Info</h3>
-                <el-form-item label="SEId" style="width:93%">
-                  <el-input v-model="AddSEForm.SEId"></el-input>
+                <el-form-item label="SEId" prop="SEId" style="width:93%">
+                  <el-input v-model="AddSEForm.SEId" style="padding-left:10px"></el-input>
                 </el-form-item>
                 <el-form-item label="New SE" prop="SEName" style="width:93%">
-                  <el-input v-model="AddSEForm.SeName"></el-input>
+                  <el-input v-model="AddSEForm.SEName" style="padding-left:10px"></el-input>
                 </el-form-item>
                 <el-form-item label="ML" prop="MLID">
-                  <el-select v-model="getMlList.data.value" clearable placeholder="请选择" @change="getMLID($event)">
+                  <el-select v-model="AddSEForm.MLID" clearable placeholder="请选择" @change="getMLID($event)">
                     <el-option
                        v-for="itemML in getMlList.data" :key="itemML.MLID" :label="itemML.MlName" :value="itemML.MLID">
                     </el-option>
                   </el-select> 
                 </el-form-item>
                 <el-form-item label="Team" prop="TeamID">
-                  <el-select v-model="getTeam.data.value" placeholder="请选择" @change="getTeamID($event)">
+                  <el-select v-model="AddSEForm.TeamID" placeholder="请选择" @change="getTeamID($event)">
                     <el-option
                        v-for="item in getTeam.data" :key="item.TeamID" :label="item.TeamName" :value="item.TeamID">
                     </el-option>
@@ -55,11 +59,11 @@
               </el-col>
               <el-col style="width:48%; float:right">
                 <h3>Geography</h3>
-                  <el-tree :data="getGeoTree" show-checkbox node-key="" :props="defaultProps" @change="getCityID($event)">
+                  <el-tree :data="getGeoTree" show-checkbox node-key="NodeId" :props="defaultProps" @change="getCityID($event)">
                   </el-tree>
                 <h3>Hospital</h3>
                 <el-form-item label="Hospital" prop="HospitalID">
-                  <el-select v-model="getHospital.data.value" placeholder="请选择"  @change="getHospitalID($event)">
+                  <el-select v-model="AddSEForm.HospitalID" placeholder="请选择"  @change="getHospitalID($event)">
                     <el-option
                        v-for="item in getHospital.data"  :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
                     </el-option>
@@ -67,7 +71,7 @@
                 </el-form-item>
                 <!-- v-if="item.level == 1" -->
                 <el-form-item label="Department" prop="DepID">
-                   <el-select v-model="getHospital.value" placeholder="请选择" @change="getDepID($event)">
+                   <el-select v-model="AddSEForm.DepID" placeholder="请选择" @change="getDepID($event)">
                     <el-option
                        v-for="item in getHospital.data" :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
                     </el-option>
@@ -109,7 +113,8 @@ export default {
   
   data() {
     return {
-    value: "",  
+    // value: "",
+    dialogCreateVisible:false, 
     SEForm: {
       SEID:"",
       SeName:"",
@@ -265,18 +270,30 @@ export default {
        CityIDP : "",
        DepIDP : "",
        HospitalIDP: "",
-
+       TeamIDTest :"",
     addSEFormRules: {
-        // SEId: [
-        //   { required: true, message: '请输入SEId', trigger: 'blur'},
-        //   { min: 6, max: 8, message: "长度在 6 到 8 个字符", trigger: "blur" }
-        // ],
-        // SEName: [
-        //   { required: true, message: '请输入SE Name', trigger: 'blur'}
-        // ],
-        // ML: [
-        //   { required: true, message: '请输入ML', trigger: 'blur'}
-        // ]  
+        SEId: [
+          { required: true, message: '请输入SEId', trigger: 'blur'},
+          { min: 6, max: 8, message: "长度在 6 到 8 个字符", trigger: "blur" }
+        ],
+        SEName: [
+          { required: true, message: '请输入SE Name', trigger: 'blur'}
+        ],
+        MLID: [
+          { required: true, message: '请选择MLName', trigger: 'change'}
+        ],
+        TeamID: [
+          { required: true, message: '请选择Team', trigger: 'change'}
+        ],
+        CityID: [
+          { required: true, message: '请选择所在城市', trigger: 'change'}
+        ],
+        HospitalID: [
+          { required: true, message: '请选择所在医院', trigger: 'change'}
+        ],
+        DepID: [
+          { required: true, message: '请选择所在部门', trigger: 'change'}
+        ],      
       },
     };
   },
@@ -305,15 +322,15 @@ export default {
     createSubmit() {
       this.$refs.AddSEForm.validate((valid) => {
         if (valid) {
-          //  alert("CityIDP" + this.CityIDP)
           this.$confirm('确认提交？', '提示', {}).then(() => {
             // this.addLoading = true;        
               axios
               .post('http://localhost:3008/se/createSE',
                   {
                     SEID: this.AddSEForm.SEId,
-                    SeName: this.AddSEForm.SeName,
-                    City: this.CityIDP,
+                    SeName: this.AddSEForm.SEName,
+                    City: "CN000100",
+                    // City ："CN000100",
                     Hospital: this.HospitalIDP,
                     Department: this.DepIDP,
                     MLName: this.MLIDP,
@@ -435,6 +452,7 @@ export default {
       this.MLIDP = event;
     },
     getTeamID(event){
+      this.TeamIDTest = event;
       this.TeamIDP = event;
     },
     getCityID(event){
@@ -445,7 +463,7 @@ export default {
     },
     getHospitalID(event){
       this.HospitalIDP = event;
-    }
+    },
   }
 };
 </script>
