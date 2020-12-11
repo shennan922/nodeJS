@@ -20,5 +20,10 @@ module.exports = {
     options: {
       expiresIn: '24h'
     }
+  },
+  errorCode:
+  {
+    notFound: 404,
+    internalError: 500
   }
 }
