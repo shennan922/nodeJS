@@ -9,12 +9,11 @@ const Op = require('Sequelize').Op;
 const setPath = function( list,level,nodeDesc) {  
   var rJson = [];
 
+  //如果指定level, 则只取指定level以下的层级
   if(level != ''){
     list.filter(list => {return list.Level >= level})
   }
-  console.log(level)
-  console.log(nodeDesc)
-  console.log(JSON.stringify(list))
+
   //将所有的pid的数据加到对应的id数据对象里面去，需要添加一个属性children
   for(var i=0;i<list.length;i++){
     var arr = [];
@@ -24,12 +23,9 @@ const setPath = function( list,level,nodeDesc) {
         }
     }
     list[i].dataValues.children = arr;
-
-    if(list[i].dataValues.children.length == 0){
-      delete list[i].children
-    }
   }
 
+  //如果指定节点, 则只取指定节点以下的层级
   if(nodeDesc == ''){
     for(var i=0;i<list.length;i++){
       if(list[i].ParentNodeID == ''){
@@ -54,6 +50,7 @@ module.exports = {
       const city = await Geo.findOne({        
         where: {
           NodeDesc: req.query.City,
+          //NodeDesc: req.params.City,
           Level: 3
         }
       })
@@ -86,7 +83,7 @@ module.exports = {
   async getTeam (req, res) {
     try {
       const data = await Team.findAll()
-      if (team) {
+      if (data) {
         res.status(200).send({
           value: 'Team',
           data: data
@@ -100,7 +97,7 @@ module.exports = {
     } catch (error) {
       res.status(500).send({
         code: 500,
-        error: '数据查询失败'
+        error: '数据查询失败: ' + error
       })
     }
   },

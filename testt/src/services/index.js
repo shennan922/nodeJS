@@ -11,6 +11,13 @@ const request = axios.create({
     Authorization: `Bearer ${store.state.token}`
   }
 })
+/*const requestMock = axios.create({
+  baseURL: '/mock',
+  headers: {
+    showLoading: true,
+  }
+})*/
+
 NProgress.configure({ showSpinner: false })
 
 request.interceptors.request.use(config => {
