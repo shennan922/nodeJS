@@ -1,7 +1,6 @@
 const db = require('../models/Index')
 const logger = require('../logger/log4')
 
-
 const SEList = db.SEList
 const Team = db.Team
 const Hospital = db.Hospital
@@ -86,14 +85,14 @@ module.exports = {
           code: 400,
           error: '没有找到对应数据'
         })
-        logger.logger.error('No data found')
+        logger.logger.error('Query SE: No data found')
       }
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '数据查询失败: ' + error
       })
-      logger.logger('Query SE exception: '+error)
+      logger.logger.fatal('Query SE fail: '+error)
     }
   },
   async create (req, res) {
@@ -126,7 +125,7 @@ module.exports = {
         code: 500,
         error: '程序异常: ' + error
       })
-      logger.logger.fatal("Exception: "+newSE.SEID)
+      logger.logger.fatal("Create SE fail: "+newSE.SEID+'/'+error)
     }
   },
   async update (req, res) {
@@ -145,11 +144,13 @@ module.exports = {
         code: 200,
         message: 'SE更新成功'
       })
+      logger.logger.info("Update SE: "+newSE.SEID)
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '程序异常: ' + error
       })
+      logger.logger.fatal("Update SE fail: "+newSE.SEID+'/'+error)
     }
   },
   async delete (req, res) {
@@ -164,11 +165,13 @@ module.exports = {
       res.status(200).send({
         message: '数据删除成功'
       })
+      logger.logger.info("Delete SE: "+newSE.SEID)
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '数据删除失败: ' + error
       })
+      logger.logger.fatal("Delete SE fail: "+newSE.SEID+'/'+error)
     }
   }
 }

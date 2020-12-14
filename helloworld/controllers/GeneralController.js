@@ -1,10 +1,9 @@
 const db = require('../models/Index')
-
+const logger = require('../logger/log4')
 
 const Team = db.Team
 const Hospital = db.Hospital
 const Geo = db.Geo
-
 
 const setPath = function( list,level,nodeDesc) {  
   var rJson = [];
@@ -67,17 +66,20 @@ module.exports = {
           value: 'Hospital',
           data: data
         })
+        logger.logger.info('Query Hospital: '+data.length+' records returned')
       } else {
         res.status(400).send({
           code: 400,
           error: '没有找到对应数据'
         })
+        logger.logger.error('Query Hospital: No data found')
       }
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '数据查询失败: '+error
       })
+      logger.logger.fatal('Query Hospital fail: '+error)
     }
   },
   async getTeam (req, res) {
@@ -88,17 +90,20 @@ module.exports = {
           value: 'Team',
           data: data
         })
+        logger.logger.info('Query Team: '+data.length+' records returned')
       } else {
         res.status(400).send({
           code: 400,
           error: '没有找到对应数据'
         })
+        logger.logger.error('Query Team: No data found')
       }
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '数据查询失败: ' + error
       })
+      logger.logger.fatal('Query Team fail: '+error)
     }
   },
   async getGeoTree (req, res) {
@@ -111,17 +116,20 @@ module.exports = {
           value: 'Geo',
           data: data
         })
+        logger.logger.info('Query Geo: '+data.length+' records returned')
       } else {
         res.status(400).send({
           code: 400,
           error: '没有找到对应数据'
         })
+        logger.logger.error('Query Geo: No data found')
       }
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '数据查询失败:' + error
       })
+      logger.logger.fatal('Query Geo fail: '+error)
     }
   }
 }

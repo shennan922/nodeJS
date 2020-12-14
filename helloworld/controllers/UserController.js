@@ -30,6 +30,7 @@ module.exports = {
         },
         token: tokenSign(user)
       })
+      logger.logger.info('User register: '+user.email)
     } catch (error) {
       let err = []
       if (error.errors) {
@@ -41,6 +42,7 @@ module.exports = {
         code: 400,
         error: err.join('<br/>')
       })
+      logger.logger.fatal('User register fail: '+error)
     }
   },
   async getUserById (req, res) {
@@ -48,7 +50,7 @@ module.exports = {
       const user = await User.findByPk(req.params.id)
      
       if (user) {
-        logger.logger.info("return data"+user.id)
+        logger.logger.info('User search: '+req.params.id)
         res.status(200).send({
           user
         })
@@ -57,13 +59,14 @@ module.exports = {
           code: 400,
           error: '没有找到对应数据'
         })
+        logger.logger.error('User search error: user not found')
       }
-    } catch (error) {
-      logger.logger.error("get user info error: "+error.message)
+    } catch (error) {      
       res.status(500).send({
         code: 500,
         error: '数据查询失败'
       })
+      logger.logger.fatal('User search fail: '+error.message)
     }
   },
   async update (req, res) {
@@ -98,11 +101,13 @@ module.exports = {
       res.status(200).send({
         message: '数据删除成功'
       })
+      logger.logger.info('User delete: '+req.params.id)
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '数据删除失败'
       })
+      logger.logger.fatal('User delete fail: '+error.message)
     }
   },
   async login (req, res) {
@@ -122,17 +127,20 @@ module.exports = {
           },
           token: tokenSign(user)
         })
+        logger.logger.info('User login: '+req.params.id)
       } else {
         res.status(403).send({
           code: 403,
           error: '用户名或密码错误'
         })
+        logger.logger.error('User login error: user or password not correct')
       }
     } catch (error) {
       res.status(403).send({
         code: 403,
         error: '用户名或密码错误'
       })
+      logger.logger.fatal('User login fail: '+error.message)
     }
   }
 }
