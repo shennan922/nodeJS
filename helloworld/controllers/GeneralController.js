@@ -4,7 +4,7 @@ const db = require('../models/Index')
 const Team = db.Team
 const Hospital = db.Hospital
 const Geo = db.Geo
-const Op = require('Sequelize').Op;
+
 
 const setPath = function( list,level,nodeDesc) {  
   var rJson = [];
@@ -57,10 +57,10 @@ module.exports = {
       var cityID = req.query.City==''?'':city.dataValues.NodeID
       var data
       if(cityID==''){
-        data = await Hospital.findAll({where:{Level:1}})
+        data = await Hospital.findAll()
       }
       else{
-        data = await Hospital.findAll({where: {Level:1,CityID:{ [Op.or]:[cityID,'']}}})
+        data = await Hospital.findAll({where: {CityID:{ [Op.or]:[cityID,'']}}})
       }
       if (data) {
         res.status(200).send({

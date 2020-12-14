@@ -2,8 +2,7 @@ const path = require('path')
 const fs = require('fs')
 const config = require('../config')
 const MD5 = require('crypto-js/md5')
-const { Sequelize, DataTypes, Model } = require('sequelize');
-
+const { Sequelize, DataTypes, Model,Op } = require('sequelize');
 
 
 const db = {}
@@ -17,6 +16,7 @@ const sequelize = new Sequelize(
 
 db.Sequelize = Sequelize
 db.sequelize = sequelize
+db.Op = Op
 
 fs.readdirSync(__dirname)
   .filter(file=>{return file !== 'index.js'})

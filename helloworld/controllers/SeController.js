@@ -1,12 +1,13 @@
 const db = require('../models/Index')
 const logger = require('../logger/log4')
 
-const Op = require('Sequelize').Op;
+
 const SEList = db.SEList
 const Team = db.Team
 const Hospital = db.Hospital
 const Geo = db.Geo
 const MLList = db.MLList
+const Op = db.Op
 
 SEList.belongsTo(Hospital, {
   foreignKey: 'DepID',
