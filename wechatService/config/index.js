@@ -8,7 +8,7 @@ module.exports = {
     options: {
       host: 'localhost',
       dialect: 'sqlite',
-      storage: path.resolve(__dirname, '../db/movie.sqlite'),
+      storage: path.resolve(__dirname, '../db/wechat.sqlite'),
       define: {
         underscored: true,
         paranoid: true
@@ -16,14 +16,18 @@ module.exports = {
     }
   },
   token: {
-    secretOrPrivateKey: 'NPnode',
+    secretOrPrivateKey: 'NPwechat',
     options: {
       expiresIn: '24h'
     }
   },
-  statusCode:
+  appInfo:{
+    appid:"wx43ce1ba96c04fd5c", //公众号的appid
+    secret:"59d51309664e12b4dc7b69f37c60b945", //公众号的secret 重要不要暴露给前端
+    wxapi:"https://api.weixin.qq.com/cgi-bin"
+  },
+  errorCode:
   {
-    ok: 200,
     notFound: 404,
     internalError: 500
   }

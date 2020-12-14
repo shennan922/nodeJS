@@ -1,5 +1,5 @@
 const UserController = require('../../controllers/UserController')
-
+const AuthenticatePolicy = require('../../policies/AuthenticatePolicy')
 const router = require('express').Router()
 
 router.post('/login', UserController.login)
