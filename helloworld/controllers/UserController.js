@@ -4,6 +4,7 @@ const Jwt = require('jsonwebtoken')
 const logger = require('../logger/log4')
 const MD5 = require('crypto-js/md5')
 const NodeRSA = require('node-rsa');
+var urlencode = require('urlencode');
 
 function tokenSign ({ id, email }) {
   try {
@@ -47,11 +48,12 @@ module.exports = {
     }
   },
   async getUserById (req, res) {
-    try {
-
+    try {    
       var publicKey = new NodeRSA(config.keys.publicKey);
       var encrypted = publicKey.encrypt(config.wechat.appID+'&'+Date.now(), 'base64');
+      var coding = urlencode(encrypted)
       console.log(encrypted);
+      console.log(coding);
       timeStamp =Date.now()
       timeStamp1 =Date.now()
       var tt = timeStamp1-timeStamp
@@ -132,6 +134,7 @@ module.exports = {
       if (isValidPassword) {
         var publicKey = new NodeRSA(config.keys.privateKey);
         var wechatEncrypted = publicKey.encrypt(config.wechat.appID+'&'+Date.now(), 'base64');
+        wechatEncrypted = urlencode(wechatEncrypted)
         res.send({
           code: 200,
           user: {

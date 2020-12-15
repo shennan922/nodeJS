@@ -6,7 +6,11 @@ module.exports = {
       '/api': {
         target: process.env.VUE_APP_MOCK_SERVER,
         pathRewrite: { '^/api': '' }
-      }
+      },
+      '/wechat': {
+        target: process.env.VUE_APP_WECHAT_SERVER,
+        pathRewrite: { '^/wechat': '/wechat'}
+      },
     }
   },
   chainWebpack: config => {

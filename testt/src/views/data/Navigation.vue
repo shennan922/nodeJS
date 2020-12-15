@@ -78,6 +78,7 @@
 </template>
 <script>
 import variables from "@/styles/variables.scss";
+import UserService from "../../services/UserService";
 export default {
   data() {
     return {
@@ -98,7 +99,7 @@ export default {
           this.$router.push("/data/MySE");
           this.breadcrumbItems = ["MySE"];
           break;
-        case "3":
+        case "3":        
           this.$router.push("/data/Test");
           this.breadcrumbItems = ["Test"];
           break;
@@ -112,6 +113,13 @@ export default {
       return variables;
     },
     logout() {
+       function pp1()
+      {
+          var pp =  UserService.getQRCode()
+          return pp
+      }
+      var ii = pp1()
+      alert(ii)
       this.$router.push({
         name: "login",
       });

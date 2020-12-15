@@ -24,7 +24,7 @@ require('./router')(app)
 sequelize.sync()
   .then(() => {
     console.log('Connection has been established successfully.')
-    app.listen(3000, () => console.log(`Server has been started on port 3000`))
+    app.listen(8081, () => console.log(`Server has been started on port 8081`))
   })
   .catch(err => {
     console.error('Unable to connect to the database:', err)
