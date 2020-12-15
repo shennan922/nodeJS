@@ -35,12 +35,24 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       field: 'URL'
     }
+    ,
+    Status: {
+      type: DataTypes.INTEGER,
+      field: 'Status'
+    }
+    ,
+    OpenID: {
+      type: DataTypes.STRING,
+      field: 'OpenID'
+    }
   },
   {
     sequelize,
     modelName: 'SEList',
     timestamps: false,
-    tableName: "SE_Master"
+    tableName: "SE_Master",
+    createdAt: true,
+    updatedAt: true
   })
   return Model
 }

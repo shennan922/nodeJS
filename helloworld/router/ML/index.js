@@ -1,5 +1,5 @@
 const router = require('express').Router()
 
-router.use('/MLOperation', require('./MLOperation'));
+router.use('/', require('./MLOperation'));
 
 module.exports = router;

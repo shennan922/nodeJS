@@ -1,7 +1,8 @@
 const router = require('express').Router()
 
-router.use('/geo', require('./Geo'));
-router.use('/hospital', require('./Hospital'));
-router.use('/team', require('./Team'));
+router.use('/', require('./Geo'));
+router.use('/', require('./Hospital'));
+router.use('/', require('./Team'));
+router.use('/', require('./Log'));
 
 module.exports = router;
