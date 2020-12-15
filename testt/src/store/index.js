@@ -8,6 +8,7 @@ export default new Vuex.Store({
   state: {
     token: '',
     user: null,
+    wechat:'',
     isUserLogin: false,
     loadingInstance: null
   },
