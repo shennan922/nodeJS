@@ -3,12 +3,13 @@ import store from '../store'
 
 export default {
   async getUserById () {
-    const response = await req.request.get('/users/3')
+
+    const response = await req.request.get('/user/:id')
     return response.data
   },
   async register (data) {
     return await req.request.post(
-      '/users',
+      '/user/',
       data
     )
   },
@@ -18,8 +19,9 @@ export default {
     )
   },
   async login (data) {
+
     const response = await req.request.post(
-      '/user/UserOperation/login',
+      '/user/login',
       data
     )
     return response

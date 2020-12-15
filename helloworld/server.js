@@ -21,7 +21,7 @@ log4.use(app)
 app.use(logger('dev'))
 require('./router')(app)
 
-sequelize.sync()
+sequelize.sync({ alter: true })
   .then(() => {
     console.log('Connection has been established successfully.')
     app.listen(3000, () => console.log(`Server has been started on port 3000`))

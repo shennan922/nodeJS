@@ -5,17 +5,17 @@
           <h3 class="title">Lilly Wechat - SE List
               <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">New SE</el-button>
           </h3>
-          <el-table :model="SEForm" :data="rows1" border style="width: 100%" class="table"
+          <el-table :model="SEForm" :data="getSEList" border style="width: 100%" class="table"
             :row-style="tableRowStyle" :header-cell-style="tableHeaderColor">
             <!-- <el-table-column prop="checkbox">
                 <input type="checkbox" v-model='checked' v-on:click='checkedAll'>{{checked}}
             </el-table-column> -->
             <el-table-column prop="SEID" label="ID"></el-table-column>
-            <el-table-column prop="SeName" label="SEName" ></el-table-column>
+            <el-table-column prop="SEName" label="SEName" ></el-table-column>
             <el-table-column prop="City" label="City"></el-table-column>
             <el-table-column prop="Hospital" label="Hospital"></el-table-column>
             <el-table-column prop="Department" label="Department"></el-table-column>
-            <el-table-column prop="MlName" label="ML"></el-table-column>
+            <el-table-column prop="MLName" label="ML"></el-table-column>
             <el-table-column prop="TeamName" label="Team"></el-table-column>
             <el-table-column label="Operation" width="180">
                 <el-button size="mini" type="primary" round><i class="el-icon-edit"></i>Edit</el-button>
@@ -45,7 +45,7 @@
                 <el-form-item label="ML" prop="MLID">
                   <el-select v-model="AddSEForm.MLID" clearable placeholder="请选择" @change="getMLID($event)">
                     <el-option
-                       v-for="itemML in getMlList.data" :key="itemML.MLID" :label="itemML.MlName" :value="itemML.MLID">
+                       v-for="itemML in getMLList.data" :key="itemML.MLID" :label="itemML.MLName" :value="itemML.MLID">
                     </el-option>
                   </el-select> 
                 </el-form-item>
@@ -96,7 +96,9 @@
 <script src="Content/vue/dist/vue.js"></script>
 
 <script>
-import axios from "axios";
+import SEService from "../../services/SEService";
+import MLService from "../../services/MLService";
+import GeneralService from "../../services/GeneralService";
 
 export default {
   name: "MySE",
@@ -104,174 +106,59 @@ export default {
   // addLoading: false,
   mounted() {
     this.getDetailList();
-    this.getMlListData();
+    this.getMLListData();
     this.getTeamData();
     this.getGeoTreeData();
     this.getHospitalData();
   },
-  getMlListValue:"",
+  getMLListValue:"",
   
   data() {
     return {
-    // value: "",
-    dialogCreateVisible:false, 
-    SEForm: {
-      SEID:"",
-      SeName:"",
-      City: "",
-      Hospital: "",
-      Department: "",
-      MlName: "",
-      TeamName: ""
-    },
-    AddSEForm: {
-      SEId:"",
-      SEName:"",
-      CityID: "",
-      HospitalID: "",
-      DepID: "",
-      MLID: "",
-      TeamID: ""
-    },
-    rows: [],
-    tableLabel: [
-        { label: "SEName", prop: "SEName" },
-        { label: "City", prop: "City" },
-        { label: "Hospital", prop: "Hospital" },
-        { label: "Department", prop: "Department" },
-        { label: "ML", prop: "ML" },
-        { label: "Team", prop: "Team" },
-      ],
-    rows1: [
-        // {
-        //   SEName: "叶枫",
-        //   City: "厦门",
-        //   Hospital: "厦门第一医院",
-        //   Department: "肿瘤内科",
-        //   ML: "张晓冰",
-        //   Team: "ONCO_SOUTH",
-        // },
-        // {
-        //   SEName: "孙学军",
-        //   City: "大连",
-        //   Hospital: "大连医科大学附属第一医院",
-        //   Department: "疼痛科",
-        //   ML: "朱佳",
-        //   Team: "CNS",
-        // },
-    ],
-    getMlList: [
-          // {
-          //   "MLID": "100001",
-          //   "MLName": "王老大"
-          // },
-          // {
-          //   "MLID": "100002",
-          //   "MLName": "王老二"
-          // },
-          // {
-          //   "MLID": "100003",
-          //   "MLName": "王老三"
-          // }
-    ],
-    getTeam: [
-          // {
-          //   "TeamID": "1000010",
-          //   "TeamName": "ONCO"
-          // },
-          // {
-          //   "TeamID": "1000020",
-          //   "TeamName": "DERM"
-          // },
-          // {
-          //   "TeamID": "1000030",
-          //   "TeamName": "CNS"
-          // }
-    ],
-   //  "getHospital":{
-  //     "value":"",
-  //     "NodeDesc":"",
-  //     "data":[
-  //         {
-  //           "level": "1",
-  //           "NodeID": "HOS000001",
-  //           "NodeDesc": "医大一院",
-  //           "ParentNodeID": ""
-  //         },
-  //         {
-  //           "level": "2",
-  //           "NodeID": "HOS000100",
-  //           "NodeDesc": "骨科",
-  //           "ParentNodeID": "HOS000001"
-  //         },
-  //         {
-  //           "level": "2",
-  //           "NodeID": "HOS000101",
-  //           "NodeDesc": "内科",
-  //           "ParentNodeID": "HOS000001"
-  //         },
-  //         {
-  //           "level": "1",
-  //           "NodeID": "HOS000002",
-  //           "NodeDesc": "医大二院",
-  //           "ParentNodeID": ""
-  //         },
-  //         {
-  //           "level": "2",
-  //           "NodeID": " HOS000102",
-  //           "NodeDesc": "耳鼻喉科",
-  //           "ParentNodeID": "HOS000002"
-  //         },
-  //         {
-  //           "level": "2",
-  //           "NodeID": " HOS000103",
-  //           "NodeDesc": "放射科",
-  //           "ParentNodeID": "HOS000002"
-  //         }
-  //   ]
-   //},
-   getHospital:[],
-   getGeoTree:[
-          // {
-          //     "level": "1",
-          //     "NodeID": "CN000001",
-          //     "NodeDesc": "北区",
-          //     "ParentNodeID": "",
-          //     "children": [
-          //         {
-          //             "level": "2",
-          //             "NodeID": "CN000005",
-          //             "NodeDesc": "辽宁省",
-          //             "ParentNodeID": "CN000001",
-          //             "children": [
-          //                 {
-          //                     "level": "3",
-          //                     "NodeID": "CN000100",
-          //                     "NodeDesc": "大连",
-          //                     "ParentNodeID": "CN000005"
-          //                 },
-          //                 {
-          //                     "level": "3",
-          //                     "NodeID": "CN000101",
-          //                     "NodeDesc": "沈阳",
-          //                     "ParentNodeID": "CN000005"
-          //                 }
-          //             ]
-          //         }
-          //     ]
-          // }
-      ],
-    defaultProps: {
+      dialogCreateVisible:false, 
+      SEForm: {
+        SEID:"",
+        SEName:"",
+        City: "",
+        Hospital: "",
+        Department: "",
+        MLName: "",
+        TeamName: ""
+      },
+      AddSEForm: {
+        SEId:"",
+        SEName:"",
+        CityID: "",
+        HospitalID: "",
+        DepID: "",
+        MLID: "",
+        TeamID: ""
+      },
+      rows: [],
+      tableLabel: [
+          { label: "SEName", prop: "SEName" },
+          { label: "City", prop: "City" },
+          { label: "Hospital", prop: "Hospital" },
+          { label: "Department", prop: "Department" },
+          { label: "ML", prop: "ML" },
+          { label: "Team", prop: "Team" },
+        ],
+      getSEList: [],
+      getMLList: [],
+      getTeam: [],
+      getHospital:[],
+      getGeoTree:[],
+      defaultProps: {
         children: "children",
         label: "NodeDesc",
       },
-       MLIDP : "",
-       TeamIDP :"",
-       CityIDP : "",
-       DepIDP : "",
-       HospitalIDP: "",
-       TeamIDTest :"",
-    addSEFormRules: {
+      MLIDP : "",
+      TeamIDP :"",
+      CityIDP : "",
+      DepIDP : "",
+      HospitalIDP: "",
+      TeamIDTest :"",
+      addSEFormRules: {
         SEId: [
           { required: true, message: '请输入SEId', trigger: 'blur'},
           { min: 6, max: 8, message: "长度在 6 到 8 个字符", trigger: "blur" }
@@ -308,35 +195,34 @@ export default {
     handleAdd() {
     this.dialogCreateVisible = true;
       this.AddSEForm = {
-              SEId:"",
-              SEName:"",
-              City: "",
-              Hospital: "",
-              Department: "",
-              ML: "",
-              Team: "",
-              checked:""
+        SEId:"",
+        SEName:"",
+        City: "",
+        Hospital: "",
+        Department: "",
+        ML: "",
+        Team: "",
+        checked:""
       };
     },
 
-    createSubmit() {
+    async createSubmit() {
       this.$refs.AddSEForm.validate((valid) => {
         if (valid) {
-          this.$confirm('确认提交？', '提示', {}).then(() => {
+          this.$confirm('确认提交？', '提示', {}).then(async() => {
             // this.addLoading = true;        
-              axios
-              .post('http://localhost:3008/se/createSE',
-                  {
-                    SEID: this.AddSEForm.SEId,
-                    SeName: this.AddSEForm.SEName,
-                    City: "CN000100",
-                    // City ："CN000100",
-                    Hospital: this.HospitalIDP,
-                    Department: this.DepIDP,
-                    MLName: this.MLIDP,
-                    Team:this.TeamIDP
-                  })
-              .then((res) => {
+            await SEService.SECreate(
+              {
+                SEID: this.AddSEForm.SEId,
+                SEName: this.AddSEForm.SEName,
+                City: "CN000100",
+                // City ："CN000100",
+                Hospital: this.HospitalIDP,
+                Department: this.DepIDP,
+                MLName: this.MLIDP,
+                Team:this.TeamIDP
+              }
+            ).then((res) => {
               // console.log(eval("("+res.data+")"));
               // console.log(addPara);
               // console.log(addPara.author);
@@ -363,34 +249,28 @@ export default {
         }
       })
     },
-    getDetailList() {
-      /*在这里进行跨域请求*/
-      axios
-        .get(
-          "http://localhost:3008/se/getSeList?Name=",
-          {},
+
+    async getDetailList() {
+      await SEService.getSEList(
+          {Name:''},
           { emulateJSON: true }
         )
         .then((res) => {
-          console.log(res.data);
-          this.rows1 = res.data.data;
+          this.getSEList = res.data;
         })
         .catch(function (err) {
           console.log(err);
         });
     },
-    //getMlList
-    getMlListData() {
-      axios
-        .get(
-          "http://localhost:3008/ml/getMlList",
-          {},
+
+    //getMLList
+    async getMLListData() {
+      MLService.getMLList(
           { emulateJSON: true }
         )
         .then((res) => {
-          //console.log(res.data);
-          this.getMlList = res.data;
-          //console.log(res.data.value);
+          console.log(res.data)
+          this.getMLList = res;
         })
         .catch(function (err) {
           console.log(err);
@@ -398,16 +278,11 @@ export default {
     },
     //getTeam
     getTeamData() {
-      axios
-        .get(
-          "http://localhost:3008/general/getTeam",
-          {},
+      GeneralService.getTeam(
           { emulateJSON: true }
         )
         .then((res) => {
-          //console.log(res.data);
-          //console.log(res.data.data);
-          this.getTeam = res.data;
+          this.getTeam = res;
 
         })
         .catch(function (err) {
@@ -416,16 +291,15 @@ export default {
     },
     //getGeoTree
     getGeoTreeData() {
-      axios
-        .get(
-          "http://localhost:3008/general/getGeoTree?Level=&NodeDesc=",
-          {},
+      GeneralService.getGeoTree(
+          {
+            Level:'',
+            NodeDesc:''
+          },
           { emulateJSON: true }
         )
         .then((res) => {
-          //console.log(res.data);
-          //console.log(res.data.data);
-          this.getGeoTree = res.data.data;
+          this.getGeoTree = res.data;
         })
         .catch(function (err) {
           console.log(err);
@@ -433,16 +307,12 @@ export default {
     },
     //getHospital
     getHospitalData() {
-      axios
-        .get(
-          "http://localhost:3008/general/getHospital?City=",
-          {},
+      GeneralService.getHospital(
+          {City:''},
           { emulateJSON: true }
         )
         .then((res) => {
-          console.log(res.data.value);
-          console.log(res.data.data.value);
-          this.getHospital = res.data;
+          this.getHospital = res;
         })
         .catch(function (err) {
           console.log(err);

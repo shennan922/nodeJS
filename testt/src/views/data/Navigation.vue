@@ -64,6 +64,10 @@
                 <i class="el-icon-menu"></i>
                 <span slot="title">Analytics</span>
               </el-menu-item>
+              <el-menu-item index="7">
+                <i class="el-icon-menu"></i>
+                <span slot="title">Log</span>
+              </el-menu-item>
             </el-menu>
           </div>
         </el-col>
@@ -106,6 +110,10 @@ export default {
         case "4":
           this.$router.push("/data/Test");
           this.breadcrumbItems = ["Test"];
+          break;
+        case "7":
+          this.$router.push("/data/Log");
+          this.breadcrumbItems = ["Log"];
           break;
       }
     },

@@ -21,7 +21,9 @@ const setPath = function( list,level,nodeDesc) {
             arr.push(list[j]);         
         }
     }
-    list[i].dataValues.children = arr;
+    if(arr.length > 0){
+      list[i].dataValues.children = arr;
+    }
   }
 
   //如果指定节点, 则只取指定节点以下的层级
