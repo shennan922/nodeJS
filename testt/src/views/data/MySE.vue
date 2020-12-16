@@ -5,14 +5,15 @@
           <h3 class="title">Lilly Wechat - SE List
               <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">New SE</el-button>
           </h3>
-          <el-table :model="SEForm" :data="getSEList" border style="width: 100%" class="table"
-            :row-style="tableRowStyle" :header-cell-style="tableHeaderColor">
+          <el-table :model="SEForm" :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border style="width: 100%" class="table"
+            :row-style="tableRowStyle" :header-cell-style="tableHeaderColor" 
+            @sort-change="changeTableSort">
             <!-- <el-table-column prop="checkbox">
                 <input type="checkbox" v-model='checked' v-on:click='checkedAll'>{{checked}}
             </el-table-column> -->
-            <el-table-column prop="SEID" label="ID"></el-table-column>
+            <el-table-column prop="SEID" label="ID" sortable="custom"></el-table-column>
             <el-table-column prop="SEName" label="SEName" ></el-table-column>
-            <el-table-column prop="City" label="City"></el-table-column>
+            <el-table-column prop="City" label="City" sortable="custom"></el-table-column>
             <el-table-column prop="Hospital" label="Hospital"></el-table-column>
             <el-table-column prop="Department" label="Department"></el-table-column>
             <el-table-column prop="MLName" label="ML"></el-table-column>
@@ -23,6 +24,17 @@
                 <el-button size="mini" type="danger" round><i class="el-icon-delete"></i>Delete</el-button>
             </el-table-column>
           </el-table>
+           <div class="block">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page="pageNum"
+              :page-sizes="[1, 2, 3, 4]"
+              :page-size="pageSize"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total= "getSEList.length">
+            </el-pagination>
+            </div>
         </el-col>
       </el-row>
        <!--增加SE页面-->
@@ -113,9 +125,12 @@ export default {
   },
   getMLListValue:"",
   
+  
   data() {
     return {
       dialogCreateVisible:false, 
+      pageNum:1,
+      pageSize:2,
       SEForm: {
         SEID:"",
         SEName:"",
@@ -185,6 +200,49 @@ export default {
     };
   },
   methods: {
+    changeTableSort(column){
+      console.log(column); 
+      //获取字段名称和排序类型
+      var fieldName = column.prop;
+      var sortingType = column.order;
+
+      //如果字段名称为“创建时间”，将“创建时间”转换为时间戳，才能进行大小比较
+      if(fieldName=="createTime"){
+        this.getSEList.map(item => {
+          item.createTime = this.$moment(item.createTime).valueOf();
+        });
+      }          
+          
+      //按照降序排序
+      if(sortingType == "descending"){
+        this.getSEList = this.getSEList.sort((a, b) => //b[fieldName] - a[fieldName]
+          b[fieldName].localeCompare(a[fieldName])
+        );
+      }
+      //按照升序排序
+      else{
+        this.getSEList = this.getSEList.sort((a, b) => //a[fieldName] - b[fieldName]
+          a[fieldName].localeCompare(b[fieldName])
+        );
+      }
+
+      //如果字段名称为“创建时间”，将时间戳格式的“创建时间”再转换为时间格式
+      if(fieldName=="createTime"){
+        this.getSEList.map(item => {
+          item.createTime = this.$moment(item.createTime).format(
+            "YYYY-MM-DD HH:mm:ss"
+          );
+        });
+      }
+      
+      console.log(this.getSEList);      
+    },
+    handleCurrentChange(pageNum){
+      this.pageNum = pageNum
+    },
+    handleSizeChange(pageSize){
+      this.pageSize = pageSize      
+    },
     tableRowStyle({ row, rowIndex }) {
       return "background-color:;font-size:15px;";
     },
@@ -269,7 +327,6 @@ export default {
           { emulateJSON: true }
         )
         .then((res) => {
-          console.log(res.data)
           this.getMLList = res;
         })
         .catch(function (err) {
