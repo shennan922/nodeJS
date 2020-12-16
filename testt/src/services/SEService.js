@@ -1,20 +1,20 @@
-import request from './index'
+import rep from './index'
 
 export default {
-  async getSEList (data) {
-    const response = await request.get('/se/getList?Name='+data.Name)
+  async getSEList (Name) {
+    const response = await rep.request.get('/se/getList?Name='+Name)
     return response.data
   },
   async SECreate (data) {
-    const response = await request.post('/se/create',data)
+    const response = await rep.request.post('/se/create',data)
     return response.data
   },
   async SEUpdate (data) {
-    const response = await request.get('/se/update',data)
+    const response = await rep.request.get('/se/update',data)
     return response.data
   },
   async SEDelete (data) {
-    const response = await request.get('/se/delete?SEID='+data.SEID)
+    const response = await rep.request.get('/se/delete?SEID='+data.SEID)
     return response.data
   }
 }

@@ -1,77 +1,60 @@
 <template>
-  <div
-    id="test"
-    style="background-color: #ebebeb; min-height: 600px; margin-top: -60px"
-  >
-    <div
-      style="
-        height: 50%;
-        width: 100%;
-        background-color: #242f42;
-        overflow: hidden;
-      "
-    >
-      <span style="float: left; color: white; margin-left: 1%">
-        <img :src="lillyImg" style="width: 160px; height: 70px" />
-      </span>
-
-      <span style="float: right; padding-top: 30px; margin-right: 1%">
-        <el-dropdown trigger="click">
-          <span class="el-dropdown-link" style="color: white">
-            admin<i class="el-icon-caret-bottom el-icon--right"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <!-- <el-dropdown-item>个人信息</el-dropdown-item> -->
-            <el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </span>
-    </div>
-
-    <div>
+  <div class="navigation">
+    <!-- 头部样式 -->
+    <div class="headerStyle">
       <el-row>
         <el-col :span="4">
-          <div style="text-align: left">
-            <el-menu
-              default-active="1"
-              style="min-height: 900px"
-              @select="handleSelect"
-              text-color="#fff"
-              active-text-color="#409EFF"
-              background-color="#304156"
-            >
-              <el-menu-item index="1">
-                <i class="el-icon-menu"></i>
-                <span slot="title">Overview</span>
-              </el-menu-item>
-              <el-menu-item index="2">
-                <i class="el-icon-menu"></i>
-                <span slot="title">MySE</span>
-              </el-menu-item>
-              <el-menu-item index="3">
-                <i class="el-icon-menu"></i>
-                <span slot="title">My Push</span>
-              </el-menu-item>
-              <el-menu-item index="4">
-                <i class="el-icon-menu"></i>
-                <span slot="title">My Content</span>
-              </el-menu-item>
-              <el-menu-item index="5">
-                <i class="el-icon-menu"></i>
-                <span slot="title">Request List</span>
-              </el-menu-item>
-              <el-menu-item index="6">
-                <i class="el-icon-menu"></i>
-                <span slot="title">Analytics</span>
-              </el-menu-item>
-              <el-menu-item index="7">
-                <i class="el-icon-menu"></i>
-                <span slot="title">Log</span>
-              </el-menu-item>
-            </el-menu>
-          </div>
+          <img class="imgStyle" :src="lillyImg"/>
         </el-col>
-        <el-col :span="20">
+        <el-col :span="16">
+          <el-menu default-active="1"
+                  @select="handleSelect"
+                  text-color="#7D879E"
+                  active-text-color="#fff"
+                  background-color="#E6E7E8"
+                  mode="horizontal"
+                >
+                  <el-menu-item index="1">
+                    <!-- <i class="el-icon-menu"></i> -->
+                    <span slot="title">Overview</span>
+                  </el-menu-item>
+                  <el-menu-item index="2">
+                    <span slot="title">MySE</span>
+                  </el-menu-item>
+                  <el-menu-item index="3">
+                    <span slot="title">My Push</span>
+                  </el-menu-item>
+                  <el-menu-item index="4">
+                    <span slot="title">My Content</span>
+                  </el-menu-item>
+                  <el-menu-item index="5">
+                    <span slot="title">Request List</span>
+                  </el-menu-item>
+                  <el-menu-item index="6">
+                    <span slot="title">Analytics</span>
+                  </el-menu-item>
+                  <el-menu-item index="7">
+                    <!-- <i class="el-icon-menu"></i> -->
+                    <span slot="title">Log</span>
+                  </el-menu-item>
+            </el-menu>
+        </el-col>
+        <el-col :span="4">
+          <el-dropdown trigger="click">
+              <div class="headerStyle__logout">
+                admin<i class="el-icon-caret-bottom"></i>
+              </div>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+        </el-col>
+      </el-row>
+    </div> 
+    <!-- 底部样式 -->
+    <div>
+      <el-row>
+        <el-col :span="24">
           <div style="margin-top: 10px">
             <router-view></router-view>
           </div>
@@ -103,14 +86,6 @@ export default {
           this.$router.push("/data/MySE");
           this.breadcrumbItems = ["MySE"];
           break;
-        case "3":        
-          this.$router.push("/data/Test");
-          this.breadcrumbItems = ["Test"];
-          break;
-        case "4":
-          this.$router.push("/data/Test");
-          this.breadcrumbItems = ["Test"];
-          break;
         case "7":
           this.$router.push("/data/Log");
           this.breadcrumbItems = ["Log"];
@@ -136,5 +111,31 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.navigation{
+  background-color: #F6F8FB; 
+  min-height: 600px; 
+  margin-left: 0px;
+margin-top: 0px;
+}
+.headerStyle{
+  height: 40%;
+  width: 100%;
+  background-color:#E6E6EA;
+  overflow: hidden;
+  &__logout {
+    color: #7D879E;
+    text-align:center;
+    padding-top:40%
+  }
+}
+.imgStyle{
+  width: 60%;
+  height: 50px;
+  position: relative;
+}
+.el-menu-item.is-active {
+  background-color: #5A5E6C !important;
+  color: #fff;
+}
 </style>

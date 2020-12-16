@@ -38,21 +38,28 @@
         </el-col>
       </el-row>
        <!--增加SE页面-->
+       <!-- title ="New SE"  -->
       <el-dialog title ="New SE" :visible.sync="dialogCreateVisible">
-        <!-- style = "background-color:#639eda" -->
           <el-form 
           ref="AddSEForm"
           :model="AddSEForm" 
           :rules="addSEFormRules"  
-          label-width="95px">
+          label-width="95px"
+          :label-position="labelPosition"
+          >
             <el-row>
-              <el-col style="width:48%;padding-left:10px">
+              <el-col :span="10" style="margin-left:5%">
+                <!-- style="width:48%;padding-left:10px" -->
                 <h3>General Info</h3>
-                <el-form-item label="SEId" prop="SEId" style="width:93%">
-                  <el-input v-model="AddSEForm.SEId" style="padding-left:10px"></el-input>
+                <el-form-item label="SEId" prop="SEId">
+                  <!-- style="width:93%" -->
+                  <el-input v-model="AddSEForm.SEId" ></el-input>
+                  <!-- style="padding-left:10px" -->
                 </el-form-item>
-                <el-form-item label="New SE" prop="SEName" style="width:93%">
-                  <el-input v-model="AddSEForm.SEName" style="padding-left:10px"></el-input>
+                <el-form-item label="New SE" prop="SEName" >
+                  <!-- style="width:93%" -->
+                  <el-input v-model="AddSEForm.SEName"></el-input>
+                   <!-- style="padding-left:10px" -->
                 </el-form-item>
                 <el-form-item label="ML" prop="MLID">
                   <el-select v-model="AddSEForm.MLID" clearable placeholder="请选择" @change="getMLID($event)">
@@ -69,26 +76,33 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col style="width:48%; float:right">
+              <el-col :span="10" style="margin-left:5%">
+                 <!-- style="width:48%; float:right" -->
                 <h3>Geography</h3>
-                  <el-tree :data="getGeoTree" show-checkbox node-key="NodeId" :props="defaultProps" @change="getCityID($event)">
-                  </el-tree>
+                  <!-- <el-tree :data="getGeoTree" show-checkbox node-key="NodeId" :props="defaultProps" @change="getCityID($event)">
+                  </el-tree> -->
+                  <!-- <el-cascader :options="getGeoTree.data" :show-all-levels="false"></el-cascader> -->
+                  <el-form-item label="City" prop="CityID">
+                    <el-cascader :options="getGeoTree">
+                      <template slot-scope="{ node, data }">
+                        <span>{{ data.NodeDesc }}</span>
+                      </template>
+                    </el-cascader>
+                  </el-form-item>
                 <h3>Hospital</h3>
                 <el-form-item label="Hospital" prop="HospitalID">
                   <el-select v-model="AddSEForm.HospitalID" placeholder="请选择"  @change="getHospitalID($event)">
                     <el-option
-                       v-for="item in getHospital.data"  :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
-                    </el-option>
-                  </el-select>
-                </el-form-item>
-                <!-- v-if="item.level == 1" -->
-                <el-form-item label="Department" prop="DepID">
-                   <el-select v-model="AddSEForm.DepID" placeholder="请选择" @change="getDepID($event)">
-                    <el-option
                        v-for="item in getHospital.data" :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
                     </el-option>
                   </el-select>
-                  <!-- v-if="item.level == 2" -->
+                </el-form-item>
+                <el-form-item label="Department" prop="DepID">
+                   <el-select v-model="AddSEForm.DepID" placeholder="请选择" @change="getDepID($event)">
+                    <el-option
+                       v-for="item in getDepData" :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
+                    </el-option>
+                  </el-select>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -97,7 +111,6 @@
           <div style="margin-right:10px" slot="footer" class="dialog-footer">
             <!-- <el-button @click="createReset">Save Draft</el-button> -->
             <el-button @click.native="createSubmit"  type="primary">Submit</el-button>
-            <!-- :loading="addLoading" -->
          </div>
 
       </el-dialog>
@@ -128,7 +141,9 @@ export default {
   
   data() {
     return {
-      dialogCreateVisible:false, 
+      labelPosition: 'left',
+      dialogCreateVisible:false,
+      getDepData:[],
       pageNum:1,
       pageSize:2,
       SEForm: {
@@ -151,14 +166,14 @@ export default {
       },
       rows: [],
       tableLabel: [
-          { label: "SEName", prop: "SEName" },
-          { label: "City", prop: "City" },
-          { label: "Hospital", prop: "Hospital" },
-          { label: "Department", prop: "Department" },
-          { label: "ML", prop: "ML" },
-          { label: "Team", prop: "Team" },
-        ],
-      getSEList: [],
+        { label: "SEName", prop: "SEName" },
+        { label: "City", prop: "City" },
+        { label: "Hospital", prop: "Hospital" },
+        { label: "Department", prop: "Department" },
+        { label: "ML", prop: "ML" },
+        { label: "Team", prop: "Team" },
+      ],
+      getSEList:[],
       getMLList: [],
       getTeam: [],
       getHospital:[],
@@ -281,11 +296,10 @@ export default {
                 Team:this.TeamIDP
               }
             ).then((res) => {
-              // console.log(eval("("+res.data+")"));
-              // console.log(addPara);
-              // console.log(addPara.author);
+                // if (res === '500 '){
+                //   alert("111");
+                // } 
               console.log(res.data);
-              // this.addLoading = false;
               this.$message({
                 type: 'success',
                 message: '提交成功!'
@@ -308,30 +322,25 @@ export default {
       })
     },
 
-    async getDetailList() {
-      await SEService.getSEList(
-          {Name:''},
-          { emulateJSON: true }
-        )
+    getDetailList() {
+      SEService.getSEList("")
         .then((res) => {
           this.getSEList = res.data;
         })
-        .catch(function (err) {
-          console.log(err);
-        });
+        // .catch(function (err) {
+        //   console.log("err"+err);
+        // });
     },
 
     //getMLList
-    async getMLListData() {
-      MLService.getMLList(
-          { emulateJSON: true }
-        )
+    getMLListData() {
+      MLService.getMLList()
         .then((res) => {
           this.getMLList = res;
         })
-        .catch(function (err) {
-          console.log(err);
-        });
+        // .catch(function (err) {
+        //   console.log(err);
+        // });
     },
     //getTeam
     getTeamData() {
@@ -357,6 +366,7 @@ export default {
         )
         .then((res) => {
           this.getGeoTree = res.data;
+          console.log("tree:" + res.data.data);
         })
         .catch(function (err) {
           console.log(err);
@@ -390,6 +400,18 @@ export default {
     },
     getHospitalID(event){
       this.HospitalIDP = event;
+      this.getDepData=[];
+      // for(var i=0;i<=this.getHospital.data.length;i++){
+      //   if(this.getHospital.data[i].ParentNodeID== event){
+      //       this.getDepData.push(this.getHospital.data[i]);
+      //   }
+      // }
+      for(var item of this.getHospital.data){
+        var parentId=item.ParentNodeID;
+        if(parentId == event){
+          this.getDepData.push(item);
+        }
+      }
     },
   }
 };
@@ -397,6 +419,7 @@ export default {
 
 <style  lang="scss" scoped>
 @import "@/styles/table.scss";
+
 .title{
     width:100%;
     height:50px;
@@ -427,22 +450,21 @@ export default {
     color:#fff;
     font-weight:400;
   }
-.el-table th >>> {
-    background: #344067;
-  }
-  .bg_red{background: rgb(252, 108, 56);}
-
-.wrap /deep/ .child-wrap {
-    color: red 
-  }
   div.el-dialog {
-  margin: 0 auto !important;
-  top: 50%;
-  transform: translateY(-50%);
-  .el-dialog__header{  
-    background: #0f0f0f;
-    text-align: left;   
-    font-weight: 600;
+   margin: 0 auto !important;
+  // top: 50%;
+  // transform: translateY(-50%);
+  // .el-dialog__header{  
+  //   background: #0f0f0f;
+  //   text-align: left;   
+  //   font-weight: 600;
+  // }
+}
+.el-dialog{
+   margin: 0 auto !important;
+   .el-dialog__header{
+      background-color: #B3EBF5
   }
 }
+
 </style>

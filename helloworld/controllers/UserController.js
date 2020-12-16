@@ -132,9 +132,9 @@ module.exports = {
       })
       let isValidPassword = comparePassword(user,req.body.password)
       if (isValidPassword) {
-        var publicKey = new NodeRSA(config.keys.privateKey);
-        var wechatEncrypted = publicKey.encrypt(config.wechat.appID+'&'+Date.now(), 'base64');
-        wechatEncrypted = urlencode(wechatEncrypted)
+        var publicKey = new NodeRSA(config.keys.publicKey);
+         var wechatEncrypted = publicKey.encrypt(config.wechat.appID+'&'+Date.now(), 'base64');
+         wechatEncrypted = urlencode(wechatEncrypted)
         res.send({
           code: 200,
           user: {
