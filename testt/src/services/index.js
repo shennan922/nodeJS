@@ -4,11 +4,19 @@ import 'nprogress/nprogress.css'
 // import { Loading } from 'element-ui'
 import store from '../store'
 
+const req ={}
 const request = axios.create({
   baseURL: '/api',
   headers: {
     showLoading: true,
     Authorization: `Bearer ${store.state.token}`
+  }
+})
+
+const wechatrequest = axios.create({
+  baseURL: '/wechat',
+  headers: {
+   
   }
 })
 /*const requestMock = axios.create({
@@ -41,5 +49,6 @@ request.interceptors.response.use(response => {
   // loadingInstance.close()
   return Promise.reject(error)
 })
-
-export default request
+req.request = request
+req.wechatrequest = wechatrequest
+export default req

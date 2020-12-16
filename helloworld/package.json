@@ -21,6 +21,7 @@
     "node-rsa": "^1.1.1",
     "sequelize": "^6.3.5",
     "sqlite3": "^5.0.0",
-    "tedious": "^9.2.1"
+    "tedious": "^9.2.1",
+    "urlencode": "^1.1.0"
   }
 }

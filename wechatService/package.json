@@ -20,8 +20,11 @@
     "jsonwebtoken": "^8.5.1",
     "log4js": "^6.3.0",
     "morgan": "~1.9.1",
+    "node-rsa": "^1.1.1",
     "sequelize": "^6.3.5",
     "sqlite3": "^5.0.0",
-    "tedious": "^9.2.1"
+    "tedious": "^9.2.1",
+    "urlencode": "^1.1.0",
+    "xml2js": "^0.4.23"
   }
 }
