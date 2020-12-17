@@ -2,7 +2,7 @@
   <div>
       <el-row>
         <el-col :span="24">
-          <h3 class="title" style="margin-top:0px">Lilly Wechat - SE List
+          <h3 class="title" >Lilly Wechat - SE List
               <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">New SE</el-button>
           </h3>
           <el-table :model="SEForm" :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border style="width: 100%" class="table"
@@ -47,8 +47,8 @@
           :label-position="labelPosition"
           >
             <el-row>
-              <el-col :span="10" style="margin-left:5%">
-                <h3>General Info</h3>
+              <el-col :span="10" class="el-col_NewSE">
+                <h2 class="h2title">General Info</h2>
                 <el-form-item label="SEId" prop="SEId">
                   <el-input v-model="AddSEForm.SEId" ></el-input>
                 </el-form-item>
@@ -70,23 +70,17 @@
                   </el-select>
                 </el-form-item>
               </el-col>
-              <el-col :span="10" style="margin-left:5%">
-                <h3>Geography</h3>
-                  <!-- <el-tree :data="getGeoTree" show-checkbox node-key="NodeId" :props="defaultProps" @change="getCityID($event)">
-                  </el-tree> -->
-                  <!-- <el-cascader :options="getGeoTree.data" :show-all-levels="false"></el-cascader> -->
+              <el-col :span="10" class="el-col_NewSE">
+                <h2 class="h2title">Geography</h2>
                   <el-form-item label="City" prop="CityID">
-                    <el-cascader :options="getGeoTree">
-                      <template slot-scope="{ node, data }">
-                        <span>{{ data.NodeDesc }}</span>
-                      </template>
+                    <el-cascader :options="getGeoTree" v-model="AddSEForm.CityID" :props="defaultProps" @change="getCityID">
                     </el-cascader>
                   </el-form-item>
-                <h3>Hospital</h3>
+                <h2 class="h2">Hospital</h2>
                 <el-form-item label="Hospital" prop="HospitalID">
                   <el-select v-model="AddSEForm.HospitalID" placeholder="请选择"  @change="getHospitalID($event)">
                     <el-option
-                       v-for="item in getHospital.data" :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
+                       v-for="item in getHosData" :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
                     </el-option>
                   </el-select>
                 </el-form-item>
@@ -136,6 +130,7 @@ export default {
       labelPosition: 'left',
       dialogCreateVisible:false,
       getDepData:[],
+      getHosData:[],
       pageNum:1,
       pageSize:8,
       SEForm: {
@@ -157,14 +152,6 @@ export default {
         TeamID: ""
       },
       rows: [],
-      tableLabel: [
-        { label: "SEName", prop: "SEName" },
-        { label: "City", prop: "City" },
-        { label: "Hospital", prop: "Hospital" },
-        { label: "Department", prop: "Department" },
-        { label: "ML", prop: "ML" },
-        { label: "Team", prop: "Team" },
-      ],
       getSEList:[],
       getMLList: [],
       getTeam: [],
@@ -173,7 +160,10 @@ export default {
       defaultProps: {
         children: "children",
         label: "NodeDesc",
+        value:"NodeID",
       },
+      selectedOptions: [],
+      seletedhosValue:[],
       MLIDP : "",
       TeamIDP :"",
       CityIDP : "",
@@ -195,7 +185,7 @@ export default {
           { required: true, message: '请选择Team', trigger: 'change'}
         ],
         CityID: [
-          { required: true, message: '请选择所在城市', trigger: 'change'}
+          { required: true, message: '请选择所在城市', trigger: 'blur'}
         ],
         HospitalID: [
           { required: true, message: '请选择所在医院', trigger: 'change'}
@@ -262,7 +252,7 @@ export default {
       this.AddSEForm = {
         SEId:"",
         SEName:"",
-        City: "",
+        CityID: "",
         Hospital: "",
         Department: "",
         ML: "",
@@ -274,28 +264,31 @@ export default {
     async createSubmit() {
       this.$refs.AddSEForm.validate((valid) => {
         if (valid) {
-          this.$confirm('确认提交？', '提示', {}).then(async() => {
-            // this.addLoading = true;        
+          this.$confirm('确认提交？', '提示', {}).then(async() => {       
             await SEService.SECreate(
               {
                 SEID: this.AddSEForm.SEId,
                 SEName: this.AddSEForm.SEName,
-                City: "CN000100",
-                // City ："CN000100",
+                City: this.CityIDP,
                 Hospital: this.HospitalIDP,
                 Department: this.DepIDP,
                 MLName: this.MLIDP,
                 Team:this.TeamIDP
               }
             ).then((res) => {
-                // if (res.code === '400 '){
-                //   alert("111");
-                // } 
-              console.log(res.data);
-              this.$message({
-                type: 'success',
-                message: '提交成功!'
-              });
+              if (res.code == 400){
+                this.$message({
+                  type: 'info',
+                  message: res.message
+                });
+              } 
+              if (res.code == 200){
+                this.$message({
+                  type: 'success',
+                  message: '提交成功!'
+                });
+
+              }
               this.dialogCreateVisible = false;
               this.getDetailList();
               // this.reload();
@@ -320,9 +313,9 @@ export default {
         .then((res) => {
           this.getSEList = res.data;
         })
-        // .catch(function (err) {
-        //   console.log("err"+err);
-        // });
+        .catch(function (err) {
+          console.log("err"+err);
+        });
     },
 
     //getMLList
@@ -331,9 +324,9 @@ export default {
         .then((res) => {
           this.getMLList = res;
         })
-        // .catch(function (err) {
-        //   console.log(err);
-        // });
+        .catch(function (err) {
+          console.log(err);
+        });
     },
     //getTeam
     getTeamData() {
@@ -359,7 +352,6 @@ export default {
         )
         .then((res) => {
           this.getGeoTree = res.data;
-          console.log("tree:" + res.data.data);
         })
         .catch(function (err) {
           console.log(err);
@@ -385,20 +377,26 @@ export default {
       this.TeamIDTest = event;
       this.TeamIDP = event;
     },
-    getCityID(event){
-      this.CityIDP = event;
-    },
-    getDepID(event){
-      this.DepIDP = event;
+    getCityID(NodeID){
+      this.CityIDP = NodeID[2];
+      this.getHosData = [];
+        for(var item of this.getHospital.data){
+          var cityId=item.CityID;
+          var level=item.Level;
+          if(cityId == this.CityIDP && level == 1){
+            this.getHosData.push(item);
+          }
+        }
+        if(this.HospitalIDP==""){
+        }
+        else{
+            this.AddSEForm.HospitalID = "";
+            this.AddSEForm.DepID = "";
+        }
     },
     getHospitalID(event){
       this.HospitalIDP = event;
       this.getDepData=[];
-      // for(var i=0;i<=this.getHospital.data.length;i++){
-      //   if(this.getHospital.data[i].ParentNodeID== event){
-      //       this.getDepData.push(this.getHospital.data[i]);
-      //   }
-      // }
       for(var item of this.getHospital.data){
         var parentId=item.ParentNodeID;
         if(parentId == event){
@@ -406,13 +404,14 @@ export default {
         }
       }
     },
+    getDepID(event){
+      this.DepIDP = event;
+    },
   }
 };
 </script>
 
 <style  lang="scss" scoped>
-@import "@/styles/table.scss";
-
 .title{
     width:100%;
     height:40px;
@@ -421,6 +420,7 @@ export default {
     color: white;
     border:  #2daaf3;
     padding-top: 20px;
+    margin-top:0px;
 }
 .NewButton{
     background-color:#639eda;
@@ -428,22 +428,33 @@ export default {
     color: white;
     float: right;
     margin-top: -10px;
+    margin-right:1%;
+    font-weight:bold;
 }
-
-.tableStyle{
-    @include table_format;
-    background-color: #98c9fa!important;
-    color:#fff;
-    font-weight:400;
-  }
-
-/deep/.dialogSE .el-dialog__header{
-  // text-align: left;
-  color:#fff;
+/deep/.dialogSE{
+  .el-dialog__header{
+  text-align: left;
+  padding-left:7%;
   background-color: #498CDF,
-}
+  };
+  .el-dialog__title{
+    color:#fff;
+  };
+  .el-dialog__close{
+    color:#fff;
+  }
+  .h2{
+    padding-top:9%;
+    text-align:left;
+  }
+  .h2title{
+    text-align:left
+  }
+} 
 .block{
   padding-top: 10px;
 }
-
+.el-col_NewSE{
+  margin-left:5%;
+}
 </style>

@@ -98,7 +98,7 @@ module.exports = {
   async create (req, res) {
     try {
       if(await SEList.findOne({where: {SEID:req.body.SEID}})){
-        res.status(400).send({
+        res.status(200).send({
           code: 400,
           message: 'SE ID已经存在'
         })

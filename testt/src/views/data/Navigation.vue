@@ -3,10 +3,10 @@
     <!-- 头部样式 -->
     <div class="headerStyle">
       <el-row>
-        <el-col :span="4">
+        <el-col :span="3">
           <img class="imgStyle" :src="lillyImg"/>
         </el-col>
-        <el-col :span="18">
+        <el-col :span="19">
           <el-menu :default-active = 'defaultTab'
                   @select="handleSelect"
                   text-color="#7D879E"
@@ -50,7 +50,7 @@
             </el-dropdown>
         </el-col>
       </el-row>
-    </div> 
+    </div>
     <!-- 底部样式 -->
     <div class="buttomStyle">
       <el-row>
