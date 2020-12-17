@@ -6,19 +6,19 @@
         <el-col :span="4">
           <img class="imgStyle" :src="lillyImg"/>
         </el-col>
-        <el-col :span="16">
-          <el-menu default-active="1"
+        <el-col :span="18">
+          <el-menu :default-active = 'defaultTab'
                   @select="handleSelect"
                   text-color="#7D879E"
                   active-text-color="#fff"
                   background-color="#E6E7E8"
                   mode="horizontal"
                 >
-                  <el-menu-item index="1">
+                  <el-menu-item index="Test">
                     <!-- <i class="el-icon-menu"></i> -->
                     <span slot="title">Overview</span>
                   </el-menu-item>
-                  <el-menu-item index="2">
+                  <el-menu-item index="MySE">
                     <span slot="title">MySE</span>
                   </el-menu-item>
                   <el-menu-item index="3">
@@ -33,13 +33,13 @@
                   <el-menu-item index="6">
                     <span slot="title">Analytics</span>
                   </el-menu-item>
-                  <el-menu-item index="7">
+                  <el-menu-item index="Log">
                     <!-- <i class="el-icon-menu"></i> -->
                     <span slot="title">Log</span>
                   </el-menu-item>
             </el-menu>
         </el-col>
-        <el-col :span="4">
+        <el-col :span="2">
           <el-dropdown trigger="click">
               <div class="headerStyle__logout">
                 admin<i class="el-icon-caret-bottom"></i>
@@ -52,10 +52,10 @@
       </el-row>
     </div> 
     <!-- 底部样式 -->
-    <div>
+    <div class="buttomStyle">
       <el-row>
         <el-col :span="24">
-          <div style="margin-top: 10px">
+          <div>
             <router-view></router-view>
           </div>
         </el-col>
@@ -72,23 +72,38 @@ export default {
       searchCriteria: "",
       breadcrumbItems: ["导航一"],
       lillyImg: require("@/assets/Lilly.png"),
+      defaultTab: ""
     };
   },
 
+  mounted () {
+    this.getRouter()
+  },
+
   methods: {
+    getRouter () {
+      const url = window.location.href;
+      var index = url.lastIndexOf("/");
+      var primaryKey = url.substring(index + 1,url.length);
+      this.handleSelect(primaryKey)
+    },
     handleSelect(key) {
+      this.defaultTab = key
       switch (key) {
-        case "1":
+        case "Test":
           this.$router.push("/data/Test");
           this.breadcrumbItems = ["Test"];
           break;
-        case "2":
+        case "MySE":
           this.$router.push("/data/MySE");
           this.breadcrumbItems = ["MySE"];
           break;
-        case "7":
+        case "Log":
           this.$router.push("/data/Log");
           this.breadcrumbItems = ["Log"];
+          break;
+        case "Navigation":
+          this.$router.push("/data/Test");
           break;
       }
     },
@@ -114,9 +129,8 @@ export default {
 <style scoped lang="scss">
 .navigation{
   background-color: #F6F8FB; 
-  min-height: 600px; 
   margin-left: 0px;
-margin-top: 0px;
+  margin-top: 0px;
 }
 .headerStyle{
   height: 40%;
@@ -126,12 +140,15 @@ margin-top: 0px;
   &__logout {
     color: #7D879E;
     text-align:center;
-    padding-top:40%
+    padding-top:40%;
   }
+}
+.buttomStyle{
+  margin-top:5px
 }
 .imgStyle{
   width: 60%;
-  height: 50px;
+  height: 55px;
   position: relative;
 }
 .el-menu-item.is-active {

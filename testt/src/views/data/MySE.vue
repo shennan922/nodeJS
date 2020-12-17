@@ -2,44 +2,43 @@
   <div>
       <el-row>
         <el-col :span="24">
-          <h3 class="title">Lilly Wechat - SE List
+          <h3 class="title" style="margin-top:0px">Lilly Wechat - SE List
               <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">New SE</el-button>
           </h3>
           <el-table :model="SEForm" :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border style="width: 100%" class="table"
-            :row-style="tableRowStyle" :header-cell-style="tableHeaderColor" 
+            :header-cell-style="tableHeaderColor" 
             @sort-change="changeTableSort">
             <!-- <el-table-column prop="checkbox">
                 <input type="checkbox" v-model='checked' v-on:click='checkedAll'>{{checked}}
             </el-table-column> -->
-            <el-table-column prop="SEID" label="ID" sortable="custom"></el-table-column>
-            <el-table-column prop="SEName" label="SEName" ></el-table-column>
-            <el-table-column prop="City" label="City" sortable="custom"></el-table-column>
-            <el-table-column prop="Hospital" label="Hospital"></el-table-column>
-            <el-table-column prop="Department" label="Department"></el-table-column>
-            <el-table-column prop="MLName" label="ML"></el-table-column>
-            <el-table-column prop="TeamName" label="Team"></el-table-column>
-            <el-table-column label="Operation" width="180">
+            <el-table-column min-width="15%" prop="SEID" label="ID" sortable="custom"></el-table-column>
+            <el-table-column min-width="15%" prop="SEName" label="SEName" ></el-table-column>
+            <el-table-column min-width="15%" prop="City" label="City" sortable="custom"></el-table-column>
+            <el-table-column min-width="15%" prop="Hospital" label="Hospital"></el-table-column>
+            <el-table-column min-width="15%" prop="Department" label="Department"></el-table-column>
+            <el-table-column min-width="15%" prop="MLName" label="ML"></el-table-column>
+            <el-table-column min-width="15%" prop="TeamName" label="Team"></el-table-column>
+            <el-table-column min-width="25%" label="Operation">
                 <el-button size="mini" type="primary" round><i class="el-icon-edit"></i>Edit</el-button>
                 <el-button size="mini">QR Code</el-button>
                 <el-button size="mini" type="danger" round><i class="el-icon-delete"></i>Delete</el-button>
             </el-table-column>
           </el-table>
-           <div class="block">
+          <div class="block">
             <el-pagination
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="pageNum"
-              :page-sizes="[1, 2, 3, 4]"
+              :page-sizes="[1, 2, 4, 8, 10]"
               :page-size="pageSize"
               layout="total, sizes, prev, pager, next, jumper"
               :total= "getSEList.length">
             </el-pagination>
-            </div>
+          </div>
         </el-col>
       </el-row>
        <!--增加SE页面-->
-       <!-- title ="New SE"  -->
-      <el-dialog title ="New SE" :visible.sync="dialogCreateVisible">
+      <el-dialog title ="New SE" :visible.sync="dialogCreateVisible" class="dialogSE">
           <el-form 
           ref="AddSEForm"
           :model="AddSEForm" 
@@ -49,17 +48,12 @@
           >
             <el-row>
               <el-col :span="10" style="margin-left:5%">
-                <!-- style="width:48%;padding-left:10px" -->
                 <h3>General Info</h3>
                 <el-form-item label="SEId" prop="SEId">
-                  <!-- style="width:93%" -->
                   <el-input v-model="AddSEForm.SEId" ></el-input>
-                  <!-- style="padding-left:10px" -->
                 </el-form-item>
                 <el-form-item label="New SE" prop="SEName" >
-                  <!-- style="width:93%" -->
                   <el-input v-model="AddSEForm.SEName"></el-input>
-                   <!-- style="padding-left:10px" -->
                 </el-form-item>
                 <el-form-item label="ML" prop="MLID">
                   <el-select v-model="AddSEForm.MLID" clearable placeholder="请选择" @change="getMLID($event)">
@@ -77,7 +71,6 @@
                 </el-form-item>
               </el-col>
               <el-col :span="10" style="margin-left:5%">
-                 <!-- style="width:48%; float:right" -->
                 <h3>Geography</h3>
                   <!-- <el-tree :data="getGeoTree" show-checkbox node-key="NodeId" :props="defaultProps" @change="getCityID($event)">
                   </el-tree> -->
@@ -107,9 +100,7 @@
               </el-col>
             </el-row>
           </el-form>
-           <!-- slot="footer" class="dialog-footer" right -->
           <div style="margin-right:10px" slot="footer" class="dialog-footer">
-            <!-- <el-button @click="createReset">Save Draft</el-button> -->
             <el-button @click.native="createSubmit"  type="primary">Submit</el-button>
          </div>
 
@@ -126,6 +117,7 @@ import MLService from "../../services/MLService";
 import GeneralService from "../../services/GeneralService";
 
 export default {
+  inject:['reload'],
   name: "MySE",
   dialogCreateVisible: false,
   // addLoading: false,
@@ -145,7 +137,7 @@ export default {
       dialogCreateVisible:false,
       getDepData:[],
       pageNum:1,
-      pageSize:2,
+      pageSize:8,
       SEForm: {
         SEID:"",
         SEName:"",
@@ -296,7 +288,7 @@ export default {
                 Team:this.TeamIDP
               }
             ).then((res) => {
-                // if (res === '500 '){
+                // if (res.code === '400 '){
                 //   alert("111");
                 // } 
               console.log(res.data);
@@ -305,7 +297,8 @@ export default {
                 message: '提交成功!'
               });
               this.dialogCreateVisible = false;
-              //this.getUsers();
+              this.getDetailList();
+              // this.reload();
               console.log("successful");
             })
           }).catch(() => {
@@ -422,49 +415,35 @@ export default {
 
 .title{
     width:100%;
-    height:50px;
+    height:40px;
     background-color:#639eda;
     text-align: left;
     color: white;
     border:  #2daaf3;
+    padding-top: 20px;
 }
 .NewButton{
     background-color:#639eda;
     text-align: right;
     color: white;
     float: right;
+    margin-top: -10px;
 }
-.myTable {
-  border-collapse: collapse;
-  margin: 0 auto;
-  text-align: center;
-  border: 2px solid #eaeaea;
-}
-.table th {
-  background-color: #eeecec;
-  color: #0c0c0c;
-}
+
 .tableStyle{
     @include table_format;
     background-color: #98c9fa!important;
     color:#fff;
     font-weight:400;
   }
-  div.el-dialog {
-   margin: 0 auto !important;
-  // top: 50%;
-  // transform: translateY(-50%);
-  // .el-dialog__header{  
-  //   background: #0f0f0f;
-  //   text-align: left;   
-  //   font-weight: 600;
-  // }
+
+/deep/.dialogSE .el-dialog__header{
+  // text-align: left;
+  color:#fff;
+  background-color: #498CDF,
 }
-.el-dialog{
-   margin: 0 auto !important;
-   .el-dialog__header{
-      background-color: #B3EBF5
-  }
+.block{
+  padding-top: 10px;
 }
 
 </style>
