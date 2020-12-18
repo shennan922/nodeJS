@@ -19,9 +19,17 @@
             <el-table-column min-width="15%" prop="MLName" label="ML"></el-table-column>
             <el-table-column min-width="15%" prop="TeamName" label="Team"></el-table-column>
             <el-table-column min-width="25%" label="Operation">
-                <el-button size="mini" type="primary" round><i class="el-icon-edit"></i>Edit</el-button>
-                <el-button size="mini">QR Code</el-button>
-                <el-button size="mini" type="danger" round><i class="el-icon-delete"></i>Delete</el-button>
+                <template slot-scope="scope">
+                  <el-button size="mini" type="primary" right-padding="20px" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
+                  <el-popover
+                    placement="right"
+                    width="200"
+                    trigger="click">
+                    <el-image :src="QRurl"  style="background: rgb(255, 255, 255); width: 200px; display: inline-block; min-height: 200px;" date-qrid="245092"></el-image>
+                    <el-button size="mini" slot="reference" type="info" @click="generateQR"  plain ><i class="el-icon-picture-outline"></i>QR Code</el-button>
+                  </el-popover>
+                  <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain><i class="el-icon-delete"></i>Delete</el-button>
+                </template>
             </el-table-column>
           </el-table>
           <div class="block">
@@ -138,6 +146,7 @@ export default {
       getDepData:[],
       pageNum:1,
       pageSize:8,
+      QRurl:'',
       SEForm: {
         SEID:"",
         SEName:"",
@@ -207,6 +216,12 @@ export default {
     };
   },
   methods: {
+    async generateQR(){
+
+      //this.QRurl = await SEService.generateQR('ayKoHfkba6yaGDHo4vSbcMoXgY6u%2F5P7Zt86IjT%2Bc829cKWpUqbNqKg%2B7Yo%2BmezNhwtNWHFNP%2FKlc1UlxEYzpP9EKcvmC%2F7Y9d0CcR5Je7tAIg4yU5oG1DcaMwXyr03R87%2BwMxzRzVHEYq%2F633iR7M0mcV1bbm9oxU%2BG0qw5sVc%3D')
+      this.QRurl = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQHB7zwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyWl91b2dTQm9jTEYxVGpEQjF2Y24AAgRTLdxfAwSAOgkA'
+
+    },
     changeTableSort(column){
       console.log(column); 
       //获取字段名称和排序类型
@@ -269,6 +284,36 @@ export default {
         Team: "",
         checked:""
       };
+    },
+    handleEdit(row) {
+    this.dialogCreateVisible = true;
+      this.AddSEForm = {
+        SEId:row.SEID,
+        SEName:row.SEName,
+        City: '',
+        Hospital: row.Hospital,
+        Department: row.Department,
+        ML: this.getMLList.find(MLName => MLName = row.MLName) ,
+        Team: row.TeamName,
+        checked:""
+      };
+    },
+    handleDelete(SEID){
+      SEService.SEDelete({SEID:SEID}).then((res) => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        });
+        this.dialogCreateVisible = false;
+        this.getDetailList();
+        // this.reload();
+        console.log("successful");
+      }).catch((error) => {
+        this.$message({
+          type: 'info',
+          message: '已取消新增'+error
+        });
+      })
     },
 
     async createSubmit() {
