@@ -29,22 +29,19 @@ async function updateAccessToken (appId,appSecret)
   }
  
 }
-async function getAccessToken (wechat)
+async function getAccessToken (timestamp,appId)
 {
   try
   {
     // wechat = 'V4AN5dTnfjdedsKPrtBsRFdEUJFVs48aiYSalrL3w1x6dhoimXralgylULYrisCb5cO62+86ywj+T810FOC+SDgI4ZFYnT4PNcOoc1HqV3XB2ES6htB3NTu1bai1YfprSs0CQe25JAH6HXAsCg9GDlAbGmk6xBJn95RM8WLVmhk='
-     wechat = urlencode.decode(wechat,'utf8')
-     var privateKey = new NodeRSA(config.keys.privateKey);
-     decrypted = privateKey.decrypt(wechat, 'utf8');
-     var arr = decrypted.split("&");
-     if(Date.now()-arr[1]>7200*1000)
+    
+     if(Date.now()-timestamp>7200*1000)
      {
        return ''
      }
      else
      {
-       const app = await db.APPList.findByPk(arr[0])
+       const app = await db.APPList.findByPk(appId)
        return app.APPToken
      }
   }
@@ -67,8 +64,13 @@ module.exports = {
   async getQRCode (req, res) {
     try {
      // await updateAccessToken(config.appInfo.appid,config.appInfo.secret)
-      var token = await getAccessToken(req.query.wechat)
-      data = {"expire_seconds": 604800, "action_name": "QR_STR_SCENE", "action_info": {"scene": {"scene_str": "test"}}}
+      var wechat = req.query.wechat
+      wechat = urlencode.decode(wechat,'utf8')
+      var privateKey = new NodeRSA(config.keys.privateKey);
+      decrypted = privateKey.decrypt(wechat, 'utf8');
+      var arr = decrypted.split("&");
+      var token = await getAccessToken(arr[1],arr[0])
+      data = {"expire_seconds": config.appInfo.expire_seconds, "action_name": "QR_STR_SCENE", "action_info": {"scene": {"scene_str": arr[2]}}}
       ticket =await axios.post(`${config.appInfo.wxapi}/qrcode/create?access_token=${token}`,data, function (error, response, body) {
         if(error!==null){
           reject("获取access_token失败 检查getAccessToken函数");
@@ -175,7 +177,18 @@ module.exports = {
 			resolve(JSON.parse(body));
 		});
 	   res.send(wtoken.data)
-	}
-  
+	},
+  async updateAllTokens()
+  {
+    try{
+      var apps = await db.APPList.findAll()
+      apps.forEach(app => 
+        {
+          updateAccessToken(app.APPID,app.APPSecret)
+        })
+    }catch(error){
+      logger.logger.error("update access tokens error: "+error.message) 
+    }
+  }
 
 }
