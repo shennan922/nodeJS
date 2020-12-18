@@ -5,14 +5,13 @@
     <el-container >
         <el-header style="text-align: right; font-size: 12px">
           <el-date-picker
-            v-model="value1"
             type="datetime"
             placeholder="选择日期时间">
           </el-date-picker>
         </el-header>
         <el-container>
           <el-aside width="100px" :span = "1" style="background-color: rgb(238, 241, 246)">
-            <el-menu @click="handleAdd">
+            <el-menu @select="typeSearch">
               <el-menu-item index="1">
                 <template slot="title">INFO</template>                  
               </el-menu-item>
@@ -43,28 +42,34 @@ import LogService from "../../services/LogService";
 
 export default {
   name: "Log",
-  dialogCreateVisible: false,
-  // addLoading: false,
   mounted() {
     this.getLog();
    },
-  getMlListValue:"",
+
   
   data() {
     return {
-    dialogCreateVisible:false, 
     LogForm: {
-      recordCount:"",
-      type:"",
-      logTime: "",
-      logLevel: "",
-      logContent: ""
+      log:""
     },
     tableLabel: [
         { prop: "log", label: "Content" }
       ],
     row: []
     };
+  },
+  computed:{
+    row: function() {
+      var search = '[INFO]'//this.search
+      if (search) {
+        return this.row.filter(function(dataNews) {
+          return Object.keys(dataNews).some(function(key) {
+            return String(dataNews[key]).includes(search)
+          })
+        })
+      }
+      return this.row   //返回过滤完的数据
+    }
   },
   methods: {
     tableRowStyle({ row, rowIndex }) {
@@ -74,31 +79,22 @@ export default {
     tableHeaderColor({ row, column, rowIndex, columnIndex }) {
       return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left";
     },
-    tables: function() {
-      console/log('1111111111111')
-      var search = '[INFO]'//this.search
-      if (search) {
-        return this.data.filter(function(dataNews) {
-          return Object.keys(dataNews).some(function(key) {
-            return String(dataNews[key]).includes(SVGPathSegCurvetoQuadraticSmoothRel)
-          })
-        })
-      }
-      return this.data   //返回过滤完的数据
+    
+    typeSearch(){      
+      var result = this.row.filter(function (e) { return e.log.includes('INFO')})
+          LogForm.data = result
     },
 
 
     
     async getLog() {
-      /*在这里进行跨域请求*/
-      const response = await LogService.getLog({
+      await LogService.getLog({
         date: '2020-12-10',
         type: '',
         operation: 'search',
         logReadFlag: '0'
       }).then((res) => {
         this.row = res.log;
-        console.log(res.log)
       })
       .catch(function (err) {
         console.log(err);

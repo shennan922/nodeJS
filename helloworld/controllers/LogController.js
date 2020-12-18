@@ -27,16 +27,20 @@ module.exports = {
         var logReadFlag = req.query.logReadFlag
         var countResult = 0;
         //对日志结果进行统计
-        var logPath = '..//logs//'+'server-.'+date+'.log';
+        var logPath = './/logs//'+'server-.'+date+'.log';
+        
         //拼接日志文件名称
         var logStr = '';
         fs.stat(logPath, function (err, stats) {
+            console.log('111')
             //获取对应的日志文件状态
             if(err){
             //日志不存在或者异常处理信息
             //$('#logTipInfo tr td').html('无日志信息可供查看');
                 var info = '无日志信息可供查看: '+err
+                console.log(info)
             }else{
+                console.log('333')
                 var log = []        
                 var lineCount = 0;                
                 var fReadName = logPath;
@@ -52,6 +56,7 @@ module.exports = {
                     //计数行数
                     var matched = true;
                     var itemStr = line.trim();
+                    console.log(itemStr)
                     var itemArr = itemStr.split(' ');
                     var logDate = itemArr[0].slice(1,11);
                     var logTime = itemArr[0].slice(12,20);                    
