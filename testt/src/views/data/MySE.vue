@@ -5,6 +5,9 @@
           <h3 class="title" >Lilly Wechat - SE List
               <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">New SE</el-button>
           </h3>
+          <div class="searchBox">
+            <el-input prefix-icon="iconfont icon-sousuo" v-model="searchTableInfo" placeholder="请输入搜索内容"></el-input>
+          </div>
           <el-table :model="SEForm" :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border style="width: 100%" class="table"
             :header-cell-style="tableHeaderColor" 
             @sort-change="changeTableSort">
@@ -131,6 +134,8 @@ export default {
       dialogCreateVisible:false,
       getDepData:[],
       getHosData:[],
+      searchTableInfo:"",
+      getSearchInfo:[],
       pageNum:1,
       pageSize:8,
       SEForm: {
@@ -152,7 +157,7 @@ export default {
         TeamID: ""
       },
       rows: [],
-      getSEList:[],
+      //getSEList:[],
       getMLList: [],
       getTeam: [],
       getHospital:[],
@@ -311,7 +316,8 @@ export default {
     getDetailList() {
       SEService.getSEList("")
         .then((res) => {
-          this.getSEList = res.data;
+          //this.getSEList = res.data;
+          this.getSearchInfo = res.data;
         })
         .catch(function (err) {
           console.log("err"+err);
@@ -407,7 +413,21 @@ export default {
     getDepID(event){
       this.DepIDP = event;
     },
-  }
+  },
+  computed: {
+      getSEList () {
+        const searchTableInfo = this.searchTableInfo
+        if (searchTableInfo) {
+          return this.getSearchInfo.filter(data => {
+            console.log("success"+data)
+            return Object.keys(data).some(key => {
+              return String(data[key]).toLowerCase().indexOf(searchTableInfo) > -1
+            })
+          })
+        }
+        return this.getSearchInfo
+      }
+    },
 };
 </script>
 
@@ -420,7 +440,7 @@ export default {
     color: white;
     border:  #2daaf3;
     padding-top: 20px;
-    margin-top:0px;
+    margin:0px;
 }
 .NewButton{
     background-color:#639eda;
@@ -456,5 +476,10 @@ export default {
 }
 .el-col_NewSE{
   margin-left:5%;
+}
+.searchBox{
+  width: 19%;
+  float: right;
+  padding: 5px;
 }
 </style>
