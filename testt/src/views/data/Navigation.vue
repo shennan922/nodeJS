@@ -51,6 +51,23 @@
         </el-col>
       </el-row>
     </div>
+
+       <!--导航栏-->
+    <div>
+
+      <template>
+          <el-breadcrumb separator="/" class='el-breadcrumb'>
+            <el-breadcrumb-item>
+              Home
+            </el-breadcrumb-item>
+           <el-breadcrumb-item>
+              {{this.breadcrumbItems}}
+            </el-breadcrumb-item>
+          </el-breadcrumb> 
+      </template>
+
+    </div>
+
     <!-- 底部样式 -->
     <div class="buttomStyle">
       <el-row>
@@ -70,7 +87,7 @@ export default {
   data() {
     return {
       searchCriteria: "",
-      breadcrumbItems: ["导航一"],
+      breadcrumbItems: "Home",
       lillyImg: require("@/assets/Lilly.png"),
       defaultTab: ""
     };
@@ -92,18 +109,34 @@ export default {
       switch (key) {
         case "Test":
           this.$router.push("/data/Test");
-          this.breadcrumbItems = ["Test"];
+          this.breadcrumbItems = "Overview";
           break;
         case "MySE":
           this.$router.push("/data/MySE");
-          this.breadcrumbItems = ["MySE"];
+          this.breadcrumbItems = "MySE";
           break;
         case "Log":
           this.$router.push("/data/Log");
-          this.breadcrumbItems = ["Log"];
+          this.breadcrumbItems = "Log";
           break;
         case "Navigation":
           this.$router.push("/data/Test");
+          break;
+           case "3":
+          this.$router.push("/data/My Push");
+          this.breadcrumbItems = "My Push";
+          break;
+          case "4":
+          this.$router.push("/data/My Content");
+          this.breadcrumbItems = "My Content";
+          break;
+          case "5":
+          this.$router.push("/data/Request List");
+          this.breadcrumbItems = "Request List";
+          break;
+          case "6":
+          this.$router.push("/data/Analytics");
+          this.breadcrumbItems = "Analytics";
           break;
       }
     },
@@ -127,6 +160,9 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.el-breadcrumb{
+  font-size: 25px;
+}
 .navigation{
   background-color: #F6F8FB; 
   margin-left: 0px;

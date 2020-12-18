@@ -44,6 +44,27 @@ const routes = [
         name: 'Log',
         component: () => import('../views/data/Log.vue')
       },
+
+      {
+        path: '/data/Analytics',
+        name: 'Analytics',
+        component: () => import('../views/data/Analytics.vue')
+      },
+      {
+        path: '/data/My Content',
+        name: 'My Content',
+        component: () => import('../views/data/My Content.vue')
+      },
+      {
+        path: '/data/My Push',
+        name: 'My Push',
+        component: () => import('../views/data/My Push.vue')
+      },
+      {
+        path: '/data/Request List',
+        name: 'Request List',
+        component: () => import('../views/data/Request List.vue')
+      },
     ]
   },
 
