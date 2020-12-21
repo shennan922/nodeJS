@@ -12,3 +12,5 @@ phases:
       - npm install -g @vue/cli@3.6.0
       - npm install
       - npm run build
+      - docker build -t seanvue ./
+      - docker images
