@@ -6,9 +6,9 @@ phases:
       - npm i npm@latest -g
       - npm install --global gatsby-cli
       - npm install
-      - pip install --upgrade pip
-      - pip install --upgrade awscli
   build:
     commands:
       - cd testt
+      - npm install -g @vue/cli@3.6.0
+      - npm install
       - npm run build
