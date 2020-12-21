@@ -3,33 +3,26 @@
     <h3 class="title">Lilly Wechat - Log Viewer
     </h3>
     <el-container >
-        <el-header style="text-align: right; font-size: 12px">
-          <el-date-picker
-            type="datetime"
-            placeholder="选择日期时间">
-          </el-date-picker>
-        </el-header>
-        <el-container>
-          <el-aside width="100px" :span = "1" style="background-color: rgb(238, 241, 246)">
-            <el-menu @select="typeSearch">
-              <el-menu-item index="1">
-                <template slot="title">INFO</template>                  
-              </el-menu-item>
-              <el-menu-item index="2">
-                <template slot="title">ERROR</template>                  
-              </el-menu-item>
-              <el-menu-item index="3">
-                <template slot="title">FATAL</template>                  
-              </el-menu-item>
-            </el-menu>
-          </el-aside>
+        <el-aside style="width: 15%">
+          <el-table  :data="fileName" border style="width: 100%" class="table"
+            :row-style="tableRowStyle" :header-cell-style="tableHeaderColor" height="580px">
+            <el-table-column label="File Name" prop="fileName"></el-table-column>
+          </el-table>
+        </el-aside>
+        <el-container >
+          <el-header style="text-align: left; font-size: 12px">
+            <el-button size="huge" type="info" @click="typeSearch('ALL')" >ALL</el-button>
+            <el-button size="huge" type="info" @click="typeSearch('[INFO]')" >INFO</el-button>
+            <el-button size="huge" type="info" @click="typeSearch('[ERROR]')" >ERROR</el-button>
+            <el-button size="huge" type="info" @click="typeSearch('[FATAL]')" >FATAL</el-button>
+          </el-header>
           <el-main :span = "23" >
-            <el-table :model="LogForm" :data="row" border style="width: 100%" class="table"
+            <el-table  :data="row" border style="width: 100%" class="table"
               :row-style="tableRowStyle" :header-cell-style="tableHeaderColor" height="500px">
               <el-table-column label="Content" prop="log"></el-table-column>
             </el-table>
-          </el-main>     
-        </el-container>     
+          </el-main>  
+        </el-container>       
     </el-container>        
   </div>
 </template>
@@ -44,33 +37,26 @@ export default {
   name: "Log",
   mounted() {
     this.getLog();
-   },
+  },
 
   
   data() {
     return {
-    LogForm: {
-      log:""
-    },
+    fileName:[{fileName:"server-.2020-12-10.log"},
+              {fileName:"server-.2020-12-11.log"},
+              {fileName:"server-.2020-12-12.log"},
+              {fileName:"server-.2020-12-13.log"},
+              {fileName:"server-.2020-12-14.log"},
+              {fileName:"server-.2020-12-15.log"},
+              {fileName:"server-.2020-12-16.log"}],
     tableLabel: [
         { prop: "log", label: "Content" }
       ],
-    row: []
+    row: [],
+    raw: []
     };
   },
-  computed:{
-    row: function() {
-      var search = '[INFO]'//this.search
-      if (search) {
-        return this.row.filter(function(dataNews) {
-          return Object.keys(dataNews).some(function(key) {
-            return String(dataNews[key]).includes(search)
-          })
-        })
-      }
-      return this.row   //返回过滤完的数据
-    }
-  },
+
   methods: {
     tableRowStyle({ row, rowIndex }) {
       return "background-color:;font-size:15px;";
@@ -80,9 +66,13 @@ export default {
       return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left";
     },
     
-    typeSearch(){      
-      var result = this.row.filter(function (e) { return e.log.includes('INFO')})
-          LogForm.data = result
+    typeSearch(search){         
+      if(search == 'ALL'){
+        var result = this.raw
+      }else{
+        var result = this.raw.filter(function (e) { return e.log.includes(search)})
+      }
+      this.row = result
     },
 
 
@@ -95,6 +85,7 @@ export default {
         logReadFlag: '0'
       }).then((res) => {
         this.row = res.log;
+        this.raw = res.log;
       })
       .catch(function (err) {
         console.log(err);
