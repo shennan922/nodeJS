@@ -14,63 +14,80 @@ const routes = [
   {
     path: '/about',
     name: 'About',
-    meta: { auth: true },
-    component: () => import( '../views/About.vue')
+    meta: { auth: true, title: 'about' },
+    component: () => import('../views/About.vue')
   },
   {
     path: '/data/demo',
     name: 'demo',
-    meta: { auth: true },
+    meta: { auth: true, title: 'about' },
     component: () => import('../views/data/demo.vue')
   },
   {
     path: '/data/Navigation',
     name: 'Navigation',
-    meta: { auth: true },
+    meta: { auth: true, title: 'Home' },
     component: () => import('../views/data/Navigation.vue'),
-    children:[
+    children: [
       {
         path: '/data/MySE',
         name: 'MySE',
+        meta: { title: 'MySE' },
         component: () => import('../views/data/MySE.vue')
       },
       {
         path: '/data/Test',
         name: 'Test',
+        meta: { title: 'Overview' },
         component: () => import('../views/data/Test.vue')
       },
       {
         path: '/data/Log',
         name: 'Log',
+        meta: { title: 'Log' },
         component: () => import('../views/data/Log.vue')
       },
 
       {
         path: '/data/Analytics',
         name: 'Analytics',
+        meta: { title: 'Analytics' },
         component: () => import('../views/data/Analytics.vue')
       },
       {
-        path: '/data/My Content',
-        name: 'My Content',
-        component: () => import('../views/data/My Content.vue')
+        path: '/data/MyContent',
+        name: 'MyContent',
+        meta: { title: 'My Content' },
+        component: () => import('../views/data/MyContent.vue')
       },
       {
-        path: '/data/My Push',
-        name: 'My Push',
-        component: () => import('../views/data/My Push.vue')
+        path: '/data/MyPush',
+        name: 'MyPush',
+        meta: { title: 'My Push' },
+        component: () => import('../views/data/MyPush.vue')
       },
       {
-        path: '/data/Request List',
-        name: 'Request List',
-        component: () => import('../views/data/Request List.vue')
+        path: '/data/RequestList',
+        name: 'RequestList',
+        meta: { title: 'Request List' },
+        component: () => import('../views/data/RequestList.vue')
       },
     ]
   },
 
-  { path: '/users/login', alias: '/login', name: 'login', component: () => import('../views/user/login.vue') },
-  { path: '/users/register', alias: '/register', name: 'register', component: () => import('../views/user/register.vue') },
- // { path: '*', redirect: { name: 'login' } }
+  {
+    path: '/users/login',
+    alias: '/login',
+    name: 'login',
+    component: () => import('../views/user/login.vue')
+  },
+  {
+    path: '/users/register',
+    alias: '/register',
+    name: 'register',
+    component: () => import('../views/user/register.vue')
+  },
+  // { path: '*', redirect: { name: 'login' } }
   {
     path: "/404",
     name: "notFound",
@@ -89,9 +106,9 @@ const routes = [
 
 
 const originalPush = VueRouter.prototype.push
-   VueRouter.prototype.push = function push(location) {
-   return originalPush.call(this, location).catch(err => err)
-  }
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 
 
 const router = new VueRouter({
