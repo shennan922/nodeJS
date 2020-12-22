@@ -8,7 +8,8 @@
         <div class="bullshit__oops">OOPS!</div>
         <div class="bullshit__headline">{{ message }}</div>
         <div class="bullshit__info">Please check that the URL you entered is correct, or click the button below to return to the homepage.</div>
-        <router-link class="bullshit__return-home" :to="{ name: 'Navigation' }">Back to Homepage</router-link>
+        <!-- <router-link class="bullshit__return-home" :to="{ name: 'Navigation' }">Back to Homepage</router-link> -->
+        <el-button class="bullshit__return-home" @click="goBack">Back to Previous Page</el-button>
       </div>
     </div>
   </div>
@@ -22,6 +23,20 @@ export default {
     message() {
       return 'Page not found...'
     }
+  },
+  methods:{
+    goBack(){
+      //this.$router.go(-1);
+      if (window.history.length <= 1) {
+          this.$router.push({
+            name: "Navigation",
+          });
+          return false 
+      } 
+      else {
+         this.$router.go(-1) 
+      }
+    },
   }
 }
 </script>
@@ -89,9 +104,9 @@ export default {
     }
     &__return-home {
       font-size: 14px;
-      line-height: 40px;
-      color: #1482f0;
-      //background: #1482f0;
+      // line-height: 40px;
+      color:white;
+      background: #1482f0;
       //opacity: 0;
       //margin-bottom: 20px;
       animation-name: slideUp;

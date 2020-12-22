@@ -8,9 +8,10 @@
           <div class="searchBox">
             <el-input prefix-icon="iconfont icon-sousuo" v-model="searchTableInfo" placeholder="请输入搜索内容"></el-input>
           </div>
-          <el-table :model="SEForm" :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border style="width: 100%" class="table"
+          <el-table :model="SEForm" :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
             :header-cell-style="tableHeaderColor" 
-            @sort-change="changeTableSort">        
+            @sort-change="changeTableSort" class="formSE"
+            >
             <el-table-column min-width="15%" prop="SEID" label="ID" sortable="custom"></el-table-column>
             <el-table-column min-width="15%" prop="SEName" label="SEName" ></el-table-column>
             <el-table-column min-width="15%" prop="City" label="City" sortable="custom"></el-table-column>
@@ -20,15 +21,15 @@
             <el-table-column min-width="15%" prop="TeamName" label="Team"></el-table-column>
             <el-table-column min-width="25%" label="Operation">
                 <template slot-scope="scope">
-                  <el-button size="mini" type="primary" right-padding="20px" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
+                <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
                   <el-popover
                     placement="right"
-                    width="200"
                     trigger="click">
-                    <el-image :src="QRurl"  style="background: rgb(255, 255, 255); width: 200px; display: inline-block; min-height: 200px;" date-qrid="245092"></el-image>
-                    <el-button size="mini" slot="reference" type="info" @click="generateQR"  plain ><i class="el-icon-picture-outline"></i>QR Code</el-button>
+                  <!-- style="background: rgb(255, 255, 255);  display: inline-block;" -->
+                  <el-image :src="QRurl" date-qrid="245092"></el-image>
+                  <el-button size="mini" slot="reference" type="info" @click="generateQR"  plain class="buttonQRCode"><i class="el-icon-picture-outline"></i>QR Code</el-button>
                   </el-popover>
-                  <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain><i class="el-icon-delete"></i>Delete</el-button>
+                <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
                 </template>
             </el-table-column>
           </el-table>
@@ -46,7 +47,7 @@
         </el-col>
       </el-row>
        <!--增加SE页面-->
-      <el-dialog title ="New SE" :visible.sync="dialogCreateVisible" class="dialogSE" @close="handleClose" :close-on-click-modal="false">
+      <el-dialog title ="New SE" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogSE">
           <el-form 
           ref="AddSEForm"
           :model="AddSEForm" 
@@ -353,11 +354,11 @@ export default {
                   type: 'success',
                   message: '提交成功!'
                 });
-
-              }
               this.dialogCreateVisible = false;
               this.formStatus = 0
               this.getDetailList();
+              }
+              
             })
           }).catch((err) => {
             this.$message({
@@ -365,10 +366,6 @@ export default {
               message: '出错了: '+err
             });
           })
-        }
-        else {
-          console.log('error');
-          return false;
         }
       })
     },
@@ -409,10 +406,6 @@ export default {
               message: '已取消新增'
             });
           })
-        }
-        else {
-          console.log('error');
-          return false;
         }
       })
     },
@@ -527,6 +520,7 @@ export default {
     padding-top: 20px;
     margin:0px;
 }
+
 .NewButton{
     background-color:#639eda;
     text-align: right;
@@ -536,6 +530,42 @@ export default {
     margin-right:1%;
     font-weight:bold;
 }
+.buttonEdit{
+  margin-right:3%;
+  width:75px
+}
+.buttonQRCode{
+  margin-right:3%;
+  width:75px;
+  margin-top:3px;
+  padding-left:3%
+}
+.buttonDelete{
+  margin-right:3%;
+  width:75px;
+  margin-top:3px;
+}
+body .el-table th.gutter{
+  display: table-cell!important;
+}
+/deep/.formSE{
+  width: 100%;
+  // .el-table__body-wrapper .el_table_body
+  // .table__header{
+  //     table-layout: auto;
+  //     // display: table-cell!important;
+  //   }
+  .el-table__body{
+    table-layout: auto;
+  } 
+    
+  
+  // .table__header{
+  //   table-layout: auto;
+  // }
+}
+
+
 /deep/.dialogSE{
   .el-dialog__header{
   text-align: left;

@@ -82,6 +82,7 @@
 </template>
 <script>
 import variables from "@/styles/variables.scss";
+import UserService from "../../services/UserService";
 //import UserService from "../../services/UserService";
 export default {
   data() {
@@ -144,15 +145,20 @@ export default {
       return variables;
     },
     logout() {
-      /*
        function pp1()
       {
           var pp =  UserService.getQRCode()
           return pp
       }
-      var ii = pp1()
-      alert(ii)
-      */
+    var ii = pp1();
+    console.log(ii);
+            //清除token
+      //window.sessionStorage.clear();
+       // 关闭浏览器窗口的时候清空浏览器缓存在localStorage的数据
+      window.onbeforeunload = function () {
+        var storage = window.localStorage;
+        storage.clear()
+      }
       this.$router.push({
         name: "login",
       });
