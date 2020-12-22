@@ -57,10 +57,7 @@
 
       <template>
           <el-breadcrumb separator="/" class='el-breadcrumb'>
-            <el-breadcrumb-item>
-              Home
-            </el-breadcrumb-item>
-           <el-breadcrumb-item>
+           <el-breadcrumb-item :to="{ path: '/' }">
               {{this.breadcrumbItems}}
             </el-breadcrumb-item>
           </el-breadcrumb> 
@@ -88,7 +85,7 @@ export default {
   data() {
     return {
       searchCriteria: "",
-      breadcrumbItems: "Home",
+      breadcrumbItems: "Overview",
       lillyImg: require("@/assets/Lilly.png"),
       defaultTab: ""
     };
@@ -124,15 +121,15 @@ export default {
           this.$router.push("/data/Test");
           break;
            case "3":
-          this.$router.push("/data/My Push");
+          this.$router.push("/data/MyPush");
           this.breadcrumbItems = "My Push";
           break;
           case "4":
-          this.$router.push("/data/My Content");
+          this.$router.push("/data/MyContent");
           this.breadcrumbItems = "My Content";
           break;
           case "5":
-          this.$router.push("/data/Request List");
+          this.$router.push("/data/RequestList");
           this.breadcrumbItems = "Request List";
           break;
           case "6":
