@@ -10,7 +10,7 @@ export default {
     return response.data
   },
   async SEUpdate (data) {
-    const response = await req.request.get('/se/update',data)
+    const response = await req.request.post('/se/update',data)
     return response.data
   },
   async SEDelete (data) {

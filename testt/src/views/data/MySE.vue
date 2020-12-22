@@ -20,7 +20,7 @@
             <el-table-column min-width="15%" prop="MLName" label="ML"></el-table-column>
             <el-table-column min-width="15%" prop="TeamName" label="Team"></el-table-column>
             <el-table-column min-width="25%" label="Operation">
-                <template slot-scope="scope">
+              <template slot-scope="scope">
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
                   <el-popover
                     placement="right"
@@ -30,7 +30,7 @@
                   <el-button size="mini" slot="reference" type="info" @click="generateQR"  plain class="buttonQRCode"><i class="el-icon-picture-outline"></i>QR Code</el-button>
                   </el-popover>
                 <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
-                </template>
+              </template>
             </el-table-column>
           </el-table>
           <div class="block">
@@ -104,8 +104,8 @@
             </el-row>
           </el-form>
           <div style="margin-right:10px" slot="footer" class="dialog-footer">
-            <el-button @click.native="createSubmit" v-if="formStatus==1" :display="formStatus==1?true:false" type="primary">Submit</el-button>
-            <el-button @click.native="updateSubmit" v-if="formStatus!=1" :disabled="formStatus==1?false:true" type="primary">Submit</el-button>
+            <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
+            <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
          </div>
 
       </el-dialog>
@@ -354,11 +354,11 @@ export default {
                   type: 'success',
                   message: '提交成功!'
                 });
-              this.dialogCreateVisible = false;
-              this.formStatus = 0
-              this.getDetailList();
-              }
-              
+                this.dialogCreateVisible = false;
+                this.formStatus = 0
+                this.getDetailList()
+                this.handleClose()
+              }              
             })
           }).catch((err) => {
             this.$message({
@@ -395,10 +395,11 @@ export default {
                   type: 'success',
                   message: '提交成功!'
                 });
-              }
-              this.dialogCreateVisible = false;
-              this.formStatus = 0
-              this.getDetailList();
+                this.dialogCreateVisible = false;
+                this.formStatus = 0
+                this.getDetailList();
+                this.handleClose()
+              }                
             })
           }).catch(() => {
             this.$message({
