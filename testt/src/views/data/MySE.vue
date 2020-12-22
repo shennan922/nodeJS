@@ -10,10 +10,7 @@
           </div>
           <el-table :model="SEForm" :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border style="width: 100%" class="table"
             :header-cell-style="tableHeaderColor" 
-            @sort-change="changeTableSort">
-            <!-- <el-table-column prop="checkbox">
-                <input type="checkbox" v-model='checked' v-on:click='checkedAll'>{{checked}}
-            </el-table-column> -->
+            @sort-change="changeTableSort">        
             <el-table-column min-width="15%" prop="SEID" label="ID" sortable="custom"></el-table-column>
             <el-table-column min-width="15%" prop="SEName" label="SEName" ></el-table-column>
             <el-table-column min-width="15%" prop="City" label="City" sortable="custom"></el-table-column>
@@ -40,7 +37,7 @@
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="pageNum"
-              :page-sizes="[1, 2, 4, 8, 10]"
+              :page-sizes="[1, 5, 10]"
               :page-size="pageSize"
               layout="total, sizes, prev, pager, next, jumper"
               :total= "getSEList.length">
@@ -49,32 +46,32 @@
         </el-col>
       </el-row>
        <!--增加SE页面-->
-      <el-dialog title ="New SE" :visible.sync="dialogCreateVisible" class="dialogSE">
+      <el-dialog title ="New SE" :visible.sync="dialogCreateVisible" class="dialogSE" @close="handleClose" :close-on-click-modal="false">
           <el-form 
           ref="AddSEForm"
           :model="AddSEForm" 
-          :rules="addSEFormRules"  
+          :rules="formStatus!=0?addSEFormRules:null"  
           label-width="95px"
-          :label-position="labelPosition"
+          label-position="left"          
           >
             <el-row>
               <el-col :span="10" class="el-col_NewSE">
                 <h2 class="h2title">General Info</h2>
-                <el-form-item label="SEId" prop="SEId">
-                  <el-input v-model="AddSEForm.SEId" ></el-input>
+                <el-form-item label="SEID" prop="SEID">
+                  <el-input v-model="AddSEForm.SEID" :disabled="formStatus==1?false:true"></el-input>
                 </el-form-item>
                 <el-form-item label="New SE" prop="SEName" >
                   <el-input v-model="AddSEForm.SEName"></el-input>
                 </el-form-item>
                 <el-form-item label="ML" prop="MLID">
-                  <el-select v-model="AddSEForm.MLID" clearable placeholder="请选择" @change="getMLID($event)">
+                  <el-select v-model="AddSEForm.MLID" clearable placeholder="请选择">
                     <el-option
                        v-for="itemML in getMLList.data" :key="itemML.MLID" :label="itemML.MLName" :value="itemML.MLID">
                     </el-option>
                   </el-select> 
                 </el-form-item>
                 <el-form-item label="Team" prop="TeamID">
-                  <el-select v-model="AddSEForm.TeamID" placeholder="请选择" @change="getTeamID($event)">
+                  <el-select v-model="AddSEForm.TeamID" placeholder="请选择" >
                     <el-option
                        v-for="item in getTeam.data" :key="item.TeamID" :label="item.TeamName" :value="item.TeamID">
                     </el-option>
@@ -84,19 +81,19 @@
               <el-col :span="10" class="el-col_NewSE">
                 <h2 class="h2title">Geography</h2>
                   <el-form-item label="City" prop="CityID">
-                    <el-cascader :options="getGeoTree" v-model="AddSEForm.CityID" :props="defaultProps" @change="getCityID">
+                    <el-cascader :options="getGeoTree" v-model="AddSEForm.CityID" :props="defaultProps" @visible-change="handleChangeFlag($event)" @change="handleChange('city')">
                     </el-cascader>
                   </el-form-item>
                 <h2 class="h2">Hospital</h2>
                 <el-form-item label="Hospital" prop="HospitalID">
-                  <el-select v-model="AddSEForm.HospitalID" placeholder="请选择"  @change="getHospitalID($event)">
+                  <el-select v-model="AddSEForm.HospitalID" placeholder="请选择"  @change="handleChange('hos')">
                     <el-option
                        v-for="item in getHosData" :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
                     </el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="Department" prop="DepID">
-                   <el-select v-model="AddSEForm.DepID" placeholder="请选择" @change="getDepID($event)">
+                   <el-select v-model="AddSEForm.DepID" placeholder="请选择" >
                     <el-option
                        v-for="item in getDepData" :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
                     </el-option>
@@ -106,7 +103,8 @@
             </el-row>
           </el-form>
           <div style="margin-right:10px" slot="footer" class="dialog-footer">
-            <el-button @click.native="createSubmit"  type="primary">Submit</el-button>
+            <el-button @click.native="createSubmit" v-if="formStatus==1" :display="formStatus==1?true:false" type="primary">Submit</el-button>
+            <el-button @click.native="updateSubmit" v-if="formStatus!=1" :disabled="formStatus==1?false:true" type="primary">Submit</el-button>
          </div>
 
       </el-dialog>
@@ -124,30 +122,27 @@ import GeneralService from "../../services/GeneralService";
 export default {
   inject:['reload'],
   name: "MySE",
-  dialogCreateVisible: false,
-  // addLoading: false,
   mounted() {
     this.getDetailList();
     this.getMLListData();
     this.getTeamData();
     this.getGeoTreeData();
     this.getHospitalData();
-  },
-  getMLListValue:"",
-  
+  },  
   
   data() {
     return {
-      labelPosition: 'left',
-      dialogCreateVisible:false,
-      getDepData:[],
-      getHosData:[],
-      searchTableInfo:"",
-      getSearchInfo:[],
-      pageNum:1,
-      pageSize:8,
-      QRurl:'',
-      SEForm: {
+      dialogCreateVisible:false,  //详细页面显示/隐藏
+      formStatus:0,               //详细页面状态: 0-隐藏/1-新增/2-编辑
+      changeFlag:false,           //编辑页面回显/手动选择
+      getHosData:[],              //根据city筛选hospital
+      getDepData:[],              //根据hospital筛选department
+      searchTableInfo:"",         //模糊搜索框
+      getSearchInfo:[],           //模糊搜索结果
+      pageNum:1,                  //table第几页
+      pageSize:5,                 //table每页几条数据
+      QRurl:'',                   //动态生成二维码链接      
+      SEForm: {                   //table数据源
         SEID:"",
         SEName:"",
         City: "",
@@ -156,8 +151,8 @@ export default {
         MLName: "",
         TeamName: ""
       },
-      AddSEForm: {
-        SEId:"",
+      AddSEForm: {                //详细页面数据源
+        SEID:"",
         SEName:"",
         CityID: "",
         HospitalID: "",
@@ -165,28 +160,20 @@ export default {
         MLID: "",
         TeamID: ""
       },
-      rows: [],
-      //getSEList:[],
-      getMLList: [],
-      getTeam: [],
-      getHospital:[],
-      getGeoTree:[],
-      defaultProps: {
+      rows: [],                   //SE接口返回数据
+      getMLList: [],              //ML接口返回数据
+      getTeam: [],                //Team接口返回数据
+      getHospital:[],             //Hospital接口返回数据
+      getGeoTree:[],              //GeoTree接口返回数据
+      defaultProps: {             //多级下拉菜单赋值
         children: "children",
         label: "NodeDesc",
         value:"NodeID",
       },
-      selectedOptions: [],
-      seletedhosValue:[],
-      MLIDP : "",
-      TeamIDP :"",
-      CityIDP : "",
-      DepIDP : "",
-      HospitalIDP: "",
-      TeamIDTest :"",
-      addSEFormRules: {
-        SEId: [
-          { required: true, message: '请输入SEId', trigger: 'blur'},
+
+      addSEFormRules: {           //详细页面校验规则
+        SEID: [
+          { required: true, message: 'SEID', trigger: 'change'},
           { min: 6, max: 8, message: "长度在 6 到 8 个字符", trigger: "blur" }
         ],
         SEName: [
@@ -199,7 +186,7 @@ export default {
           { required: true, message: '请选择Team', trigger: 'change'}
         ],
         CityID: [
-          { required: true, message: '请选择所在城市', trigger: 'blur'}
+          { required: true, message: '请选择所在城市', trigger: 'change'}
         ],
         HospitalID: [
           { required: true, message: '请选择所在医院', trigger: 'change'}
@@ -210,7 +197,37 @@ export default {
       },
     };
   },
+
+  watch: {
+    'AddSEForm.CityID'(city) {
+      if(this.changeFlag){
+        city = city[2]
+      }
+      this.filterHospital(city)
+    },
+    'AddSEForm.HospitalID'(hospital) {
+      this.filterDeparement(hospital)
+    }
+  },
+
   methods: {
+    handleChange(flag){
+      if(flag=='city'){
+        this.AddSEForm.HospitalID = ''
+        this.AddSEForm.DepID = ''
+      }
+      if(flag=='hos'){
+        this.AddSEForm.DepID = ''
+      }
+    },
+
+    //select回调，判断当前下拉框是否展示
+    handleChangeFlag(val) {
+      if(val){
+        this.changeFlag = true
+      }  
+    },
+
     async generateQR(){
 
       //this.QRurl = await SEService.generateQR('ayKoHfkba6yaGDHo4vSbcMoXgY6u%2F5P7Zt86IjT%2Bc829cKWpUqbNqKg%2B7Yo%2BmezNhwtNWHFNP%2FKlc1UlxEYzpP9EKcvmC%2F7Y9d0CcR5Je7tAIg4yU5oG1DcaMwXyr03R87%2BwMxzRzVHEYq%2F633iR7M0mcV1bbm9oxU%2BG0qw5sVc%3D')
@@ -218,41 +235,38 @@ export default {
 
     },
     changeTableSort(column){
-      console.log(column); 
       //获取字段名称和排序类型
       var fieldName = column.prop;
       var sortingType = column.order;
 
       //如果字段名称为“创建时间”，将“创建时间”转换为时间戳，才能进行大小比较
       if(fieldName=="createTime"){
-        this.getSEList.map(item => {
+        this.getSearchInfo.map(item => {
           item.createTime = this.$moment(item.createTime).valueOf();
         });
       }          
           
       //按照降序排序
       if(sortingType == "descending"){
-        this.getSEList = this.getSEList.sort((a, b) => //b[fieldName] - a[fieldName]
+        this.getSearchInfo = this.getSearchInfo.sort((a, b) => //b[fieldName] - a[fieldName]
           b[fieldName].localeCompare(a[fieldName])
         );
       }
       //按照升序排序
       else{
-        this.getSEList = this.getSEList.sort((a, b) => //a[fieldName] - b[fieldName]
+        this.getSearchInfo = this.getSearchInfo.sort((a, b) => //a[fieldName] - b[fieldName]
           a[fieldName].localeCompare(b[fieldName])
         );
       }
 
       //如果字段名称为“创建时间”，将时间戳格式的“创建时间”再转换为时间格式
       if(fieldName=="createTime"){
-        this.getSEList.map(item => {
+        this.getSearchInfo.map(item => {
           item.createTime = this.$moment(item.createTime).format(
             "YYYY-MM-DD HH:mm:ss"
           );
         });
-      }
-      
-      console.log(this.getSEList);      
+      }  
     },
     handleCurrentChange(pageNum){
       this.pageNum = pageNum
@@ -268,29 +282,20 @@ export default {
       return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left";
     },
     handleAdd() {
-    this.dialogCreateVisible = true;
-      this.AddSEForm = {
-        SEId:"",
-        SEName:"",
-        CityID: "",
-        Hospital: "",
-        Department: "",
-        ML: "",
-        Team: "",
-        checked:""
-      };
+      this.formStatus = 1
+      this.dialogCreateVisible = true;   
     },
     handleEdit(row) {
-    this.dialogCreateVisible = true;
+      this.formStatus = 2
+      this.dialogCreateVisible = true;
       this.AddSEForm = {
-        SEId:row.SEID,
+        SEID:row.SEID,
         SEName:row.SEName,
-        City: '',
-        Hospital: row.Hospital,
-        Department: row.Department,
-        ML: this.getMLList.find(MLName => MLName = row.MLName) ,
-        Team: row.TeamName,
-        checked:""
+        CityID: row.CityID,
+        HospitalID: row.HospitalID,
+        DepID: row.DepartmentID,
+        MLID: row.MLID ,
+        TeamID: row.TeamID
       };
     },
     handleDelete(SEID){
@@ -299,10 +304,7 @@ export default {
           type: 'success',
           message: '删除成功!'
         });
-        this.dialogCreateVisible = false;
         this.getDetailList();
-        // this.reload();
-        console.log("successful");
       }).catch((error) => {
         this.$message({
           type: 'info',
@@ -310,20 +312,34 @@ export default {
         });
       })
     },
-
-    async createSubmit() {
+    handleClose(){            
+      //resetFields将form重置到mounted之后的状态, 对于编辑页面不适用
+      //this.$refs.AddSEForm.resetFields()   
+      this.AddSEForm = {
+        SEID:"",
+        SEName:"",
+        CityID: "",
+        HospitalID: "",
+        DepID: "",
+        MLID: "",
+        TeamID: ""
+      }
+      this.formStatus = 0 
+      this.changeFlag = false
+    },
+    async createSubmit(formStatus) {
       this.$refs.AddSEForm.validate((valid) => {
         if (valid) {
-          this.$confirm('确认提交？', '提示', {}).then(async() => {       
+          this.$confirm('确认提交？', '提示', {}).then(async() => {    
             await SEService.SECreate(
               {
-                SEID: this.AddSEForm.SEId,
+                SEID: this.AddSEForm.SEID,
                 SEName: this.AddSEForm.SEName,
-                City: this.CityIDP,
-                Hospital: this.HospitalIDP,
-                Department: this.DepIDP,
-                MLName: this.MLIDP,
-                Team:this.TeamIDP
+                City: this.AddSEForm.CityID[2],
+                Hospital: this.AddSEForm.HospitalID,
+                Department: this.AddSEForm.DepID,
+                MLName: this.AddSEForm.MLID,
+                Team:this.AddSEForm.TeamID
               }
             ).then((res) => {
               if (res.code == 400){
@@ -340,9 +356,52 @@ export default {
 
               }
               this.dialogCreateVisible = false;
+              this.formStatus = 0
               this.getDetailList();
-              // this.reload();
-              console.log("successful");
+            })
+          }).catch((err) => {
+            this.$message({
+              type: 'info',
+              message: '出错了: '+err
+            });
+          })
+        }
+        else {
+          console.log('error');
+          return false;
+        }
+      })
+    },
+
+    async updateSubmit(formStatus) {
+      this.$refs.AddSEForm.validate((valid) => {
+        if (valid) {
+          this.$confirm('确认提交？', '提示', {}).then(async() => { 
+            await SEService.SEUpdate(
+              {
+                SEID: this.AddSEForm.SEID,
+                SEName: this.AddSEForm.SEName,
+                City: this.AddSEForm.CityID,
+                Department: this.AddSEForm.DepID,
+                MLName: this.AddSEForm.MLID,
+                Team:this.AddSEForm.TeamID
+              }
+            ).then((res) => {
+              if (res.code == 400){
+                this.$message({
+                  type: 'info',
+                  message: res.message
+                });
+              } 
+              if (res.code == 200){
+                this.$message({
+                  type: 'success',
+                  message: '提交成功!'
+                });
+              }
+              this.dialogCreateVisible = false;
+              this.formStatus = 0
+              this.getDetailList();
             })
           }).catch(() => {
             this.$message({
@@ -361,7 +420,6 @@ export default {
     getDetailList() {
       SEService.getSEList("")
         .then((res) => {
-          //this.getSEList = res.data;
           this.getSearchInfo = res.data;
         })
         .catch(function (err) {
@@ -421,42 +479,24 @@ export default {
           console.log(err);
         });
     },
-    getMLID(event) {
-      this.MLIDP = event;
-    },
-    getTeamID(event){
-      this.TeamIDTest = event;
-      this.TeamIDP = event;
-    },
-    getCityID(NodeID){
-      this.CityIDP = NodeID[2];
+    filterHospital(NodeID){
       this.getHosData = [];
-        for(var item of this.getHospital.data){
-          var cityId=item.CityID;
-          var level=item.Level;
-          if(cityId == this.CityIDP && level == 1){
-            this.getHosData.push(item);
-          }
-        }
-        if(this.HospitalIDP==""){
-        }
-        else{
-            this.AddSEForm.HospitalID = "";
-            this.AddSEForm.DepID = "";
-        }
-    },
-    getHospitalID(event){
-      this.HospitalIDP = event;
-      this.getDepData=[];
       for(var item of this.getHospital.data){
-        var parentId=item.ParentNodeID;
-        if(parentId == event){
-          this.getDepData.push(item);
+        var cityId=item.CityID;
+        var level=item.Level;
+        if(cityId == NodeID && level == 1){
+          this.getHosData.push(item);
         }
       }
     },
-    getDepID(event){
-      this.DepIDP = event;
+    filterDeparement(NodeID){
+      this.getDepData=[];
+      for(var item of this.getHospital.data){
+        var parentId=item.ParentNodeID;
+        if(parentId == NodeID){
+          this.getDepData.push(item);
+        }
+      }
     },
   },
   computed: {

@@ -39,15 +39,17 @@ module.exports = {
   async getList (req, res) {
     try {
       var data = await SEList.findAll({
-        attributes:['SEID','SEName','Geo.NodeDesc','Department->Hos.NodeDesc','MLList.MLName','Team.TeamName','URL'],
+        attributes:['SEID','SEName','Department->Hos.NodeDesc','Department->Hos.NodeID','MLList.MLName','Team.TeamName','URL',
+                    'Team.TeamID','MLList.MLID'//,['Geo.City','City']
+                  ],
         include:[
           {
             model: Geo,
-            attributes: [['NodeDesc','City']]
+            attributes: [['NodeDesc','City'],['NodeID','CityID']]
           },
           {
             model: Hospital,
-            attributes: [['NodeDesc','Dep']],
+            attributes: [['NodeDesc','Dep'],['NodeID','DepID']],
             as: 'Department',
             include:[
               {
@@ -72,9 +74,9 @@ module.exports = {
       })
 
       if (data) {
-        data = JSON.parse(JSON.stringify(data).replace(/NodeDesc/g, 'Hospital'))
-        data = JSON.parse(JSON.stringify(data).replace(/Department.Dep/g, 'Department'))
-        data = JSON.parse(JSON.stringify(data).replace(/Geo.City/g, 'City'))
+        data = JSON.parse(JSON.stringify(data).replace(/NodeDesc/g, 'Hospital').replace(/NodeID/g, 'HospitalID').replace(/Department.Dep/g, 'Department').replace(/Geo.City/g, 'City'))
+        //data = JSON.parse(JSON.stringify(data).replace(/Department.Dep/g, 'Department'))
+        //data = JSON.parse(JSON.stringify(data).replace(/Geo.City/g, 'City'))
         res.status(200).send({
           value:'SEList',
           data:data

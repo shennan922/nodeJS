@@ -82,7 +82,7 @@
 </template>
 <script>
 import variables from "@/styles/variables.scss";
-import UserService from "../../services/UserService";
+//import UserService from "../../services/UserService";
 export default {
   data() {
     return {
@@ -144,6 +144,7 @@ export default {
       return variables;
     },
     logout() {
+      /*
        function pp1()
       {
           var pp =  UserService.getQRCode()
@@ -151,6 +152,7 @@ export default {
       }
       var ii = pp1()
       alert(ii)
+      */
       this.$router.push({
         name: "login",
       });
