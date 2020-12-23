@@ -63,7 +63,7 @@
         </el-col>
       </el-row>
       <!--增加Content页面-->
-      <el-dialog title ="Create a New Paper" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent">
+      <el-dialog title ="Create a New Paper" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent" :modal-append-to-body="false">
           <el-form 
           ref="AddContentForm"
           :model="AddContentForm" 
@@ -106,9 +106,13 @@
                     <el-input v-model="AddContentForm.UpdatePDFName" class="input_UploadPdf" :disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="Content">
-                  <!-- <div class="editor-container">
-                    <UE :defaultMsg=defaultMsg :config=config :id=ue1 ref="ue"></UE>
-                  </div> -->
+                  <div>
+                    <!-- <button @click="getUEContent()">获取内容</button>
+                    <button @click="getUEContentTxt()">获取无文本内容</button> -->
+                    <div class="layui-form-item" style="position: relative;z-index: 10000;">
+                      <UE :defaultMsg=defaultMsg :config=config :id=ue1 ref="ue"></UE>
+                    </div>
+                  </div>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -131,8 +135,17 @@ import GeneralService from "../../services/GeneralService";
 import UE from '../../components/ue/ue.vue';
 
 export default {
+  components: {UE},
   data(){
      return {
+      //  defaultMsg: '<span style="orphans: 2; widows: 2; font-size: 22px; font-family: KaiTi_GB2312; background-color: rgb(229, 51, 51);"><strong>夏钧姗：成功的投资需具备哪些心态和掌握哪些重要止损位</strong></span>',
+        defaultMsg:"",
+        config: {
+          initialFrameWidth: null,
+          initialFrameHeight: 300
+        },
+        ue1: "ue1", // 不同编辑器必须不同的id
+        ue2: "ue2",
        dialogCreateVisible: false,
       AddContentForm: {
         SE:"",
@@ -341,6 +354,23 @@ export default {
 
 
 <style  lang="scss" scoped>
+.el-dialog{
+       display: flex;
+       flex-direction: column;
+       margin:0 !important;
+       position:absolute;
+       top:50%;
+       left:50%;
+       transform:translate(-50%,-50%);
+       /*height:600px;*/
+       max-height:calc(100% - 30px);
+       max-width:calc(100% - 30px);
+   }
+   .el-dialog .el-dialog__body{
+       flex:1;
+       overflow: auto;
+   }
+
 /deep/.formSE{
   width: 100%;
   .el-table__body{
@@ -383,10 +413,14 @@ export default {
   padding: 5px;
 }
 /deep/.dialogContent{
+  //  width:120%;
+  //  display: center;
+  //  transform:translate(-50%,-50%);
+
   .el-dialog__header{
-  text-align: left;
-  padding-left:7%;
-  background-color: #498CDF,
+    text-align: left;
+    padding-left:7%;
+    background-color: #498CDF,
   };
   .el-dialog__title{
     color:#fff;
@@ -398,6 +432,9 @@ export default {
     padding-left:2%;
     width:75%;
     background-color:white
+  }
+  .el-form-item__content{
+    line-height: 0px;
   }
 } 
 </style>
