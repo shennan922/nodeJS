@@ -62,6 +62,62 @@
           -->
         </el-col>
       </el-row>
+      <!--增加Content页面-->
+      <el-dialog title ="Create a New Paper" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent">
+          <el-form 
+          ref="AddContentForm"
+          :model="AddContentForm" 
+          :rules="addContentFormRules"  
+          label-width="130px"
+          >
+            <el-row>
+              <el-col class="el-col_Content">
+                <el-form-item label="SE" prop="SE">
+                  <el-select v-model="AddContentForm.SE" clearable placeholder="请选择" style="width:100%;padding-left:0px">
+                    <!-- <el-option
+                      v-for="itemML in getMLList.data" :key="itemML.MLID" :label="itemML.MLName" :value="itemML.MLID">
+                    </el-option> -->
+                  </el-select> 
+                </el-form-item>
+                <el-form-item label="Content Category" prop="ContentCategory">
+                  <el-select v-model="AddContentForm.ContentCategory" clearable placeholder="请选择" style="width:100%;padding-left:0px">
+                    <!-- <el-option
+                      v-for="itemML in getMLList.data" :key="itemML.MLID" :label="itemML.MLName" :value="itemML.MLID">
+                    </el-option> -->
+                    </el-select> 
+                </el-form-item>
+                <el-form-item label="Short Title" prop="ShortTitle">
+                  <el-input v-model="AddContentForm.ShortTitle" ></el-input>
+                </el-form-item>
+                <el-form-item label="Search Term" prop="SearchTeam" >
+                  <el-input v-model="AddContentForm.SearchTeam"></el-input>
+                </el-form-item> 
+                <el-form-item label="Upload PDF">
+                    <!-- style="width: 200px; display: inline; margin-left: 25px" -->
+                    <!-- class="upload-demo" -->
+                    <el-upload
+                      ref="upload"
+                      action=""
+                      :show-file-list="true"
+                      :before-upload="beforeUpload"
+                      style="float:left">
+                      <el-button slot="trigger">Choose file</el-button>
+                    </el-upload>
+                    <el-input v-model="AddContentForm.UpdatePDFName" class="input_UploadPdf" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="Content">
+                  <!-- <div class="editor-container">
+                    <UE :defaultMsg=defaultMsg :config=config :id=ue1 ref="ue"></UE>
+                  </div> -->
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+          <div style="margin-right:10px" slot="footer" class="dialog-footer">
+            <el-button @click.native="createSubmit"  type="primary">Submit</el-button>
+         </div>
+
+      </el-dialog>
 </div>
 </template>
 
@@ -72,10 +128,34 @@
 import SEService from "../../services/SEService";
 import MLService from "../../services/MLService";
 import GeneralService from "../../services/GeneralService";
+import UE from '../../components/ue/ue.vue';
 
 export default {
   data(){
      return {
+       dialogCreateVisible: false,
+      AddContentForm: {
+        SE:"",
+        ContentCategory:"",
+        ShortTitle: "",
+        SearchTeam: "",
+        UpdatePDF: null,
+        UpdatePDFName: '',
+        UpdatePDFData:'',
+        Content: "",
+        // file:null,
+        // fileName:'',
+        // fileData:null
+      },
+         addContentFormRules: {
+        // SEId: [
+        //   { required: true, message: '请输入SEId', trigger: 'blur'},
+        //   { min: 6, max: 8, message: "长度在 6 到 8 个字符", trigger: "blur" }
+        // ],
+        // SEName: [
+        //   { required: true, message: '请输入SE Name', trigger: 'blur'}
+        // ],
+      },
        pickerOptions: {
           shortcuts: [{
             text: '最近一周',
@@ -211,14 +291,33 @@ export default {
     },
     handleAdd() {
     this.dialogCreateVisible = true;
-      this.AddForm = {
+      this.AddContentForm = {
         SE:"",
-        Category:"",
-        ShortTile: "",
-        CreateDate: "",
-        ModifyDate: "",
-        Operation: ""
+        ContentCategory:"",
+        ShortTitle: "",
+        SearchTeam: "",
+        UpdatePDF: null,
+        UpdatePDFName: '',
+        UpdatePDFData:'',
+        Content: "",
       };
+    },
+    beforeUpload(UpdatePDF) {
+      this.AddContentForm.UpdatePDF = UpdatePDF;
+      this.AddContentForm.UpdatePDFName = UpdatePDF.name;
+      // this.fileSize = file.size;
+      const extension = UpdatePDF.name.split(".").slice(-1) == "pdf";
+      if (!extension) {
+        this.$message.warning("上传模板只能是pdf格式!");
+        return;
+      }
+      let reader = new FileReader();
+      reader.readAsDataURL(UpdatePDF);
+      let that = this;
+      reader.onload = function () {
+        that.AddContentForm.UpdatePDFData = reader.result;
+      };
+      return false; // 返回false不会自动上传
     },
 
   },
@@ -244,19 +343,9 @@ export default {
 <style  lang="scss" scoped>
 /deep/.formSE{
   width: 100%;
-  // .el-table__body-wrapper .el_table_body
-  // .table__header{
-  //     table-layout: auto;
-  //     // display: table-cell!important;
-  //   }
   .el-table__body{
     table-layout: auto;
   } 
-    
-  
-  // .table__header{
-  //   table-layout: auto;
-  // }
 }
 .content{
   display: flex;
@@ -293,4 +382,22 @@ export default {
   float: right;
   padding: 5px;
 }
+/deep/.dialogContent{
+  .el-dialog__header{
+  text-align: left;
+  padding-left:7%;
+  background-color: #498CDF,
+  };
+  .el-dialog__title{
+    color:#fff;
+  };
+  .el-dialog__close{
+    color:#fff;
+  }
+  .input_UploadPdf{
+    padding-left:2%;
+    width:75%;
+    background-color:white
+  }
+} 
 </style>
