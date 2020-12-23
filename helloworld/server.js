@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 var logger = require('./logger/accessLogger')
 const log4 = require('./logger/log4')
 const { sequelize } = require('./models')
-
+const schedule = require('./utils/Schedule')
 const app = express()
 app.all('*', function (req, res, next) {
   // 设置允许跨域的域名，*代表允许任意域名跨域
@@ -20,7 +20,7 @@ app.use(bodyParser.json())
 log4.use(app)
 app.use(logger('dev'))
 require('./router')(app)
-
+schedule.scheduleForTokens()
 sequelize.sync({ alter: true })
   .then(() => {
     console.log('Connection has been established successfully.')
