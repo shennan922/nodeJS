@@ -38,7 +38,7 @@ const routes = [
   {
     path: '/data/Welcome',
     name: 'Welcome',
-    // meta: { auth: true, title: 'Welcome' },
+    meta: { auth: false, wechat:true, title: 'Welcome' },
     component: () => import('../views/data/Welcome.vue')
   },
   {
@@ -50,7 +50,7 @@ const routes = [
       {
         path: '/data/MySE',
         name: 'MySE',
-        meta: { title: 'MySE' },
+        meta: { auth: true,title: 'MySE' },
         component: () => import('../views/data/MySE.vue')
       },
       {
@@ -150,6 +150,10 @@ router.beforeEach((to, from, next) => {
         query: { redirect: to.fullPath }
       })
     }
+  }
+  if (to.matched.some((router) => router.meta.wechat)) {
+    alert(to.query.my)
+    next()
   }
   next()
 })

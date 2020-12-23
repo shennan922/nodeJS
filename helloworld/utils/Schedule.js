@@ -23,12 +23,12 @@ function getRuleMinutes(period){
 
 exports.scheduleForTokens = function ()
 {
-    const rule=new schedule.RecurrenceRule();
-    const times=getRuleHours(1);
-    rule.hour=times;
+   // const rule=new schedule.RecurrenceRule();
+   // const times=getRuleHours(1);
+   // rule.hour=times;
     // rule.second=times;
     wechat.updateAllTokens()
-    schedule.scheduleJob(rule,async function(){
+    schedule.scheduleJob('30 59 * * * *',async function(){
         await  wechat.updateAllTokens();
     })
    
