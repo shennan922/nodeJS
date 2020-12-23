@@ -24,6 +24,24 @@ const routes = [
     component: () => import('../views/data/demo.vue')
   },
   {
+    path: '/data/ActiveUser',
+    name: 'ActiveUser',
+    // meta: { auth: true, title: 'ActiveUser' },
+    component: () => import('../views/data/ActiveUser.vue')
+  },
+  {
+    path: '/data/InactiveUser',
+    name: 'InactiveUser',
+    // meta: { auth: true, title: 'InactiveUser' },
+    component: () => import('../views/data/InactiveUser.vue')
+  },
+  {
+    path: '/data/Welcome',
+    name: 'Welcome',
+    // meta: { auth: true, title: 'Welcome' },
+    component: () => import('../views/data/Welcome.vue')
+  },
+  {
     path: '/data/Navigation',
     name: 'Navigation',
     meta: { auth: true, title: 'Home' },
