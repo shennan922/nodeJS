@@ -12,7 +12,10 @@
             :header-cell-style="tableHeaderColor" 
             @sort-change="changeTableSort" class="formSE"
             >
-            <el-table-column min-width="15%" prop="SEID" label="ID" sortable="custom"></el-table-column>
+            <el-table-column min-width="5%" prop="SEID" label="ID" sortable="custom">
+              <el-checkbox ></el-checkbox>
+            </el-table-column>
+            <el-table-column min-width="10%" prop="SEID" label="ID" sortable="custom"></el-table-column>
             <el-table-column min-width="15%" prop="SEName" label="SEName" ></el-table-column>
             <el-table-column min-width="15%" prop="City" label="City" sortable="custom"></el-table-column>
             <el-table-column min-width="15%" prop="Hospital" label="Hospital"></el-table-column>
@@ -47,7 +50,7 @@
         </el-col>
       </el-row>
        <!--增加SE页面-->
-      <el-dialog title ="New SE" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogSE">
+      <el-dialog :title ="formStatus==1?'New SE':'Update SE'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogSE">
           <el-form 
           ref="AddSEForm"
           :model="AddSEForm" 
@@ -592,7 +595,14 @@ body .el-table th.gutter{
 }
 .el-col_NewSE{
   margin-left:5%;
+  .el-select{
+    width:100%
+  }
+  .el-cascader{
+    width:100%
+  }
 }
+ 
 .searchBox{
   width: 19%;
   float: right;
