@@ -8,6 +8,7 @@ module.exports = (app) => {
   router.use('/ml', require('./ML'));
   router.use('/general', require('./General'));
   router.use('/user', require('./User'));
+  router.use('/myContent', require('./MyContent'));
   app.use('/', router);
   
 }

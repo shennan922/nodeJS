@@ -50,7 +50,7 @@ module.exports = {
   async getUserById (req, res) {
     try {    
       var publicKey = new NodeRSA(config.keys.publicKey);
-      var encrypted = publicKey.encrypt(config.wechat.appID+'&'+Date.now(), 'base64');
+      var encrypted = publicKey.encrypt(config.appInfo.appID +'&'+Date.now(), 'base64');
       var coding = urlencode(encrypted)
       console.log(encrypted);
       console.log(coding);
@@ -133,7 +133,7 @@ module.exports = {
       let isValidPassword = comparePassword(user,req.body.password)
       if (isValidPassword) {
         var publicKey = new NodeRSA(config.keys.publicKey);
-        var wechatEncrypted = publicKey.encrypt(config.wechat.appID+'&'+Date.now()+'&'+user.email, 'base64');
+        var wechatEncrypted = publicKey.encrypt(config.appInfo.appID+'&'+Date.now()+'&'+user.email, 'base64');
         wechatEncrypted = urlencode(wechatEncrypted)
         res.send({
           code: 200,
@@ -154,8 +154,8 @@ module.exports = {
       }
     } catch (error) {
       res.status(403).send({
-        code: 403,
-        error: '用户名或密码错误'
+        code: 404,
+        error: '登陆异常: '+error
       })
       logger.logger.fatal('User login fail: '+error.message)
     }
