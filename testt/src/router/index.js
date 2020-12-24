@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '../store'
+//import config from '../config'
+import wechatService from '../services/WechatService'
 import { Notification } from 'element-ui'
 
 Vue.use(VueRouter)
@@ -150,11 +152,26 @@ router.beforeEach((to, from, next) => {
         query: { redirect: to.fullPath }
       })
     }
+  }else if (to.matched.some((router) => router.meta.wechat)) {
+    alert(to.query.code)
+    wechatService.checkPermission(to.query.code).then(tt=>
+      {
+        //alert(tt)
+        alert(tt.data.code)
+        if(tt.data.code==201){
+          next()
+        }else{
+          next({
+            name: 'InactiveUser',
+            query: { redirect: to.fullPath }
+          })
+        }
+       
+      })
+  
   }
-  if (to.matched.some((router) => router.meta.wechat)) {
-    alert(to.query.my)
-    next()
-  }
+  else{
   next()
+  }
 })
 export default router
