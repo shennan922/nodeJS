@@ -28,6 +28,7 @@ const routes = [
   {
     path: '/data/ActiveUser',
     name: 'ActiveUser',
+    meta: { auth: false, wechat:true, title: 'Welcome' },
     // meta: { auth: true, title: 'ActiveUser' },
     component: () => import('../views/data/ActiveUser.vue')
   },
@@ -40,7 +41,7 @@ const routes = [
   {
     path: '/data/Welcome',
     name: 'Welcome',
-    meta: { auth: false, wechat:true, title: 'Welcome' },
+   
     component: () => import('../views/data/Welcome.vue')
   },
   {

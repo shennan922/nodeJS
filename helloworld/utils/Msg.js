@@ -36,8 +36,8 @@ exports.message = function (data) {
     } 
     else if(data === ""){ 
         content = "hello cute"
-    }else {
-        content = ".......";
+    }else if(data === "unknown") {
+        content = "unknown user with qrcode";
     }
     return content;
 }

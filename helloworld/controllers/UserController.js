@@ -136,9 +136,6 @@ module.exports = {
       //const token = apps[0].APPToken
       const token =await db.APPList.findByPk(config.appInfo.appID)
       if (isValidPassword) {
-        var publicKey = new NodeRSA(config.keys.publicKey);
-        var wechatEncrypted = publicKey.encrypt(config.appInfo.appID+'&'+Date.now()+'&'+user.email, 'base64');
-        wechatEncrypted = urlencode(wechatEncrypted)
         res.send({
           code: 200,
           user: {
