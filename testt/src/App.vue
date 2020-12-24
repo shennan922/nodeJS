@@ -41,6 +41,12 @@ export default {
   text-align: center;
   color: #2c3e50;
 }
+#edui_fixedlayer {
+  z-index: 99999!important;
+}
+// #edui-default{
+//   z-index: 99999!important;
+// }
 
 #nav {
   //padding: 30px;

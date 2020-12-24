@@ -30,7 +30,7 @@
                     trigger="click">
                   <!-- style="background: rgb(255, 255, 255);  display: inline-block;" -->
                   <el-image :src="QRurl" date-qrid="245092"></el-image>
-                  <el-button size="mini" slot="reference" type="info" @click="generateQR"  plain class="buttonQRCode"><i class="el-icon-picture-outline"></i>QR Code</el-button>
+                  <el-button size="mini" slot="reference" type="info" @click="generateQR(scope.row.SEID)"  plain class="buttonQRCode"><i class="el-icon-picture-outline"></i>QR Code</el-button>
                   </el-popover>
                 <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
               </template>
@@ -122,6 +122,7 @@
 import SEService from "../../services/SEService";
 import MLService from "../../services/MLService";
 import GeneralService from "../../services/GeneralService";
+import WechatService from "../../services/WechatService";
 
 export default {
   inject:['reload'],
@@ -145,7 +146,7 @@ export default {
       getSearchInfo:[],           //模糊搜索结果
       pageNum:1,                  //table第几页
       pageSize:5,                 //table每页几条数据
-      QRurl:'',                   //动态生成二维码链接      
+      QRurl:'',                   //动态生成二维码链接     
       SEForm: {                   //table数据源
         SEID:"",
         SEName:"",
@@ -232,10 +233,14 @@ export default {
       }  
     },
 
-    async generateQR(){
-
-      //this.QRurl = await SEService.generateQR('ayKoHfkba6yaGDHo4vSbcMoXgY6u%2F5P7Zt86IjT%2Bc829cKWpUqbNqKg%2B7Yo%2BmezNhwtNWHFNP%2FKlc1UlxEYzpP9EKcvmC%2F7Y9d0CcR5Je7tAIg4yU5oG1DcaMwXyr03R87%2BwMxzRzVHEYq%2F633iR7M0mcV1bbm9oxU%2BG0qw5sVc%3D')
-      this.QRurl = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQHB7zwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyWl91b2dTQm9jTEYxVGpEQjF2Y24AAgRTLdxfAwSAOgkA'
+    async generateQR(SEID){
+      var ii = WechatService.getQRCode(SEID).then(url=>
+      {
+         this.QRurl = url;
+         console.log("this.QRurl:" + this.QRurl);
+      })
+      console.log(ii);      
+      //this.QRurl = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQHB7zwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyWl91b2dTQm9jTEYxVGpEQjF2Y24AAgRTLdxfAwSAOgkA'
 
     },
     changeTableSort(column){

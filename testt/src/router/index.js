@@ -41,7 +41,7 @@ const routes = [
   {
     path: '/data/Welcome',
     name: 'Welcome',
-   
+    // meta: { auth: true, title: 'Welcome' },
     component: () => import('../views/data/Welcome.vue')
   },
   {
@@ -53,44 +53,44 @@ const routes = [
       {
         path: '/data/MySE',
         name: 'MySE',
-        meta: { auth: true,title: 'MySE' },
+        meta: { auth: true, title: 'MySE' },
         component: () => import('../views/data/MySE.vue')
       },
       {
         path: '/data/Test',
         name: 'Test',
-        meta: { title: 'Overview' },
+        meta: { auth: true, title: 'Overview' },
         component: () => import('../views/data/Test.vue')
       },
       {
         path: '/data/Log',
         name: 'Log',
-        meta: { title: 'Log' },
+        meta: { auth: true, title: 'Log' },
         component: () => import('../views/data/Log.vue')
       },
 
       {
         path: '/data/Analytics',
         name: 'Analytics',
-        meta: { title: 'Analytics' },
+        meta: { auth: true, title: 'Analytics' },
         component: () => import('../views/data/Analytics.vue')
       },
       {
         path: '/data/MyContent',
         name: 'MyContent',
-        meta: { title: 'My Content' },
+        meta: { auth: true, title: 'My Content' },
         component: () => import('../views/data/MyContent.vue')
       },
       {
         path: '/data/MyPush',
         name: 'MyPush',
-        meta: { title: 'My Push' },
+        meta: { auth: true, title: 'My Push' },
         component: () => import('../views/data/MyPush.vue')
       },
       {
         path: '/data/RequestList',
         name: 'RequestList',
-        meta: { title: 'Request List' },
+        meta: { auth: true, title: 'Request List' },
         component: () => import('../views/data/RequestList.vue')
       },
     ]
