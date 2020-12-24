@@ -180,7 +180,7 @@ module.exports = {
 	},
   async updateAllTokens()
   {
- /*   try{
+    try{
       var apps = await db.APPList.findAll()
       if (apps.length==0)
       {
@@ -194,7 +194,7 @@ module.exports = {
       
     }catch(error){
       logger.logger.error("update access tokens error: "+error.message) 
-    }*/
+    }
   }
 
 }

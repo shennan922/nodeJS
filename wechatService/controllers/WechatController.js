@@ -52,7 +52,7 @@ async function getAccessToken (timestamp,appId)
 }
 
 module.exports = {  
-/*  initdb(req, res)
+  initdb(req, res)
   {
     var newToken = {
       APPID: config.appInfo.appid,
@@ -60,7 +60,7 @@ module.exports = {
       APPToken: ''      
     }
     db.APPList.create(newToken)           
-  },*/
+  },
   async getQRCode (req, res) {
     try {
      // await updateAccessToken(config.appInfo.appid,config.appInfo.secret)
@@ -182,10 +182,15 @@ module.exports = {
   {
     try{
       var apps = await db.APPList.findAll()
+      if (apps.count==0)
+      {
+        this.initdb()
+      }else{
       apps.forEach(app => 
         {
           updateAccessToken(app.APPID,app.APPSecret)
         })
+      }
     }catch(error){
       logger.logger.error("update access tokens error: "+error.message) 
     }

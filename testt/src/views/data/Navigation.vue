@@ -79,7 +79,8 @@
 </template>
 <script>
 import variables from "@/styles/variables.scss";
-import UserService from "../../services/UserService";
+//import UserService from "../../services/UserService";
+import WechatService from "../../services/WechatService";
 //import UserService from "../../services/UserService";
 export default {
   data() {
@@ -142,13 +143,12 @@ export default {
       return variables;
     },
     logout() {
-       function pp1()
+      alert('123')
+      var ii =WechatService.getQRCode('ceshile').then(url=>
       {
-          var pp =  UserService.getQRCode()
-          return pp
-      }
-    var ii = pp1();
-    console.log(ii);
+         alert(url)
+      })
+      console.log(ii);
             //清除token
       //window.sessionStorage.clear();
        // 关闭浏览器窗口的时候清空浏览器缓存在localStorage的数据

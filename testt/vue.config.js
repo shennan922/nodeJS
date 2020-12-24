@@ -8,8 +8,8 @@ module.exports = {
         pathRewrite: { '^/api': '' }
       },
       '/wechat': {
-        target: process.env.VUE_APP_WECHAT_SERVER,
-        pathRewrite: { '^/wechat': '/wechat'}
+        target: process.env.VUE_APP_NEWWECHAT_SERVER,
+        pathRewrite: { '^/wechat': ''}
       },
     }
   },

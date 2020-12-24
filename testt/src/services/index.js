@@ -13,12 +13,19 @@ const request = axios.create({
   }
 })
 
-const wechatrequest = axios.create({
+const wapirequest = axios.create({
   baseURL: '/wechat',
   headers: {
    
   }
 })
+
+/*const wqrrequest = axios.create({
+  baseURL: 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=',
+  headers: {
+   
+  }
+})*/
 /*const requestMock = axios.create({
   baseURL: '/mock',
   headers: {
@@ -50,5 +57,5 @@ request.interceptors.response.use(response => {
   return Promise.reject(error)
 })
 req.request = request
-req.wechatrequest = wechatrequest
+req.wapirequest = wapirequest
 export default req

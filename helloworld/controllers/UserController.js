@@ -19,6 +19,7 @@ function comparePassword (user,password) {
 }
 
 const User = db.User
+const SEList = db.SEList
 
 module.exports = {
   async register (req, res) {
@@ -131,6 +132,9 @@ module.exports = {
         }
       })
       let isValidPassword = comparePassword(user,req.body.password)
+      //var apps = await db.APPList.findAll()
+      //const token = apps[0].APPToken
+      const token =await db.APPList.findByPk(config.appInfo.appID)
       if (isValidPassword) {
         var publicKey = new NodeRSA(config.keys.publicKey);
         var wechatEncrypted = publicKey.encrypt(config.appInfo.appID+'&'+Date.now()+'&'+user.email, 'base64');
@@ -140,7 +144,7 @@ module.exports = {
           user: {
             email: user.email,
             id: user.id,
-            wechat:wechatEncrypted
+            wechat:token.APPToken
           },
           token: tokenSign(user)
         })
@@ -158,6 +162,42 @@ module.exports = {
         error: '登陆异常: '+error
       })
       logger.logger.fatal('User login fail: '+error.message)
+    }
+  },
+  async setOpenID (req, res) {
+    try {
+      if(!await SEList.findOne({where: {SEID:req.body.SEID}})){
+        res.status(200).send({
+          code: 200,
+          message: 'SE不存在'
+        })
+      }
+      else{
+        if(await SEList.findOne({where: {SEID:req.body.SEID, OpenID:req.body.OpenID}})){
+          res.status(200).send({
+            code: 200,
+            message: 'OpenID无变化'
+          })
+        }
+        else{
+          var newID = {
+            OpenID: req.body.OpenID
+          }
+          await SEList.update(newID,{where: {SEID:req.body.SEID}})
+
+          res.status(200).send({
+            code: 200,
+            message: 'OpenID已更新'
+          })
+        }
+      }
+      logger.logger.info("Update OpenID: "+req.body.SEID+': '+req.body.OpenID)
+    } catch (error) {
+      res.status(400).send({
+        code: 400,
+        error: '程序异常: ' + error
+      })
+      logger.logger.fatal("Update OpenID: "+req.body.SEID+'/'+error)
     }
   }
 }

@@ -28,7 +28,7 @@ module.exports = {
     internalError: 500
   },
   appInfo:{
-    appid:"wx43ce1ba96c04fd5c", //公众号的appid
+    appID:"wx43ce1ba96c04fd5c", //公众号的appid
     secret:"59d51309664e12b4dc7b69f37c60b945", //公众号的secret 重要不要暴露给前端
     wxapi:"https://api.weixin.qq.com/cgi-bin",
     QRurl:'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=',
@@ -36,7 +36,12 @@ module.exports = {
   },
   keys:
   {  
-
+    publicKey: `-----BEGIN PUBLIC KEY-----
+    MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCcgPpTEKH6jYdRCOONmzUohKkd
+    dmFuRuFr0x+00p8owNUuwhiaiCAfU82HXPVNJwAVqDKWRbFwhzxG5TUDYwlWP1W+
+    8wIVDMsQovjsErRJf37LMn7ruD8t2VieVMg7KUSZXxDmiKVJedD1ymVBr/kPMu4o
+    n3deou+3/QAQ6dAMWQIDAQAB
+    -----END PUBLIC KEY-----`
   }
   
 }
