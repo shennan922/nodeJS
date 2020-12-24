@@ -8,5 +8,5 @@ const ActionsHandler = require('../../controllers/ActionsController')
 })*/
 router.get('/',SignPolicy.isValidWechat)
 router.post('/',ActionsHandler.actionHandler)
-
+router.get('/checkpermission',ActionsHandler.checkPermission)
 module.exports = router

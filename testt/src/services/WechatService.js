@@ -13,6 +13,13 @@ export default {
       data
     )
   },
+
+  async checkPermission (code) {
+    return await req.request.get(
+      '/wechat/checkpermission?code='+code
+    )
+  },
+
   async getQRCode (id) {
     var data = {"expire_seconds": 604800, "action_name": "QR_STR_SCENE", "action_info": {"scene": {"scene_str": id}}}
     alert("kaishi")

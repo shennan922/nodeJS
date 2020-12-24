@@ -45,5 +45,14 @@ module.exports = {
   }
     })
   
-	}
+  },
+  
+  async checkPermission(req, res, next)
+	{
+    var openid ='';
+    res.send({
+      code: 200,
+      openid: openid
+    })
+  }
 }

@@ -3,7 +3,7 @@ const router = express.Router()
 
 module.exports = (app) => {
   router.use(function(req, res, next) {next();});
-  router.use('/wechat', require('./SE'));
+  router.use('/wechat', require('./WeChat'));
   router.use('/se', require('./SE'));
   router.use('/ml', require('./ML'));
   router.use('/general', require('./General'));
