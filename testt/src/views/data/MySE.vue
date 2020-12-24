@@ -11,9 +11,12 @@
           <el-table :model="SEForm" :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
             :header-cell-style="tableHeaderColor" 
             @sort-change="changeTableSort" class="formSE"
+            
+            :row-key="(row)=>{ return row.SEID}"
+            
+            ref="SeTable"
             >
-            <el-table-column min-width="5%" prop="SEID" label="ID" sortable="custom">
-              <el-checkbox ></el-checkbox>
+            <el-table-column min-width="5%" prop="SEID" type="selection" label="" :reserve-selection="true" >
             </el-table-column>
             <el-table-column min-width="10%" prop="SEID" label="ID" sortable="custom"></el-table-column>
             <el-table-column min-width="15%" prop="SEName" label="SEName" ></el-table-column>
@@ -214,7 +217,7 @@ export default {
     }
   },
 
-  methods: {
+  methods: {    
     handleChange(flag){
       if(flag=='city'){
         this.AddSEForm.HospitalID = ''
@@ -501,7 +504,6 @@ export default {
         const searchTableInfo = this.searchTableInfo
         if (searchTableInfo) {
           return this.getSearchInfo.filter(data => {
-            console.log("success"+data)
             return Object.keys(data).some(key => {
               return String(data[key]).toLowerCase().indexOf(searchTableInfo) > -1
             })
