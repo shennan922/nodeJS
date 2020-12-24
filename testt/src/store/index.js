@@ -9,7 +9,8 @@ export default new Vuex.Store({
     token: '',
     user: null,
     isUserLogin: false,
-    loadingInstance: null
+    loadingInstance: null,
+    wechatUser:''
   },
   mutations: {
     setToken (state, token) {

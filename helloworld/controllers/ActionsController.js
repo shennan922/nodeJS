@@ -1,8 +1,10 @@
+const axios = require('axios')
 const db = require('../models/Index')
 const logger = require('../logger/log4')
 const xml2js = require('xml2js');
 const msg = require('../utils/Msg');
 const config = require('../config')
+
 
 async function binding(seId ,openId)
 {
@@ -115,8 +117,8 @@ module.exports = {
   
   async checkPermission(req, res, next)
 	{
-    
-    data =await axios.get(`${config.appInfo.snsurl}/access_token?appid=${config.appInfo.appID}&secret=${config.appInfo.secret}&code=${req.params.code}&grant_type=authorization_code`)    
+    try{
+    data =await axios.get(`${config.appInfo.snsurl}/access_token?appid=${config.appInfo.appID}&secret=${config.appInfo.secret}&code=${req.query.code}&grant_type=authorization_code`)    
     var openid =data.data.openid;
     var seid = await checkSE(openid)
     if(seid=="")
@@ -131,6 +133,13 @@ module.exports = {
         id: seid
       })
     }
-    
+    }catch (error) {
+      logger.logger.error("get user info error: "+error.message)
+      res.send({
+        code: 404,
+        id: "",
+        error: error.message
+      })
+    }
   }
 }

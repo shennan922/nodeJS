@@ -159,7 +159,8 @@ router.beforeEach((to, from, next) => {
       {
         //alert(tt)
         alert(tt.data.code)
-        if(tt.data.code==201){
+        if(tt.data.code==200){
+          store.state.wechatUser = tt.data.id
           next()
         }else{
           next({
