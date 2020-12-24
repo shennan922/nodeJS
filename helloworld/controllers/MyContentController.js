@@ -3,13 +3,31 @@ const logger = require('../logger/log4')
 
 const Content = db.MyContent
 const Category = db.MyContentCategory
+const SEList = db.SEList
+
+Content.belongsTo(SEList, {
+  foreignKey: 'SEID',
+  targetKey: 'SEID',
+  as: 'SE'
+});
 
 module.exports = {
   async getList (req, res) {
-    try {console.log('111')
-      const data = await Content.findAll()
+    try {
+      var data = await Content.findAll({
+        attributes:['ContentID','SEID','SearchTerm','ContentCategory','ShortTitle','ContentMessage','CreateDt','ModifyDt'],
+        include:[
+          {
+            model: SEList,
+            attributes: ['SEName'],
+            as: 'SE'
+          }
+        ],
+        raw: true
+      })
       
       if (data) {
+        data = JSON.parse(JSON.stringify(data).replace(/SE.SEName/g, 'SEName'))
         res.status(200).send({
           value: 'MyContentList',
           data: data
@@ -63,8 +81,9 @@ module.exports = {
         })
       }
       else{
+        var maxID = await Content.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('ContentID')),'maxID']]})
         var newContent = {
-          ContentID: req.body.ContentID,
+          ContentID: maxID.dataValues.maxID+1,
           SEID: req.body.SEID,
           SearchTerm: req.body.SearchTerm,
           ContentCategory: req.body.ContentCategory,
