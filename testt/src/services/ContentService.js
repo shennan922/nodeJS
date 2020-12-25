@@ -8,7 +8,10 @@ export default {
   async getCategoryList () {
     const response = await req.request.get('/MyContent/getCategory')
     return response.data
+  },
+  async myContentCreate (data) {
+    const response = await req.request.post('/myContent/create',data)
+    return response.data
   }
- 
 }
 

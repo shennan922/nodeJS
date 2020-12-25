@@ -73,26 +73,18 @@ module.exports = {
     }
   },
   async create (req, res) {
-    try {
-      if(await Content.findOne({where: {SEID:req.body.ContentID}})){
-        res.status(200).send({
-          code: 400,
-          message: 'Content已经存在'
-        })
+    try {   
+      var maxID = await Content.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('ContentID')),'maxID']]})
+      var newContent = {
+        ContentID: maxID.dataValues.maxID+1,
+        SEID: req.body.SEID,
+        SearchTerm: req.body.SearchTerm,
+        ContentCategory: req.body.ContentCategory,
+        ShortTitle: req.body.ShortTitle,
+        ContentMessage: req.body.ContentMessage,
+        CreateDt: req.body.TimeStamp
       }
-      else{
-        var maxID = await Content.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('ContentID')),'maxID']]})
-        var newContent = {
-          ContentID: maxID.dataValues.maxID+1,
-          SEID: req.body.SEID,
-          SearchTerm: req.body.SearchTerm,
-          ContentCategory: req.body.ContentCategory,
-          ShortTitle: req.body.ShortTitle,
-          ContentMessage: req.body.ContentMessage,
-          CreateDt: req.body.TimeStamp
-        }
-        await Content.create(newContent)
-      }
+      await Content.create(newContent)      
       
       res.status(200).send({
         code: 200,
@@ -104,7 +96,7 @@ module.exports = {
         code: 500,
         error: '程序异常: ' + error
       })
-      logger.logger.fatal("Create Content fail: "+newSE.SEID+'/'+error)
+      logger.logger.fatal("Create Content fail: "+newContent.SEID+'/'+error)
     }
   }
 }

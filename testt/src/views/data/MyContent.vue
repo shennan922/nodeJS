@@ -5,7 +5,7 @@
         <div class='top'>
           <div class="title">
             <h3>
-            Lilly Wechat - SE List
+            Lilly Wechat - My Content
             </h3>
           </div>
           <div class='Button'>
@@ -39,7 +39,7 @@
             <el-table-column min-width="5%" prop="SearchTerm" label="SearchTerm" ></el-table-column>
             <el-table-column min-width="5%" prop="ContentCategory" label="ContentCategory"></el-table-column>
             <el-table-column min-width="5%" prop="ShortTitle" label="ShortTitle"></el-table-column>
-            <el-table-column min-width="5%" prop="ContentMessage" label="ContentMessage"></el-table-column>
+            <!-- <el-table-column min-width="5%" prop="ContentMessage" label="ContentMessage"></el-table-column> -->
             <el-table-column min-width="5%" prop="SEID" label="SEID"></el-table-column>
             <el-table-column min-width="5%" prop="CreateDT" label="CreateDT"></el-table-column>
             <el-table-column min-width="5%" prop="ModifyDT" label="ModifyDT"></el-table-column>
@@ -86,7 +86,7 @@
                   <div>
                   <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:90%;padding-left:0px">
                     <el-option
-                      v-for="item in getCategoryList.data" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
+                      v-for="item in getCategoryList" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
                     </el-option> 
                     </el-select> 
                     <el-button  class="button-new-tag" size="small" @click="showInput">+ </el-button>
@@ -107,25 +107,27 @@
                   <el-input v-model="AddContentForm.SearchTerm"></el-input>
                 </el-form-item> 
                 <el-form-item label="Upload PDF">
-                    <!-- style="width: 200px; display: inline; margin-left: 25px" -->
-                    <!-- class="upload-demo" -->
-                    <el-upload
-                      ref="upload"
-                      action=""
-                      :show-file-list="true"
-                      :before-upload="beforeUpload"
-                      style="float:left">
-                      <el-button slot="trigger">Choose file</el-button>
-                    </el-upload>
-                    <el-input v-model="AddContentForm.UpdatePDFName" class="input_UploadPdf" :disabled="true"></el-input>
+                  
+                  
+                  <el-row>
+                    <el-col :span="5">
+                      <el-upload
+                        ref="upload"
+                        action=""
+                        :show-file-list="true"
+                        :before-upload="beforeUpload"
+                        style="float:left">
+                        <el-button slot="trigger">Choose file</el-button>
+                      </el-upload>
+                    </el-col>
+                    <el-col :span="19">
+                      <el-input v-model="AddContentForm.UpdatePDFName"  :disabled="true"></el-input>
+                    </el-col>
+                  </el-row>
                 </el-form-item>
-                <el-form-item label="Content" prop="Content">
+                <el-form-item label="Content" prop="ContentMessage">
                   <div>
-                    <!-- <button @click="getUEContent()">获取内容</button>
-                    <button @click="getUEContentTxt()">获取无文本内容</button> -->
-                    <div class="edui-default">
-                      <UE :defaultMsg=defaultMsg :config=config :id=ue1 ref="ue"></UE>
-                    </div>
+                    <UE :defaultMsg=defaultMsg :config=config :id=ue1 ref="ue"></UE>
                   </div>
                 </el-form-item>
               </el-col>
@@ -134,6 +136,10 @@
           <div style="margin-right:10px" slot="footer">
             <el-button @click.native="createSubmit"  type="primary">Submit</el-button>
          </div>
+         <!-- <div style="margin-right:10px" slot="footer" class="dialog-footer">
+            <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
+            <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
+         </div> -->
 
       </el-dialog>
   </div>
@@ -147,20 +153,20 @@ import SEService from "../../services/SEService";
 import MLService from "../../services/MLService";
 import GeneralService from "../../services/GeneralService";
 import UE from '../../components/ue/ue.vue';
+// import MyContentService from "../../services/MyContentService";
 import ContentService from "../../services/ContentService";
 
 export default {
   mounted() {
     this.getDetailList();
     this.getCategoryListData();
-    
+    this.getSEList();
   },  
   components: {UE},
   data(){
     return {
-      pageNum:1,                  //table第几页
+      pageNum:1,//table第几页
       pageSize:1,  
-      //  defaultMsg: '<span style="orphans: 2; widows: 2; font-size: 22px; font-family: KaiTi_GB2312; background-color: rgb(229, 51, 51);"><strong>夏钧姗：成功的投资需具备哪些心态和掌握哪些重要止损位</strong></span>',
       defaultMsg:"",
       config: {
         // 初始容器宽度
@@ -174,6 +180,7 @@ export default {
       },
       ue1: "ue1", // 不同编辑器必须不同的id
       ue2: "ue2",
+      formStatus:0, 
       getSEListAll:[],
       dialogCreateVisible: false,
        dynamicTags:['标签','222','333'],
@@ -292,6 +299,14 @@ export default {
        ContentService.getList("")
         .then((res) => {
           this.getSearchInfo = res.data;
+        })
+        .catch(function (err) {
+          console.log("err"+err);
+        });
+    },
+    getSEList() {
+      SEService.getSEList("")
+        .then((res) => {
           this.getSEListAll = res.data;
           //console.log("getSEListAll:" + JSON.stringify(this.getSEListAll));
         })
@@ -384,7 +399,7 @@ export default {
         UpdatePDF: null,
         UpdatePDFName: '',
         UpdatePDFData:'',
-        Content: "",
+        ContentMessage: "",
       };
     },
     beforeUpload(UpdatePDF) {
@@ -406,7 +421,7 @@ export default {
     },
     async createSubmit() {
       //获取富文本框内容
-      this.AddContentForm.Content = this.$refs.ue.getUEContent(); // 调用子组件方法
+      this.AddContentForm.ContentMessage = this.$refs.ue.getUEContent(); // 调用子组件方法
       //获取当前系统时间
       var myDate = new Date()
       var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
@@ -415,54 +430,40 @@ export default {
       var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
       var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
       var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
-      var dataToDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
-      //alert("dataToDate:"+ dataToDate);
-        // this.$notify({
-        //   title: '获取成功，可在控制台查看！',
-        //   message: content,
-        //   type: 'success'
-        // });
-        console.log(this.AddContentForm.Content);
+      var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
+
         this.$refs.AddContentForm.validate((valid) => {
            if (valid) {
               this.$confirm('确认提交？', '提示', {}).then(async() => {
-          //      alert("SEID:"+ this.AddContentForm.SEID);
-          //      alert("ShortTitle:" + this.AddContentForm.ShortTitle);
-          //      alert("SearchTerm:" + this.AddContentForm.SearchTerm); 
-           //     alert("content:" + this.AddContentForm.Content); 
-          //     await SEService.SECreate(
-          //       {
-          //         SEID: this.AddSEForm.SEID,
-          //         SEName: this.AddSEForm.SEName,
-          //         City: this.AddSEForm.CityID[2],
-          //         Hospital: this.AddSEForm.HospitalID,
-          //         Department: this.AddSEForm.DepID,
-          //         MLName: this.AddSEForm.MLID,
-          //         Team:this.AddSEForm.TeamID
-          //       }
-          //     ).then((res) => {
-          //       if (res.code == 400){
-          //         this.$message({
-          //           type: 'info',
-          //           message: res.message
-          //         });
-          //       } 
-          //       if (res.code == 200){
-          //         this.$message({
-          //           type: 'success',
-          //           message: '提交成功!'
-          //         });
-          //         this.dialogCreateVisible = false;
-          //         this.formStatus = 0
-          //         this.getDetailList()
-          //         this.handleClose()
-          //       }              
-          //     })
-          //   }).catch((err) => {
-          //     this.$message({
-          //       type: 'info',
-          //       message: '出错了: '+err
-          //     });
+ 
+              await ContentService.myContentCreate(
+                {
+                  // ContentID: "100004",
+                  SEID: this.AddContentForm.SEID,
+                  SearchTerm: this.AddContentForm.SearchTerm,
+                  ContentCategory: "1,3",
+                  ShortTitle: this.AddContentForm.ShortTitle,
+                  ContentMessage: this.AddContentForm.ContentMessage,
+                  TimeStamp: createDate
+                }
+              ).then((res) => {
+              
+                if (res.code == 200){
+                  this.$message({
+                    type: 'success',
+                    message: '提交成功!'
+                  });
+                  this.dialogCreateVisible = false;
+                  this.formStatus = 0
+                  this.getDetailList()
+                  //this.handleClose()
+                }              
+              })
+            }).catch((err) => {
+              this.$message({
+                type: 'info',
+                message: '出错了: '+err
+              });
              })
           }
         })
@@ -532,7 +533,9 @@ export default {
   float: right;
   padding: 5px;
 }
-///deep/.dialogContent{
+
+/deep/.dialogContent{
+  text-align: left;
   .el-dialog__header{
     text-align: left;
     padding-left:7%;
@@ -545,8 +548,8 @@ export default {
     color:#fff;
   }
   .input_UploadPdf{
-    padding-left:2%;
-    width:75%;
+    padding-left:3%;
+    //width:85%;
     background-color:white
   }
   .el-form-item__content{
@@ -563,7 +566,8 @@ export default {
   }
   .el-dialog__body{
     padding: 3% 5% 0px 5%;
-  }
+  }  
+}
 
   
 </style>
