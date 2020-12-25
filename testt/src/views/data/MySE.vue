@@ -8,9 +8,12 @@
           <div class="searchBox">
             <el-input prefix-icon="iconfont icon-sousuo" v-model="searchTableInfo" placeholder="请输入搜索内容"></el-input>
           </div>
-          <el-table :model="SEForm" :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
-            :header-cell-style="tableHeaderColor" 
-            @sort-change="changeTableSort" class="formSE"
+          
+          <el-table 
+          :model="SEForm" 
+          :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
+          :header-cell-style="tableHeaderColor" 
+          @sort-change="changeTableSort" class="formSE"
             
             :row-key="(row)=>{ return row.SEID}"
             
@@ -437,10 +440,12 @@ export default {
       MLService.getMLList()
         .then((res) => {
           this.getMLList = res;
+          
         })
         .catch(function (err) {
           console.log(err);
         });
+       
     },
     //getTeam
     getTeamData() {
