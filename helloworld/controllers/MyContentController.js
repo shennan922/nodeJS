@@ -1,6 +1,6 @@
 const db = require('../models/Index')
 const logger = require('../logger/log4')
-
+var fs=require('fs');
 const Content = db.MyContent
 const Category = db.MyContentCategory
 const SEList = db.SEList
@@ -97,6 +97,35 @@ module.exports = {
         error: '程序异常: ' + error
       })
       logger.logger.fatal("Create Content fail: "+newContent.SEID+'/'+error)
+    }
+  },
+  async createPdf(req, res) {
+    try {
+      logger.logger.info('req.body==>', req.body.file);
+      console.log('req.body==>', req.body.fileName);
+
+      var base64Data = req.body.file.replace(/^data:application\/pdf;base64,/, "");
+      var dataBuffer = new Buffer(base64Data, 'base64');
+      fs.writeFile('.//contents//'+req.body.fileName, dataBuffer,function(err) {
+        if(err){
+          logger.logger.info(err);
+        }else{
+          logger.logger.info(err);
+        }
+      })
+
+      res.status(200).send({
+        code: 200,
+        message: 'Content创建成功',
+        data: req.body.fileName
+      })
+
+    } catch (error) {
+      res.status(500).send({
+        code: 500,
+        error: '程序异常: ' + error
+      })
+      //logger.logger.fatal("Create Content fail: " + newContent.ContentID + '/' + error)
     }
   }
 }

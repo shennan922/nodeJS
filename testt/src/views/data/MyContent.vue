@@ -122,8 +122,6 @@
                   <el-input v-model="AddContentForm.SearchTerm"></el-input>
                 </el-form-item> 
                 <el-form-item label="Upload PDF">
-                  
-                  
                   <el-row>
                     <el-col :span="5">
                       <el-upload
@@ -175,6 +173,7 @@ export default {
   mounted() {
     this.getDetailList();
     this.getCategoryListData();
+    this.getSEList();
   },  
   components: {UE},
   data(){
@@ -295,12 +294,13 @@ export default {
       //this.$refs.AddSEForm.resetFields()   
       this.AddContentForm = {
         SEID:"",
-        SEName:"",
-        CityID: "",
-        HospitalID: "",
-        DepID: "",
-        MLID: "",
-        TeamID: ""
+        ContentCategory:"",
+        ShortTitle: "",
+        SearchTerm: "",
+        UpdatePDF: null,
+        UpdatePDFName: '',
+        UpdatePDFData:'',
+        ContentMessage: "",
       }
       this.formStatus = 0 
       this.changeFlag = false
@@ -336,6 +336,16 @@ export default {
           console.log("err"+err);
         });
     },
+    getSEList() {
+      SEService.getSEList("")
+        .then((res) => {
+          this.getSEListAll = res.data;
+          //console.log("getSEListAll:" + JSON.stringify(this.getSEListAll));
+        })
+        .catch(function (err) {
+          console.log("err"+err);
+        });
+    },
     handleSizeChange(pageSize){
       this.pageSize = pageSize      
     },
@@ -343,15 +353,21 @@ export default {
       this.pageNum = pageNum
     },
     handleEdit(row) {
+      this.formStatus = 2;
       this.dialogCreateVisible = true;
+      
+      this.defaultMsg =row.ContentMessage;
         this.AddContentForm = {
         SEID:row.SEID,
-        SEName:row.SEName,
-        CityID: row.CityID,
-        HospitalID: row,
-        DepID: row,
-        MLID: row,
-        TeamID: row
+          ContentCategory:row.ContentCategory,
+          ShortTitle: row.ShortTitle,
+          SearchTerm: row.SearchTerm,
+          UpdatePDF: null,
+          UpdatePDFName: '',
+          UpdatePDFData:'',
+          ContentMessage: row.ContentMessage,
+          CreateDt:row.CreateDt,
+          ModifyDt:row.ModifyDT
       };
     },
     handleDelete(SEID){
@@ -411,6 +427,7 @@ export default {
     },
     handleAdd() {
     this.dialogCreateVisible = true;
+      this.defaultMsg ="";
       this.AddContentForm = {
         SEID:"",
         ContentCategory:"",
@@ -455,7 +472,6 @@ export default {
         this.$refs.AddContentForm.validate((valid) => {
            if (valid) {
               this.$confirm('确认提交？', '提示', {}).then(async() => {
- 
               await ContentService.myContentCreate(
                 {
                   // ContentID: "100004",
@@ -465,7 +481,13 @@ export default {
                   ShortTitle: this.AddContentForm.ShortTitle,
                   ContentMessage: this.AddContentForm.ContentMessage,
                   TimeStamp: createDate
-                }
+            },
+            await ContentService.ContentCreate({
+                contentId: "1",
+                fileId: "1",
+                fileName: this.AddContentForm.UpdatePDFName,
+                file: this.AddContentForm.UpdatePDFData,
+              })
               ).then((res) => {
               
                 if (res.code == 200){

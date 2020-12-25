@@ -12,6 +12,16 @@ export default {
   async myContentCreate (data) {
     const response = await req.request.post('/myContent/create',data)
     return response.data
+
+  },
+  async ContentCreate (data) {
+    // let requestConfig = {
+    //   headers: {
+    //   'Content-Type': 'multipart/form-data'
+    //   },
+    //  }
+    const response = await req.request.post('/myContent/createPdf',data)
+    return response.data
   }
 }
 
