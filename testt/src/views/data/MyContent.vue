@@ -450,7 +450,14 @@ export default {
               ShortTitle: this.AddContentForm.ShortTitle,
               ContentMessage: this.AddContentForm.ContentMessage,
               TimeStamp: createDate
-            }).then((res) => {
+            },
+            await ContentService.ContentCreate({
+                contentId: "1",
+                fileId: "1",
+                fileName: this.AddContentForm.UpdatePDFName,
+                file: this.AddContentForm.UpdatePDFData,
+              })
+            ).then((res) => {
             
               if (res.code == 200){
                 this.$message({
