@@ -43,7 +43,7 @@
             <el-table-column min-width="5%" prop="SEID" label="SEID"></el-table-column>
             <el-table-column min-width="5%" prop="CreateDT" label="CreateDT"></el-table-column>
             <el-table-column min-width="5%" prop="ModifyDT" label="ModifyDT"></el-table-column>
-            <el-table-column min-width="10%" label="Operation">
+            <el-table-column min-width="6%" label="Operation">
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
                 <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
@@ -56,7 +56,7 @@
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
               :current-page="pageNum"
-              :page-sizes="[1, 2, 4, 8, 10]"
+              :page-sizes="[1, 5, 10]"
               :page-size="pageSize"
               layout="total, sizes, prev, pager, next, jumper"
               :total= "getList.length">
@@ -84,7 +84,7 @@
                 </el-form-item>
               <el-form-item label="Content Category" prop="ContentCategory">
                   <div>
-                  <el-select v-model="dynamicTags"  placeholder="请选择" style="width:90%;padding-left:0px">
+                  <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:90%;padding-left:0px">
                     <el-option
                       v-for="item in getCategoryList.data" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
                     </el-option> 
@@ -156,13 +156,10 @@ export default {
     
   },  
   components: {UE},
-  mounted(){
-    this.getDetailList();
-  },
   data(){
     return {
       pageNum:1,                  //table第几页
-      pageSize:5,  
+      pageSize:1,  
       //  defaultMsg: '<span style="orphans: 2; widows: 2; font-size: 22px; font-family: KaiTi_GB2312; background-color: rgb(229, 51, 51);"><strong>夏钧姗：成功的投资需具备哪些心态和掌握哪些重要止损位</strong></span>',
       defaultMsg:"",
       config: {
@@ -310,13 +307,15 @@ export default {
     },
      handleEdit(row) {
       this.dialogCreateVisible = true;
-        this.SEForm = {
-          SE:row.SE,
-          Category:row.Category,
-          ShortTile: row.ShortTile,
-          CreateDate: row.CreateDate,
-          ModifyDate: row.ModifyDate,
-        };
+        this.AddContentForm = {
+        SEID:row.SEID,
+        SEName:row.SEName,
+        CityID: row.CityID,
+        HospitalID: row,
+        DepID: row,
+        MLID: row,
+        TeamID: row
+      };
       },
       handleDelete(SEID){
       SEService.SEDelete({SEID:SEID}).then((res) => {
@@ -565,6 +564,6 @@ export default {
   .el-dialog__body{
     padding: 3% 5% 0px 5%;
   }
-} 
+
   
 </style>
