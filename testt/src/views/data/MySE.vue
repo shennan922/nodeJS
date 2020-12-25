@@ -15,10 +15,10 @@
           :header-cell-style="tableHeaderColor" 
           @sort-change="changeTableSort" class="formSE"
             
-            :row-key="(row)=>{ return row.SEID}"
-            
-            ref="SeTable"
-            >
+          :row-key="(row)=>{ return row.SEID}"
+          
+          ref="SeTable"
+          >
             <el-table-column min-width="5%" prop="SEID" type="selection" label="" :reserve-selection="true" >
             </el-table-column>
             <el-table-column min-width="10%" prop="SEID" label="ID" sortable="custom"></el-table-column>

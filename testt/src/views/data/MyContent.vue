@@ -34,16 +34,28 @@
             :data="getList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border
             :header-cell-style="tableHeaderColor" 
             @sort-change="changeTableSort" class="formSE"
+            ref="ContenTable"
             >
-            <el-table-column min-width="5%" prop="ContentID" label="ContentID"></el-table-column>
-            <el-table-column min-width="5%" prop="SearchTerm" label="SearchTerm" ></el-table-column>
-            <el-table-column min-width="5%" prop="ContentCategory" label="ContentCategory"></el-table-column>
-            <el-table-column min-width="5%" prop="ShortTitle" label="ShortTitle"></el-table-column>
+            <el-table-column min-width="8%" prop="ContentID" label="Content ID"></el-table-column>
+            <el-table-column min-width="8%" prop="SearchTerm" label="Search Term" ></el-table-column>
+            <el-table-column min-width="20%" prop="ContentCategory" label="Category">
+              <template slot-scope="scope" >
+                <el-tag
+                  :key="tag"
+                  v-for="tag in getCategoryDesc(scope.row.ContentCategory)"
+                  :closable="false"
+                  effect="light"
+                  >
+                  {{tag}}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column min-width="10%" prop="ShortTitle" label="Short Title"></el-table-column>
             <!-- <el-table-column min-width="5%" prop="ContentMessage" label="ContentMessage"></el-table-column> -->
-            <el-table-column min-width="5%" prop="SEID" label="SEID"></el-table-column>
-            <el-table-column min-width="5%" prop="CreateDT" label="CreateDT"></el-table-column>
-            <el-table-column min-width="5%" prop="ModifyDT" label="ModifyDT"></el-table-column>
-            <el-table-column min-width="6%" label="Operation">
+            <el-table-column min-width="10%" prop="SEID" label="SEID"></el-table-column>
+            <el-table-column min-width="15%" prop="CreateDt" label="Create Date"></el-table-column>
+            <el-table-column min-width="15%" prop="ModifyDt" label="Modify Date"></el-table-column>
+            <el-table-column min-width="15%" label="Operation">
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
                 <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
@@ -55,9 +67,9 @@
             <el-pagination
               @size-change="handleSizeChange"
               @current-change="handleCurrentChange"
-              :current-page="pageNum"
+              :current-page=pageNum
               :page-sizes="[1, 5, 10]"
-              :page-size="pageSize"
+              :page-size=pageSize
               layout="total, sizes, prev, pager, next, jumper"
               :total= "getList.length">
             </el-pagination>
@@ -84,22 +96,25 @@
                 </el-form-item>
               <el-form-item label="Content Category" prop="ContentCategory">
                   <div>
-                  <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:90%;padding-left:0px">
+                  <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:90%;padding-left:0px" ref="categorySelect">
                     <el-option
                       v-for="item in getCategoryList" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
                     </el-option> 
                     </el-select> 
                     <el-button  class="button-new-tag" size="small" @click="showInput">+ </el-button>
                   </div>
-                </el-form-item>
-                   <el-tag
+                  <div style="margin-top:5px">
+                    <el-tag
                     :key="tag"
                     v-for="tag in dynamicTags"
-                    closable
-                    :disable-transitions="false"
-                    @close="handleClose(tag)">
+                    :closable="true"
+                    @close="onTagClose(tag)"
+                    >
                     {{tag}}
                    </el-tag>
+                  </div>
+                </el-form-item>
+                   
                 <el-form-item label="Short Title" prop="ShortTitle">
                   <el-input v-model="AddContentForm.ShortTitle" ></el-input>
                 </el-form-item>
@@ -160,13 +175,12 @@ export default {
   mounted() {
     this.getDetailList();
     this.getCategoryListData();
-    this.getSEList();
   },  
   components: {UE},
   data(){
     return {
       pageNum:1,//table第几页
-      pageSize:1,  
+      pageSize:5,  
       defaultMsg:"",
       config: {
         // 初始容器宽度
@@ -182,19 +196,21 @@ export default {
       ue2: "ue2",
       formStatus:0, 
       getSEListAll:[],
+      getCategoryList:[],
       dialogCreateVisible: false,
-       dynamicTags:['标签','222','333'],
-        value:'',
-        ContentForm:{
-          ContentID:"",
-          SearchTerm:"",
-          ContentCategory:"",
-          ShortTitle:"",
-          ContentMessage:"",
-          SEID:"",
-          CreateDT:"",
-          ModifyDT:"",
-        },
+      dynamicTags:[],
+      dynamicTagIDs:[],
+      value:'',
+      ContentForm:{
+        ContentID:"",
+        SearchTerm:"",
+        ContentCategory:"",
+        ShortTitle:"",
+        ContentMessage:"",
+        SEID:"",
+        CreateDT:"",
+        ModifyDT:"",
+      },
       AddContentForm: {
         SEID:"",
         ContentCategory:"",
@@ -216,49 +232,65 @@ export default {
           { required: true, message: '请输入Search Team', trigger: 'blur'}
         ],
       },
-       pickerOptions: {
-          shortcuts: [{
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit('pick', [start, end]);
-            }
-          }]
-        },
-        value1: '',
-        value2: '',
+      pickerOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            picker.$emit('pick', [start, end]);
+          }
+        }]
+      },
+      value1: '',
+      value2: '',
 
-        getSearchInfo:[], 
-       searchTableInfo:"",
-        AddForm: {
-                SE:"",
-                Category:"",
-                ShortTile: "",
-                CreateDate: "",
-                ModifyDate: ""
-              },
-     };
+      getSearchInfo:[], 
+      searchTableInfo:"",
+      AddForm: {
+          SE:"",
+          Category:"",
+          ShortTile: "",
+          CreateDate: "",
+          ModifyDate: ""
+        },
+      };
   },
   methods: {
-     handleClose(){            
+    onTagClose(tag){
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag),1)
+      this.dynamicTagIDs.splice(this.dynamicTags.indexOf(tag),1)
+    },
+    getCategoryDesc(id){
+      let idx = id.split(",")
+      let desc = []
+      idx.forEach(id => {
+        for(var item of this.getCategoryList){
+          if(id==item.CategoryID){
+            desc.push(item.CategoryDesc)
+          }
+        }
+      })
+      return desc
+    },
+    handleClose(){            
       //resetFields将form重置到mounted之后的状态, 对于编辑页面不适用
       //this.$refs.AddSEForm.resetFields()   
       this.AddContentForm = {
@@ -274,21 +306,21 @@ export default {
       this.changeFlag = false
     },
     
-     handleClose(tag) {
-        this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
-      },
-     showInput() {
-       //获取input中的值
-       //当鼠标失去焦点时，将值放进数组中
-        this.$nextTick(_ => {
-          this.$refs.saveTagInput.$refs.input.focus();
-        });
-      },
+    handleClose(tag) {
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+    },
+    showInput() {
+     var name =this.getCategoryList.find((item)=>{//这里的selectList就是上面遍历的数据源
+          return item.CategoryID === this.$refs.categorySelect.value;//筛选出匹配数据
+      }).CategoryDesc
+     this.dynamicTags.push(name)
+     this.dynamicTagIDs.push(this.$refs.categorySelect.value)
+    },
     
-     getCategoryListData() {
+    getCategoryListData() {
       ContentService.getCategoryList()
         .then((res) => {
-          this.getCategoryList = res;
+          this.getCategoryList = res.data;
             //console.log("-=====-"+JSON.stringify(this.getCategoryList))
         })
         .catch(function (err) {
@@ -304,23 +336,13 @@ export default {
           console.log("err"+err);
         });
     },
-    getSEList() {
-      SEService.getSEList("")
-        .then((res) => {
-          this.getSEListAll = res.data;
-          //console.log("getSEListAll:" + JSON.stringify(this.getSEListAll));
-        })
-        .catch(function (err) {
-          console.log("err"+err);
-        });
-    },
-     handleSizeChange(pageSize){
+    handleSizeChange(pageSize){
       this.pageSize = pageSize      
     },
-     handleCurrentChange(pageNum){
+    handleCurrentChange(pageNum){
       this.pageNum = pageNum
     },
-     handleEdit(row) {
+    handleEdit(row) {
       this.dialogCreateVisible = true;
         this.AddContentForm = {
         SEID:row.SEID,
@@ -331,8 +353,8 @@ export default {
         MLID: row,
         TeamID: row
       };
-      },
-      handleDelete(SEID){
+    },
+    handleDelete(SEID){
       SEService.SEDelete({SEID:SEID}).then((res) => {
         this.$message({
           type: 'success',
@@ -382,9 +404,7 @@ export default {
             "YYYY-MM-DD HH:mm:ss"
           );
         });
-      }
-      
-      console.log(this.getList);      
+      }   
     },
     tableHeaderColor({ row, column, rowIndex, columnIndex }) {
       return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left";
@@ -441,7 +461,7 @@ export default {
                   // ContentID: "100004",
                   SEID: this.AddContentForm.SEID,
                   SearchTerm: this.AddContentForm.SearchTerm,
-                  ContentCategory: "1,3",
+                  ContentCategory: this.dynamicTagIDs.toString(),
                   ShortTitle: this.AddContentForm.ShortTitle,
                   ContentMessage: this.AddContentForm.ContentMessage,
                   TimeStamp: createDate
@@ -567,7 +587,12 @@ export default {
   .el-dialog__body{
     padding: 3% 5% 0px 5%;
   }  
+  
+
 }
+.el-tag {
+  margin-right: 10px;
+  } 
 
   
 </style>
