@@ -445,10 +445,30 @@ export default {
                   ShortTitle: this.AddContentForm.ShortTitle,
                   ContentMessage: this.AddContentForm.ContentMessage,
                   TimeStamp: createDate
+
                 }
               ).then((res) => {
               
                 if (res.code == 200){
+                  await ContentService.ContentCreate({
+                contentId: "1",
+                fileId: "1",
+                fileName: this.AddContentForm.UpdatePDFName,
+                file: this.AddContentForm.UpdatePDFData,
+              }).then((res) => {
+                if (res.code == 400) {
+                  this.$message({
+                    type: "info",
+                    message: res.message,
+                  });
+                }
+                if (res.code == 200) {
+                  this.$message({
+                    type: "success",
+                    message: "提交成功!",
+                  });
+                }
+              });
                   this.$message({
                     type: 'success',
                     message: '提交成功!'
