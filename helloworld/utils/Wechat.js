@@ -54,12 +54,18 @@ async function getAccessToken (timestamp,appId)
 module.exports = {  
   initdb()
   {
-    var newToken = {
-      APPID: config.appInfo.appid,
-      APPSecret: config.appInfo.secret,
-      APPToken: ''      
-    }
-    db.APPList.create(newToken)           
+    try
+    {
+       var newToken = {
+          APPID: config.appInfo.appid,
+          APPSecret: config.appInfo.secret,
+          APPToken: ''   
+       }   
+       db.APPList.create(newToken)   
+    } catch(error)
+    {
+      logger.logger.error("init token error: "+error.message)    
+    }    
   },
   async getQRCode (req, res) {
     try {
