@@ -153,12 +153,9 @@ router.beforeEach((to, from, next) => {
         query: { redirect: to.fullPath }
       })
     }
-  }else if (to.matched.some((router) => router.meta.wechat)) {
-    alert(to.query.code)
+  }else if (to.matched.some((router) => router.meta.wechat)) {    
     wechatService.checkPermission(to.query.code).then(tt=>
-      {
-        //alert(tt)
-        alert(tt.data.code)
+      {       
         if(tt.data.code==200){
           store.state.wechatUser = tt.data.id
           next()
