@@ -53,7 +53,7 @@
     </div>
 
        <!--导航栏-->
-    <div>
+ <!--   <div>
 
       <template>
           <el-breadcrumb separator="/" class='el-breadcrumb'>
@@ -63,7 +63,7 @@
           </el-breadcrumb> 
       </template>
 
-    </div>
+    </div> -->
 
     <!-- 底部样式 -->
     <div class="buttomStyle">

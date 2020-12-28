@@ -1,15 +1,33 @@
 const db = require('../models/Index')
 const logger = require('../logger/log4')
-
+var fs=require('fs');
 const Content = db.MyContent
 const Category = db.MyContentCategory
+const SEList = db.SEList
+
+Content.belongsTo(SEList, {
+  foreignKey: 'SEID',
+  targetKey: 'SEID',
+  as: 'SE'
+});
 
 module.exports = {
   async getList (req, res) {
-    try {console.log('111')
-      const data = await Content.findAll()
+    try {
+      var data = await Content.findAll({
+        attributes:['ContentID','SEID','SearchTerm','ContentCategory','ShortTitle','ContentMessage','CreateDt','ModifyDt'],
+        include:[
+          {
+            model: SEList,
+            attributes: ['SEName'],
+            as: 'SE'
+          }
+        ],
+        raw: true
+      })
       
       if (data) {
+        data = JSON.parse(JSON.stringify(data).replace(/SE.SEName/g, 'SEName'))
         res.status(200).send({
           value: 'MyContentList',
           data: data
@@ -55,25 +73,18 @@ module.exports = {
     }
   },
   async create (req, res) {
-    try {
-      if(await Content.findOne({where: {SEID:req.body.ContentID}})){
-        res.status(200).send({
-          code: 400,
-          message: 'Content已经存在'
-        })
+    try {   
+      var maxID = await Content.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('ContentID')),'maxID']]})
+      var newContent = {
+        ContentID: maxID.dataValues.maxID+1,
+        SEID: req.body.SEID,
+        SearchTerm: req.body.SearchTerm,
+        ContentCategory: req.body.ContentCategory,
+        ShortTitle: req.body.ShortTitle,
+        ContentMessage: req.body.ContentMessage,
+        CreateDt: req.body.TimeStamp
       }
-      else{
-        var newContent = {
-          ContentID: req.body.ContentID,
-          SEID: req.body.SEID,
-          SearchTerm: req.body.SearchTerm,
-          ContentCategory: req.body.ContentCategory,
-          ShortTitle: req.body.ShortTitle,
-          ContentMessage: req.body.ContentMessage,
-          CreateDt: req.body.TimeStamp
-        }
-        await Content.create(newContent)
-      }
+      await Content.create(newContent)      
       
       res.status(200).send({
         code: 200,
@@ -85,7 +96,36 @@ module.exports = {
         code: 500,
         error: '程序异常: ' + error
       })
-      logger.logger.fatal("Create Content fail: "+newSE.SEID+'/'+error)
+      logger.logger.fatal("Create Content fail: "+newContent.SEID+'/'+error)
+    }
+  },
+  async createPdf(req, res) {
+    try {
+      logger.logger.info('req.body==>', req.body.file);
+      console.log('req.body==>', req.body.fileName);
+
+      var base64Data = req.body.file.replace(/^data:application\/pdf;base64,/, "");
+      var dataBuffer = new Buffer(base64Data, 'base64');
+      fs.writeFile('.//contents//'+req.body.fileName, dataBuffer,function(err) {
+        if(err){
+          logger.logger.info(err);
+        }else{
+          logger.logger.info(err);
+        }
+      })
+
+      res.status(200).send({
+        code: 200,
+        message: 'Content创建成功',
+        data: req.body.fileName
+      })
+
+    } catch (error) {
+      res.status(500).send({
+        code: 500,
+        error: '程序异常: ' + error
+      })
+      //logger.logger.fatal("Create Content fail: " + newContent.ContentID + '/' + error)
     }
   }
 }

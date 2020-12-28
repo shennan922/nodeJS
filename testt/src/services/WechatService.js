@@ -32,8 +32,7 @@ export default {
     });        
     //alert(ticket.data.ticket.pp)
     //console.log("ticket.data.ticket:" + JSON.stringify(ticket))
-      if (ticket) {
-      
+      if (ticket) {      
         return  'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='+ticket.data.ticket
       }else{
         return ''

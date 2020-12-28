@@ -5,7 +5,7 @@
         <div class='top'>
           <div class="title">
             <h3>
-            Lilly Wechat - SE List
+            Lilly Wechat - My Content
             </h3>
           </div>
           <div class='Button'>
@@ -29,39 +29,54 @@
           </div> 
         </div>  
 
-        <el-table 
-          :data="SEForm" border
-          :header-cell-style="tableHeaderColor" 
-          @sort-change="changeTableSort" class="formSE"
-          >
-          <!--:model="SEForm"  :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border -->
-          <el-table-column min-width="20%" prop="SE" label="SE" sortable="custom"></el-table-column>
-          <el-table-column min-width="20%" prop="Category" label="Category" ></el-table-column>
-          <el-table-column min-width="20%" prop="ShortTile" label="ShortTile"></el-table-column>
-          <el-table-column min-width="20%" prop="CreateDate" label="CreateDate"></el-table-column>
-          <el-table-column min-width="20%" prop="ModifyDate" label="ModifyDate"></el-table-column>
-          <el-table-column min-width="20%" label="Operation">
-            <template slot-scope="scope">
-              <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
-              <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
-            </template>
-          </el-table-column>
-        </el-table> 
-<!--
-        <div class="block">
-          <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="pageNum"
-            :page-sizes="[1, 2, 4, 8, 10]"
-            :page-size="pageSize"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total= "getSEList.length">
-          </el-pagination>
-        </div>
-        -->
-      </el-col>
-    </el-row>
+          <el-table 
+            :model="ContentForm"
+            :data="getList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border
+            :header-cell-style="tableHeaderColor" 
+            @sort-change="changeTableSort" class="formSE"
+            ref="ContenTable"
+            >
+            <el-table-column min-width="8%" prop="ContentID" label="Content ID"></el-table-column>
+            <el-table-column min-width="8%" prop="SearchTerm" label="Search Term" ></el-table-column>
+            <el-table-column min-width="20%" prop="ContentCategory" label="Category">
+              <template slot-scope="scope" >
+                <el-tag
+                  :key="tag"
+                  v-for="tag in getCategoryDesc(scope.row.ContentCategory)"
+                  :closable="false"
+                  effect="light"
+                  >
+                  {{tag}}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column min-width="10%" prop="ShortTitle" label="Short Title"></el-table-column>
+            <!-- <el-table-column min-width="5%" prop="ContentMessage" label="ContentMessage"></el-table-column> -->
+            <el-table-column min-width="10%" prop="SEID" label="SEID"></el-table-column>
+            <el-table-column min-width="15%" prop="CreateDt" label="Create Date"></el-table-column>
+            <el-table-column min-width="15%" prop="ModifyDt" label="Modify Date"></el-table-column>
+            <el-table-column min-width="15%" label="Operation">
+              <template slot-scope="scope">
+                <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
+                <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
+              </template>
+            </el-table-column>
+          </el-table> 
+
+          <div class="block">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page=pageNum
+              :page-sizes="[1, 5, 10]"
+              :page-size=pageSize
+              layout="total, sizes, prev, pager, next, jumper"
+              :total= "getList.length">
+            </el-pagination>
+          </div>
+        
+        </el-col>
+      </el-row>
       <!--增加Content页面-->
       <el-dialog title ="Create a New Paper" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent" :modal-append-to-body="false">
           <el-form 
@@ -79,13 +94,27 @@
                     </el-option>
                   </el-select> 
                 </el-form-item>
-                <el-form-item label="Content Category" prop="ContentCategory">
-                  <el-select v-model="AddContentForm.ContentCategory" clearable placeholder="请选择" style="width:100%;padding-left:0px">
-                    <!-- <el-option
-                      v-for="itemML in getMLList.data" :key="itemML.MLID" :label="itemML.MLName" :value="itemML.MLID">
-                    </el-option> -->
+              <el-form-item label="Content Category" prop="ContentCategory">
+                  <div>
+                  <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:90%;padding-left:0px" ref="categorySelect">
+                    <el-option
+                      v-for="item in getCategoryList" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
+                    </el-option> 
                     </el-select> 
+                    <el-button  class="button-new-tag" size="small" @click="showInput">+ </el-button>
+                  </div>
+                  <div style="margin-top:5px">
+                    <el-tag
+                    :key="tag"
+                    v-for="tag in dynamicTags"
+                    :closable="true"
+                    @close="onTagClose(tag)"
+                    >
+                    {{tag}}
+                   </el-tag>
+                  </div>
                 </el-form-item>
+                   
                 <el-form-item label="Short Title" prop="ShortTitle">
                   <el-input v-model="AddContentForm.ShortTitle" ></el-input>
                 </el-form-item>
@@ -93,25 +122,25 @@
                   <el-input v-model="AddContentForm.SearchTerm"></el-input>
                 </el-form-item> 
                 <el-form-item label="Upload PDF">
-                    <!-- style="width: 200px; display: inline; margin-left: 25px" -->
-                    <!-- class="upload-demo" -->
-                    <el-upload
-                      ref="upload"
-                      action=""
-                      :show-file-list="true"
-                      :before-upload="beforeUpload"
-                      style="float:left">
-                      <el-button slot="trigger">Choose file</el-button>
-                    </el-upload>
-                    <el-input v-model="AddContentForm.UpdatePDFName" class="input_UploadPdf" :disabled="true"></el-input>
+                  <el-row>
+                    <el-col :span="5">
+                      <el-upload
+                        ref="upload"
+                        action=""
+                        :show-file-list="true"
+                        :before-upload="beforeUpload"
+                        style="float:left">
+                        <el-button slot="trigger">Choose file</el-button>
+                      </el-upload>
+                    </el-col>
+                    <el-col :span="19">
+                      <el-input v-model="AddContentForm.UpdatePDFName"  :disabled="true"></el-input>
+                    </el-col>
+                  </el-row>
                 </el-form-item>
-                <el-form-item label="Content" prop="Content">
+                <el-form-item label="Content" prop="ContentMessage">
                   <div>
-                    <!-- <button @click="getUEContent()">获取内容</button>
-                    <button @click="getUEContentTxt()">获取无文本内容</button> -->
-                    <div class="edui-default">
-                      <UE :defaultMsg=defaultMsg :config=config :id=ue1 ref="ue"></UE>
-                    </div>
+                    <UE :defaultMsg=defaultMsg :config=config :id=ue1 ref="ue"></UE>
                   </div>
                 </el-form-item>
               </el-col>
@@ -120,6 +149,10 @@
           <div style="margin-right:10px" slot="footer">
             <el-button @click.native="createSubmit"  type="primary">Submit</el-button>
          </div>
+         <!-- <div style="margin-right:10px" slot="footer" class="dialog-footer">
+            <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
+            <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
+         </div> -->
 
       </el-dialog>
   </div>
@@ -133,15 +166,20 @@ import SEService from "../../services/SEService";
 import MLService from "../../services/MLService";
 import GeneralService from "../../services/GeneralService";
 import UE from '../../components/ue/ue.vue';
+// import MyContentService from "../../services/MyContentService";
+import ContentService from "../../services/ContentService";
 
 export default {
-  components: {UE},
-  mounted(){
+  mounted() {
     this.getDetailList();
-  },
+    this.getCategoryListData();
+    this.getSEList();
+  },  
+  components: {UE},
   data(){
     return {
-      //  defaultMsg: '<span style="orphans: 2; widows: 2; font-size: 22px; font-family: KaiTi_GB2312; background-color: rgb(229, 51, 51);"><strong>夏钧姗：成功的投资需具备哪些心态和掌握哪些重要止损位</strong></span>',
+      pageNum:1,//table第几页
+      pageSize:5,  
       defaultMsg:"",
       config: {
         // 初始容器宽度
@@ -155,8 +193,23 @@ export default {
       },
       ue1: "ue1", // 不同编辑器必须不同的id
       ue2: "ue2",
+      formStatus:0, 
       getSEListAll:[],
+      getCategoryList:[],
       dialogCreateVisible: false,
+      dynamicTags:[],
+      dynamicTagIDs:[],
+      value:'',
+      ContentForm:{
+        ContentID:"",
+        SearchTerm:"",
+        ContentCategory:"",
+        ShortTitle:"",
+        ContentMessage:"",
+        SEID:"",
+        CreateDT:"",
+        ModifyDT:"",
+      },
       AddContentForm: {
         SEID:"",
         ContentCategory:"",
@@ -178,66 +231,114 @@ export default {
           { required: true, message: '请输入Search Team', trigger: 'blur'}
         ],
       },
-       pickerOptions: {
-          shortcuts: [{
-            text: '最近一周',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近一个月',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-              picker.$emit('pick', [start, end]);
-            }
-          }, {
-            text: '最近三个月',
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-              picker.$emit('pick', [start, end]);
-            }
-          }]
+      pickerOptions: {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            picker.$emit('pick', [start, end]);
+          }
+        }]
+      },
+      value1: '',
+      value2: '',
+
+      getSearchInfo:[], 
+      searchTableInfo:"",
+      AddForm: {
+          SE:"",
+          Category:"",
+          ShortTile: "",
+          CreateDate: "",
+          ModifyDate: ""
         },
-        value1: '',
-        value2: '',
-
-
-       searchTableInfo:"",
-        AddForm: {
-                SE:"",
-                Category:"",
-                ShortTile: "",
-                CreateDate: "",
-                ModifyDate: ""
-              },
-        SEForm: [{
-                SE:"LI",
-                Category:"1",
-                ShortTile: "A",
-                CreateDate: "2020-12-22",
-                ModifyDate: "2020-12-22",
-              },
-              {
-                SE:"LI",
-                Category:"2",
-                ShortTile: "B",
-                CreateDate: "2020-12-22",
-                ModifyDate: "2020-12-22",
-              }],
-     };
+      };
   },
   methods: {
+    onTagClose(tag){
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag),1)
+      this.dynamicTagIDs.splice(this.dynamicTags.indexOf(tag),1)
+    },
+    getCategoryDesc(id){
+      let idx = id.split(",")
+      let desc = []
+      idx.forEach(id => {
+        for(var item of this.getCategoryList){
+          if(id==item.CategoryID){
+            desc.push(item.CategoryDesc)
+          }
+        }
+      })
+      return desc
+    },
+    handleClose(){            
+      //resetFields将form重置到mounted之后的状态, 对于编辑页面不适用
+      //this.$refs.AddSEForm.resetFields()   
+      this.AddContentForm = {
+        SEID:"",
+        ContentCategory:"",
+        ShortTitle: "",
+        SearchTerm: "",
+        UpdatePDF: null,
+        UpdatePDFName: '',
+        UpdatePDFData:'',
+        ContentMessage: "",
+      }
+      this.formStatus = 0 
+      this.changeFlag = false
+    },
+    
+    handleClose(tag) {
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+    },
+    showInput() {
+     var name =this.getCategoryList.find((item)=>{//这里的selectList就是上面遍历的数据源
+          return item.CategoryID === this.$refs.categorySelect.value;//筛选出匹配数据
+      }).CategoryDesc
+     this.dynamicTags.push(name)
+     this.dynamicTagIDs.push(this.$refs.categorySelect.value)
+    },
+    
+    getCategoryListData() {
+      ContentService.getCategoryList()
+        .then((res) => {
+          this.getCategoryList = res.data;
+            //console.log("-=====-"+JSON.stringify(this.getCategoryList))
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
+    },
     getDetailList() {
-      SEService.getSEList("")
+       ContentService.getList("")
         .then((res) => {
           this.getSearchInfo = res.data;
+        })
+        .catch(function (err) {
+          console.log("err"+err);
+        });
+    },
+    getSEList() {
+      SEService.getSEList("")
+        .then((res) => {
           this.getSEListAll = res.data;
           //console.log("getSEListAll:" + JSON.stringify(this.getSEListAll));
         })
@@ -245,14 +346,28 @@ export default {
           console.log("err"+err);
         });
     },
+    handleSizeChange(pageSize){
+      this.pageSize = pageSize      
+    },
+    handleCurrentChange(pageNum){
+      this.pageNum = pageNum
+    },
     handleEdit(row) {
-    this.dialogCreateVisible = true;
-      this.SEForm = {
-        SE:row.SE,
-        Category:row.Category,
-        ShortTile: row.ShortTile,
-        CreateDate: row.CreateDate,
-        ModifyDate: row.ModifyDate,
+      this.formStatus = 2;
+      this.dialogCreateVisible = true;
+      
+      this.defaultMsg =row.ContentMessage;
+        this.AddContentForm = {
+        SEID:row.SEID,
+          ContentCategory:row.ContentCategory,
+          ShortTitle: row.ShortTitle,
+          SearchTerm: row.SearchTerm,
+          UpdatePDF: null,
+          UpdatePDFName: '',
+          UpdatePDFData:'',
+          ContentMessage: row.ContentMessage,
+          CreateDt:row.CreateDt,
+          ModifyDt:row.ModifyDT
       };
     },
     handleDelete(SEID){
@@ -280,40 +395,39 @@ export default {
 
       //如果字段名称为“创建时间”，将“创建时间”转换为时间戳，才能进行大小比较
       if(fieldName=="createTime"){
-        this.getSEList.map(item => {
+        this.getList.map(item => {
           item.createTime = this.$moment(item.createTime).valueOf();
         });
       }          
           
       //按照降序排序
       if(sortingType == "descending"){
-        this.getSEList = this.getSEList.sort((a, b) => //b[fieldName] - a[fieldName]
+        this.getList = this.getList.sort((a, b) => //b[fieldName] - a[fieldName]
           b[fieldName].localeCompare(a[fieldName])
         );
       }
       //按照升序排序
       else{
-        this.getSEList = this.getSEList.sort((a, b) => //a[fieldName] - b[fieldName]
+        this.getList = this.getList.sort((a, b) => //a[fieldName] - b[fieldName]
           a[fieldName].localeCompare(b[fieldName])
         );
       }
 
       //如果字段名称为“创建时间”，将时间戳格式的“创建时间”再转换为时间格式
       if(fieldName=="createTime"){
-        this.getSEList.map(item => {
+        this.getList.map(item => {
           item.createTime = this.$moment(item.createTime).format(
             "YYYY-MM-DD HH:mm:ss"
           );
         });
-      }
-      
-      console.log(this.getSEList);      
+      }   
     },
     tableHeaderColor({ row, column, rowIndex, columnIndex }) {
       return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left";
     },
     handleAdd() {
     this.dialogCreateVisible = true;
+      this.defaultMsg ="";
       this.AddContentForm = {
         SEID:"",
         ContentCategory:"",
@@ -322,7 +436,7 @@ export default {
         UpdatePDF: null,
         UpdatePDFName: '',
         UpdatePDFData:'',
-        Content: "",
+        ContentMessage: "",
       };
     },
     beforeUpload(UpdatePDF) {
@@ -344,7 +458,7 @@ export default {
     },
     async createSubmit() {
       //获取富文本框内容
-      this.AddContentForm.Content = this.$refs.ue.getUEContent(); // 调用子组件方法
+      this.AddContentForm.ContentMessage = this.$refs.ue.getUEContent(); // 调用子组件方法
       //获取当前系统时间
       var myDate = new Date()
       var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
@@ -353,54 +467,45 @@ export default {
       var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
       var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
       var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
-      var dataToDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
-      //alert("dataToDate:"+ dataToDate);
-        // this.$notify({
-        //   title: '获取成功，可在控制台查看！',
-        //   message: content,
-        //   type: 'success'
-        // });
-        console.log(this.AddContentForm.Content);
+      var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
+
         this.$refs.AddContentForm.validate((valid) => {
            if (valid) {
               this.$confirm('确认提交？', '提示', {}).then(async() => {
-          //      alert("SEID:"+ this.AddContentForm.SEID);
-          //      alert("ShortTitle:" + this.AddContentForm.ShortTitle);
-          //      alert("SearchTerm:" + this.AddContentForm.SearchTerm); 
-           //     alert("content:" + this.AddContentForm.Content); 
-          //     await SEService.SECreate(
-          //       {
-          //         SEID: this.AddSEForm.SEID,
-          //         SEName: this.AddSEForm.SEName,
-          //         City: this.AddSEForm.CityID[2],
-          //         Hospital: this.AddSEForm.HospitalID,
-          //         Department: this.AddSEForm.DepID,
-          //         MLName: this.AddSEForm.MLID,
-          //         Team:this.AddSEForm.TeamID
-          //       }
-          //     ).then((res) => {
-          //       if (res.code == 400){
-          //         this.$message({
-          //           type: 'info',
-          //           message: res.message
-          //         });
-          //       } 
-          //       if (res.code == 200){
-          //         this.$message({
-          //           type: 'success',
-          //           message: '提交成功!'
-          //         });
-          //         this.dialogCreateVisible = false;
-          //         this.formStatus = 0
-          //         this.getDetailList()
-          //         this.handleClose()
-          //       }              
-          //     })
-          //   }).catch((err) => {
-          //     this.$message({
-          //       type: 'info',
-          //       message: '出错了: '+err
-          //     });
+              await ContentService.myContentCreate(
+                {
+                  // ContentID: "100004",
+                  SEID: this.AddContentForm.SEID,
+                  SearchTerm: this.AddContentForm.SearchTerm,
+                  ContentCategory: this.dynamicTagIDs.toString(),
+                  ShortTitle: this.AddContentForm.ShortTitle,
+                  ContentMessage: this.AddContentForm.ContentMessage,
+                  TimeStamp: createDate
+            },
+            await ContentService.ContentCreate({
+                contentId: "1",
+                fileId: "1",
+                fileName: this.AddContentForm.UpdatePDFName,
+                file: this.AddContentForm.UpdatePDFData,
+              })
+              ).then((res) => {
+              
+                if (res.code == 200){
+                  this.$message({
+                    type: 'success',
+                    message: '提交成功!'
+                  });
+                  this.dialogCreateVisible = false;
+                  this.formStatus = 0
+                  this.getDetailList()
+                  //this.handleClose()
+                }              
+              })
+            }).catch((err) => {
+              this.$message({
+                type: 'info',
+                message: '出错了: '+err
+              });
              })
           }
         })
@@ -408,7 +513,7 @@ export default {
 
   },
   computed: {
-      getSEList () {
+      getList () {
         const searchTableInfo = this.searchTableInfo
         if (searchTableInfo) {
           return this.getSearchInfo.filter(data => {
@@ -419,7 +524,8 @@ export default {
           })
         }
         return this.getSearchInfo
-      }
+      },
+      
   },
   
 };
@@ -469,7 +575,9 @@ export default {
   float: right;
   padding: 5px;
 }
+
 /deep/.dialogContent{
+  text-align: left;
   .el-dialog__header{
     text-align: left;
     padding-left:7%;
@@ -482,19 +590,31 @@ export default {
     color:#fff;
   }
   .input_UploadPdf{
-    padding-left:2%;
-    width:75%;
+    padding-left:3%;
+    //width:85%;
     background-color:white
   }
   .el-form-item__content{
     line-height: 0px;
+  }
+ .button-new-tag{
+  width:10%;
+  padding-left:20px;
+  background-color:#639eda;
+  color:#fff
   }
   .el-dialog__footer{
     padding-top:0px;
   }
   .el-dialog__body{
     padding: 3% 5% 0px 5%;
-  }
-} 
+  }  
+  
+
+}
+.el-tag {
+  margin-right: 10px;
+  } 
+
   
 </style>

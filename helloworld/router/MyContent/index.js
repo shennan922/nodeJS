@@ -9,5 +9,5 @@ router.use(function(req, res, next)
 router.get('/getList', MyContentController.getList)
 router.get('/getCategory', MyContentController.getCategory)
 router.post('/create', MyContentController.create)
-
+router.post('/createPdf', MyContentController.createPdf)
 module.exports = router
