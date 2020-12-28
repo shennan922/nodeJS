@@ -16,7 +16,8 @@ app.all('*', function (req, res, next) {
     res.send(200)// 让options尝试请求快速结束
   } else { next() }
 })
-app.use(bodyParser.json())
+app.use(bodyParser.json({limit: '50mb'}))
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 log4.use(app)
 app.use(logger('dev'))
 require('./router')(app)
