@@ -78,13 +78,14 @@
         </el-col>
       </el-row>
       <!--增加Content页面-->
-      <el-dialog title ="Create a New Paper" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent" :modal-append-to-body="false">
+      <el-dialog :title ="formStatus==1?'Create a New Paper':'Update a Paper'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent" :modal-append-to-body="false">
           <el-form 
           ref="AddContentForm"
           :model="AddContentForm" 
-          :rules="addContentFormRules"  
+          :rules="formStatus!=0?addContentFormRules:null"    
           label-width="130px"
           >
+           <!-- :rules="addContentFormRules" -->
             <el-row>
               <el-col class="el-col_Content">
                 <el-form-item label="SE" prop="SEID">
@@ -146,13 +147,13 @@
               </el-col>
             </el-row>
           </el-form>
-          <div style="margin-right:10px" slot="footer">
+          <!-- <div style="margin-right:10px" slot="footer">
             <el-button @click.native="createSubmit"  type="primary">Submit</el-button>
-         </div>
-         <!-- <div style="margin-right:10px" slot="footer" class="dialog-footer">
+         </div> -->
+         <div style="margin-right:10px" slot="footer" class="dialog-footer">
             <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
             <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
-         </div> -->
+         </div>
 
       </el-dialog>
   </div>
@@ -181,6 +182,7 @@ export default {
       pageNum:1,//table第几页
       pageSize:5,  
       defaultMsg:"",
+      currentTime:"",
       config: {
         // 初始容器宽度
         initialFrameWidth: '100%',
@@ -190,6 +192,9 @@ export default {
         autoFloatEnabled: false,
         // 编辑器不自动被内容撑高
         autoHeightEnabled: false,
+        //UEDITOR_HOME_URL: '/static/UE/',
+        serverUrl: "https://operationgwdev.bgycc.com/zuul/phantom-service-storage/ueditor/exec", //图片上传的地址
+        //serverUrl:"http://localhost:8080/data/MyContent"
       },
       ue1: "ue1", // 不同编辑器必须不同的id
       ue2: "ue2",
@@ -211,6 +216,7 @@ export default {
         ModifyDT:"",
       },
       AddContentForm: {
+        ContentID:"",
         SEID:"",
         ContentCategory:"",
         ShortTitle: "",
@@ -289,9 +295,9 @@ export default {
       })
       return desc
     },
-    handleClose(){            
+    handleClose(){          
       //resetFields将form重置到mounted之后的状态, 对于编辑页面不适用
-      //this.$refs.AddSEForm.resetFields()   
+      //this.$refs.AddSEForm.resetFields()
       this.AddContentForm = {
         SEID:"",
         ContentCategory:"",
@@ -304,8 +310,11 @@ export default {
       }
       this.formStatus = 0 
       this.changeFlag = false
+      this.dynamicTags = []
+      this.dynamicTagIDs = []
+
     },
-    
+
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
     },
@@ -353,12 +362,25 @@ export default {
       this.pageNum = pageNum
     },
     handleEdit(row) {
+      this.dynamicTags = []
+      this.dynamicTagIDs = []
+      var id = row.ContentCategory
+      var idx = id.split(",")
+      idx.forEach(id => {
+        for(var item of this.getCategoryList){
+          if(id==item.CategoryID){
+            this.dynamicTags.push(item.CategoryDesc)
+            this.dynamicTagIDs.push(item.CategoryID)
+          }
+        }
+      })
       this.formStatus = 2;
       this.dialogCreateVisible = true;
       
       this.defaultMsg =row.ContentMessage;
         this.AddContentForm = {
-        SEID:row.SEID,
+          ContentID:row.ContentID,
+          SEID:row.SEID,
           ContentCategory:row.ContentCategory,
           ShortTitle: row.ShortTitle,
           SearchTerm: row.SearchTerm,
@@ -426,7 +448,11 @@ export default {
       return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left";
     },
     handleAdd() {
+    this.dynamicTags =[];
+    this.dynamicTags = [];
+    this.formStatus = 1
     this.dialogCreateVisible = true;
+    //this.dynamicTagIDs =[];
       this.defaultMsg ="";
       this.AddContentForm = {
         SEID:"",
@@ -456,10 +482,7 @@ export default {
       };
       return false; // 返回false不会自动上传
     },
-    async createSubmit() {
-      //获取富文本框内容
-      this.AddContentForm.ContentMessage = this.$refs.ue.getUEContent(); // 调用子组件方法
-      //获取当前系统时间
+    getCurrentTime(){
       var myDate = new Date()
       var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
       var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
@@ -468,6 +491,14 @@ export default {
       var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
       var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
       var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
+      this.currentTime = createDate;
+
+    },
+    async createSubmit(formStatus) {
+      //获取富文本框内容
+      this.AddContentForm.ContentMessage = this.$refs.ue.getUEContent(); // 调用子组件方法
+      //获取当前系统时间
+      this.getCurrentTime();
 
         this.$refs.AddContentForm.validate((valid) => {
            if (valid) {
@@ -480,7 +511,7 @@ export default {
                   ContentCategory: this.dynamicTagIDs.toString(),
                   ShortTitle: this.AddContentForm.ShortTitle,
                   ContentMessage: this.AddContentForm.ContentMessage,
-                  TimeStamp: createDate
+                  TimeStamp: this.currentTime
             },
             await ContentService.ContentCreate({
                 contentId: "1",
@@ -498,6 +529,8 @@ export default {
                   this.dialogCreateVisible = false;
                   this.formStatus = 0
                   this.getDetailList()
+                  this.dynamicTags = []
+                  this.dynamicTagIDs = []
                   //this.handleClose()
                 }              
               })
@@ -509,6 +542,54 @@ export default {
              })
           }
         })
+    },
+    async updateSubmit() {
+      //获取富文本框内容
+      this.AddContentForm.ContentMessage = this.$refs.ue.getUEContent();
+      //获取当前系统时间
+      this.getCurrentTime();
+      this.$refs.AddContentForm.validate((valid) => {
+        if (valid) {
+          this.$confirm('确认提交？', '提示', {}).then(async() => { 
+            await ContentService.myContentUpdate(
+              {
+                  ContentID:this.AddContentForm.ContentID,
+                  SEID: this.AddContentForm.SEID,
+                  SearchTerm: this.AddContentForm.SearchTerm,
+                  ContentCategory: this.dynamicTagIDs.toString(),
+                  ShortTitle: this.AddContentForm.ShortTitle,
+                  ContentMessage: this.AddContentForm.ContentMessage,
+                  TimeStamp: this.currentTime,
+              }
+            ).then((res) => {
+              // if (res.code == 400){
+              //   this.$message({
+              //     type: 'info',
+              //     message: res.message
+              //   });
+              // } 
+              if (res.code == 200){
+                this.$message({
+                  type: 'success',
+                  message: '提交成功!'
+                });
+                this.dialogCreateVisible = false;
+                this.getDetailList();
+                //this.handleClose()
+                this.formStatus = 0
+                this.changeFlag = false,
+                this.dynamicTags = []
+                this.dynamicTagIDs = []
+              }                
+            })
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消新增'
+            });
+          })
+        }
+      })
     },
 
   },
