@@ -51,16 +51,47 @@ async function getAccessToken (timestamp,appId)
   }
 }
 
+
+
 module.exports = {  
   initdb()
   {
-    var newToken = {
-      APPID: config.appInfo.appid,
-      APPSecret: config.appInfo.secret,
-      APPToken: ''      
-    }
-    db.APPList.create(newToken)           
+    try
+    {
+       var newToken = {
+          APPID: config.appInfo.appid,
+          APPSecret: config.appInfo.secret,
+          APPToken: ''   
+       }   
+       db.APPList.create(newToken)   
+    } catch(error)
+    {
+      logger.logger.error("init token error: "+error.message)    
+    }    
   },
+
+  async uploadPermMaterial(type,material,token){
+    var that = this;
+    var form = {}
+    var uploadUrl = '';
+    if(type === 'pic') uploadUrl = api.uploadPermPics;
+    if(type === 'other') uploadUrl = api.uploadPermOther;
+    if(type === 'news'){
+      uploadUrl = api.uploadPermNews;
+      data = material
+    }else{
+      data.media = fs.createReadStream(material);
+    }
+    var url = uploadUrl + 'access_token=' + token;
+    mediaId =await axios.post(`${uploadUrl}access_token=${token}`,data, function (error, response, body) {
+      if(error!==null){
+        reject("获取access_token失败 检查getAccessToken函数");
+      }
+      resolve(JSON.parse(body));
+    });  
+    return mediaId
+  },
+
   async getQRCode (req, res) {
     try {
      // await updateAccessToken(config.appInfo.appid,config.appInfo.secret)
@@ -96,39 +127,118 @@ module.exports = {
       })
     }
   },
-  async getUsers (req, res) {
-    try {
-      const user = await User.findByPk(req.params.id)
-     
-      if (user) {
-        logger.logger.info("return data"+user.id)
-        res.status(200).send({
-          user
-        })
-      } else {
-        res.status(400).send({
-          code: 400,
-          error: '没有找到对应数据'
-        })
+  async uploadImage(token, material){ 
+    var material = 'helloworld/public/images/test123.jpg'   
+    var data = {}
+    try
+    { 
+    data.media = fs.createReadStream(material)    
+    request.post({url: `${config.appInfo.uploadPermOther}access_token=${token}&type=image`, formData:data}, function(err,response,body){
+      if(err) {
+        logger.logger.error("upload image error: "+err.message)
+        return ''
       }
-    } catch (error) {
-      logger.logger.error("get user info error: "+error.message)
-      res.status(500).send({
-        code: 500,
-        error: '数据查询失败'
-      })
+      return JSON.parse(response.body).media_id
+      })   
+  }catch (error)
+    {
+      logger.logger.error("upload error: "+error.message)
     }
   },
-  async pppp(req, res, next)
-	{
-		wtoken =await axios.get(`${base.wxapi}/token?grant_type=client_credential&appid=${base.appid}&secret=${base.secret}`, function (error, response, body) {
-			if(error!==null){
-				reject("获取access_token失败 检查getAccessToken函数");
-			}
-			resolve(JSON.parse(body));
-		});
-	   res.send(wtoken.data)
-	},
+  async uploadImageText(token, material){ 
+    var data = {}
+    //var data = 
+    try
+    {
+      material =  {
+        "articles": [{
+        "title": 'seantest',
+        "thumb_media_id": 'rg-P4AQ-1Njrj6-brqd5dEQTLot2ogyhX2HwbYEyrPU',
+        "author": 'sean',
+        "digest": 'zhaiyao',
+        "show_cover_pic": 1,
+        "content": 'zheshiceshiwenzhang',
+        "content_source_url": 'www.baidu.com',
+        "need_open_comment":1,
+        "only_fans_can_comment":1
+    },
+      
+    ]
+    }
+     uploadUrl = config.appInfo.uploadPermNews;
+     data = material
+     var ticket =await axios.post(`${config.appInfo.uploadPermNews}access_token=${token}`, data, function (error, response, body) {
+        if(error!==null){
+          logger.logger.error("upload image_text error: "+error.message)
+          reject(error.message);
+        }
+        resolve(JSON.parse(body));
+      });   
+      return ticket.data        
+      
+  }catch (error)
+    {
+      logger.logger.error("upload image_text error: "+error.message)
+    }
+  },
+  async uploadPermMaterial(req, res, next){ 
+    
+    var token = '40_4ROYYyfp2I6G6ccvszmNvkfXDKV3RfJc-HdWVDl9MLzxLoIQIe_63v2mrCftpoorDw8bJhzHSz2tHOeIZ2dfSxFMxvvOG36N32mpdRlE52mzft-BOqCbq02Ioq2ADvgeghHlO36IN2fdxokvDOUhAJANYE'
+    try
+    {
+      data =  {
+        "touser":"oJVgv6a8CT5JWPbaS-21t2cp_NNk",
+        "mpnews":{              
+          "media_id":"rg-P4AQ-1Njrj6-brqd5dEVIDdRjwT9hUjUsEphGRd4"               
+         },
+        "msgtype":"mpnews" 
+     }
+    
+    
+     var ticket =await axios.post(`${config.appInfo.sendMessageurl}access_token=${token}`, data, function (error, response, body) {
+        if(error!==null){
+          reject("获取access_token失败 检查getAccessToken函数");
+        }
+        resolve(JSON.parse(body));
+      });  
+      return  ticket.data
+  }catch (error)
+    {
+      logger.logger.error("upload error: "+error.message)
+    }
+  },
+  async uploadPermMaterial555(req, res, next){ 
+    
+    var token = '40_4ROYYyfp2I6G6ccvszmNvkfXDKV3RfJc-HdWVDl9MLzxLoIQIe_63v2mrCftpoorDw8bJhzHSz2tHOeIZ2dfSxFMxvvOG36N32mpdRlE52mzft-BOqCbq02Ioq2ADvgeghHlO36IN2fdxokvDOUhAJANYE'
+    try
+    {
+      data = {
+      "filter":{
+         "is_to_all":true        
+      },
+      "mpnews":{
+         "media_id":"rg-P4AQ-1Njrj6-brqd5dEVIDdRjwT9hUjUsEphGRd4"
+      },
+       "msgtype":"mpnews",
+       "send_ignore_reprint":0
+   }
+    
+    
+     var ticket =await axios.post(`${config.appInfo.sendMessageurl}access_token=${token}`, data, function (error, response, body) {
+        if(error!==null){
+          reject("获取access_token失败 检查getAccessToken函数");
+        }
+        resolve(JSON.parse(body));
+      });   
+      res.send({
+        code: 200,
+        id: ticket.data        
+      })
+    }catch (error)
+      {
+        logger.logger.error("upload error: "+error.message)
+      }
+  },
     async getusers(req, res, next)
 	{
 		const token1 = '40_XIaLpyYiJm26PQJqQmiS_j3RSS-KxfWKgvbhUZtfkInFWBWFa-C2catxzAg6bdgKHRVpy5tdNLMjlm46gaGZNjuFXRvtps6ANmqIvGKjYxLb2zWfFIZHllfs-unjhTYjJmkksm5UlyXe4feyPSWiAAAILP'
@@ -180,7 +290,7 @@ module.exports = {
 	},
   async updateAllTokens()
   {
-    try{
+    /*try{
       var apps = await db.APPList.findAll()
       if (apps.length==0)
       {
@@ -194,7 +304,7 @@ module.exports = {
       
     }catch(error){
       logger.logger.error("update access tokens error: "+error.message) 
-    }
+    }*/
   }
 
 }

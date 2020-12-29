@@ -2,18 +2,6 @@ import req from './index'
 import store from '../store'
 
 export default {
-  async getUserById () {
-
-    const response = await req.request.get('/user/:id')
-    return response.data
-  },
-  async register (data) {
-    return await req.request.post(
-      '/user/',
-      data
-    )
-  },
-
   async checkPermission (code) {
     return await req.request.get(
       '/wechat/checkpermission?code='+code
@@ -30,7 +18,7 @@ export default {
       }
       alert(JSON.parse(body));
     });        
-    //alert("jieshu")
+    //alert(ticket.data.ticket.pp)
     //console.log("ticket.data.ticket:" + JSON.stringify(ticket))
       if (ticket) {      
         return  'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='+ticket.data.ticket
@@ -40,12 +28,6 @@ export default {
      
      
 },
-  async login (data) {
-
-    const response = await req.request.post(
-      '/user/login',
-      data
-    )
-    return response
-  }
 }
+
+

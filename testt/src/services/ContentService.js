@@ -15,6 +15,10 @@ export default {
     return response.data
 
   },
+  async myContentUpdate (data) {
+    const response = await req.request.post('/myContent/update',data)
+    return response.data
+  },
   async ContentCreate (data) {
     // let requestConfig = {
     //   headers: {

@@ -28,11 +28,16 @@ module.exports = {
     internalError: 500
   },
   appInfo:{
-    appID:"wx43ce1ba96c04fd5c", //公众号的appid
-    secret:"59d51309664e12b4dc7b69f37c60b945", //公众号的secret 重要不要暴露给前端
+    appID: "wx43ce1ba96c04fd5c", 
+    secret: "59d51309664e12b4dc7b69f37c60b945", 
     wxapi:"https://api.weixin.qq.com/cgi-bin",
     QRurl:'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=',
     snsurl:'https://api.weixin.qq.com/sns/oauth2',
+    uploadPermPics:'https://api.weixin.qq.com/cgi-bin/media/upload?',
+    uploadPermOther:'https://api.weixin.qq.com/cgi-bin/material/add_material?',
+    uploadPermNews:'https://api.weixin.qq.com/cgi-bin/material/add_news?',
+    sendMessageurlpre:'https://api.weixin.qq.com/cgi-bin/message/mass/preview?',
+    sendMessageurl:'https://api.weixin.qq.com/cgi-bin/message/mass/sendall?',
     expire_seconds:604800
   }
   

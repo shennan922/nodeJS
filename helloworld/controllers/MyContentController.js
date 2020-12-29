@@ -99,6 +99,33 @@ module.exports = {
       logger.logger.fatal("Create Content fail: "+newContent.SEID+'/'+error)
     }
   },
+  
+  async update (req, res) {
+    try {
+      var newContent = {
+        SEID: req.body.SEID,
+        SearchTerm: req.body.SearchTerm,
+        ContentCategory: req.body.ContentCategory,
+        ShortTitle: req.body.ShortTitle,
+        ContentMessage: req.body.ContentMessage,
+        ModifyDt: req.body.TimeStamp
+      }
+      await Content.update(newContent,{where:{ContentID: req.body.ContentID}})
+      
+      res.status(200).send({
+        code: 200,
+        message: 'Content更新成功'
+      })
+      logger.logger.info("Update Content: "+newContent.ContentID)
+    } catch (error) {
+      res.status(500).send({
+        code: 500,
+        error: '程序异常: ' + error
+      })
+      logger.logger.fatal("Update Content fail: "+newContent.ContentID+'/'+error)
+    }
+  },
+
   async createPdf(req, res) {
     try {
       logger.logger.info('req.body==>', req.body.file);
