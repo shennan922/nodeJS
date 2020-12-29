@@ -108,6 +108,7 @@
                     :key="tag"
                     v-for="tag in dynamicTags"
                     :closable="true"
+                    :size="medium"
                     @close="onTagClose(tag)"
                     >
                     {{tag}}
@@ -126,10 +127,14 @@
                     <el-col :span="5">
                       <el-upload
                         ref="upload"
-                        action=""
+                        action="http://localhost:8080/api/MyContent/createPdf"
+                        :multiple="true"
                         :show-file-list="true"
-                        :before-upload="beforeUpload"
-                        style="float:left">
+                        :file-list="fileList"
+                        :accept="pdf"
+                        :limit="3"         
+                        :auto-upload="false"
+                        >
                         <el-button slot="trigger">Choose file</el-button>
                       </el-upload>
                     </el-col>
@@ -137,6 +142,8 @@
                       <el-input v-model="AddContentForm.UpdatePDFName"  :disabled="true"></el-input>
                     </el-col>
                   </el-row>
+                  <!--<el-button type="text" @click="downloadFile">下载test</el-button>
+                  <a class='download' :href='api/myContent/downloadpdf' download=""  title="下载">下载</a>-->
                 </el-form-item>
                 <el-form-item label="Content" prop="ContentMessage">
                   <div>
@@ -191,6 +198,7 @@ export default {
         // 编辑器不自动被内容撑高
         autoHeightEnabled: false,
       },
+      fileList:[111111,222222222222,333333],
       ue1: "ue1", // 不同编辑器必须不同的id
       ue2: "ue2",
       formStatus:0, 
@@ -273,6 +281,17 @@ export default {
       };
   },
   methods: {
+    downloadFile(){
+      //ContentService.downloadFile({filePath:"./contents/3333.pdf"})
+      
+      let link = document.createElement('a');
+      link.style.display = 'none';
+      link.href = 'http://localhost:3000/myContent/downloadpdf?file=./contents/3333.pdf';
+      link.setAttribute('download', 'aaa.pdf');
+      document.body.appendChild(link);
+      link.click();
+      
+    },
     onTagClose(tag){
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag),1)
       this.dynamicTagIDs.splice(this.dynamicTags.indexOf(tag),1)
@@ -614,6 +633,8 @@ export default {
 }
 .el-tag {
   margin-right: 10px;
+  width: 120px;
+
   } 
 
   

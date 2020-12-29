@@ -102,10 +102,9 @@ module.exports = {
   async createPdf(req, res) {
     try {
       logger.logger.info('req.body==>', req.body.file);
-      console.log('req.body==>', req.body.fileName);
-
+      
       var base64Data = req.body.file.replace(/^data:application\/pdf;base64,/, "");
-      var dataBuffer = new Buffer(base64Data, 'base64');
+      var dataBuffer = Buffer.from(base64Data, 'base64');
       fs.writeFile('.//contents//'+req.body.fileName, dataBuffer,function(err) {
         if(err){
           logger.logger.info(err);
@@ -127,5 +126,22 @@ module.exports = {
       })
       //logger.logger.fatal("Create Content fail: " + newContent.ContentID + '/' + error)
     }
+  },
+
+
+  async downloadPdf(req, res) {
+
+    res.set({
+
+        "Content-Type":"application/octet-stream;charset=base64",//告诉浏览器这是一个二进制文件
+        "Content-Disposition":"attachment; filename=xxx.pdf"//告诉浏览器这是一个需要下载的文件
+      
+    });
+    //fs.createReadStream('./public/file/test.txt').pipe(res);
+  
+
+  fs.createReadStream(req.query.file).pipe(res);
+
+ 
   }
 }
