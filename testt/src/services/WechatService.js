@@ -13,8 +13,7 @@ export default {
     //alert("kaishi")
     var ticket =await req.wapirequest.post(`/qrcode/create?access_token=${store.state.user.wechat}`,data,function (error, response, body) {
       if(error!==null){
-        alert(error)
-       // reject("获取access_token失败 检查getAccessToken函数");
+        alert(error)      
       }
       alert(JSON.parse(body));
     });        
