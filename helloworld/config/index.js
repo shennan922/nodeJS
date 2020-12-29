@@ -33,6 +33,11 @@ module.exports = {
     wxapi:"https://api.weixin.qq.com/cgi-bin",
     QRurl:'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=',
     snsurl:'https://api.weixin.qq.com/sns/oauth2',
+    uploadPermPics:'https://api.weixin.qq.com/cgi-bin/media/upload?',
+    uploadPermOther:'https://api.weixin.qq.com/cgi-bin/material/add_material?',
+    uploadPermNews:'https://api.weixin.qq.com/cgi-bin/material/add_news?',
+    sendMessageurlpre:'https://api.weixin.qq.com/cgi-bin/message/mass/preview?',
+    sendMessageurl:'https://api.weixin.qq.com/cgi-bin/message/mass/sendall?',
     expire_seconds:604800
   }
   
