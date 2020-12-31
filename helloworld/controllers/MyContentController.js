@@ -188,5 +188,14 @@ module.exports = {
       //logger.logger.fatal("Create Content fail: " + newContent.ContentID + '/' + error)
     }
   },
+  async testImg (req, res) {
+    res.status(200).send({
+      imageUrl: "http://localhost:3000/myContent/photoUpload",
+      imagePath: "C:/Workspace/nodeJS_new_1222/helloworld/public/ueditor/images",
+      imageFieldName: "upfile",
+      imageMaxSize: 2048,
+      imageAllowFiles: [".png", ".jpg", ".jpeg", ".gif", ".bmp"]
+    })
+  },
 
 }

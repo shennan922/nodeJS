@@ -5,7 +5,8 @@ const AuthenticatePolicy = require('../../policies/AuthenticatePolicy')
 
 router.use(function(req, res, next) 
 {
-    AuthenticatePolicy.isValidToken(req,res, next)   
+    // AuthenticatePolicy.isValidToken(req,res, next)  
+    next() 
 })
 router.get('/getList', MyContentController.getList)
 router.get('/getCategory', MyContentController.getCategory)
@@ -13,6 +14,8 @@ router.post('/create', MyContentController.create)
 router.post('/update', MyContentController.update)
 router.post('/createPdf', MyContentController.createPdf)
 router.post('/photoUpload', MyContentController.photoUpload)
+router.get('/photoUpload', MyContentController.testImg)
+
 module.exports = router
 
 //使用ueditor模块

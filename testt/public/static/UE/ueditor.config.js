@@ -34,6 +34,7 @@
         //, serverUrl: URL + "php/controller.php",
         //,serverUrl: URL + "jsp/controller.jsp"
         //, serverUrl: "api/ue/upload"
+        ,serverUrl:"http://localhost:3000/myContent/photoUpload?action=config&&noCache=1609404339284"
         //工具栏上的所有的功能按钮和下拉框，可以在new编辑器的实例时选择自己需要的从新定义
          ,toolbars: [[
             'fullscreen', 'source', '|', 'undo', 'redo', '|',
