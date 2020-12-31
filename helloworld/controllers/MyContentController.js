@@ -187,6 +187,6 @@ module.exports = {
       })
       //logger.logger.fatal("Create Content fail: " + newContent.ContentID + '/' + error)
     }
-  }
-  }
+  },
+
 }
