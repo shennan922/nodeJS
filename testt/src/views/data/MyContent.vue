@@ -36,7 +36,7 @@
             @sort-change="changeTableSort" class="formSE"
             ref="ContenTable"
             >
-            <el-table-column min-width="8%" prop="ContentID" label="Content ID"></el-table-column>
+            <el-table-column min-width="8%" prop="ContentID" label="ContentID" sortable></el-table-column>
             <el-table-column min-width="8%" prop="SearchTerm" label="Search Term" ></el-table-column>
             <el-table-column min-width="20%" prop="ContentCategory" label="Category">
               <template slot-scope="scope" >
@@ -52,13 +52,14 @@
             </el-table-column>
             <el-table-column min-width="10%" prop="ShortTitle" label="Short Title"></el-table-column>
             <!-- <el-table-column min-width="5%" prop="ContentMessage" label="ContentMessage"></el-table-column> -->
-            <el-table-column min-width="10%" prop="SEID" label="SEID"></el-table-column>
+            <el-table-column min-width="10%" prop="SEID" label="SEID" sortable></el-table-column>
             <el-table-column min-width="15%" prop="CreateDt" label="Create Date"></el-table-column>
             <el-table-column min-width="15%" prop="ModifyDt" label="Modify Date"></el-table-column>
             <el-table-column min-width="15%" label="Operation">
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
                 <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
+                <el-button size="mini" type="info" @click="handleID(scope.row.SEID)" plain >Test</el-button>
               </template>
             </el-table-column>
           </el-table> 
@@ -78,7 +79,7 @@
         </el-col>
       </el-row>
       <!--增加Content页面-->
-      <el-dialog :title ="formStatus==1?'Create a New Paper':'Update a Paper'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent" :modal-append-to-body="false">
+      <el-dialog :title ="formStatus==1?'Create a New Paper':'Update a Paper'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent" @close="handleFormClose" :close-on-click-modal="false" :modal-append-to-body="false">
           <el-form 
           ref="AddContentForm"
           :model="AddContentForm" 
@@ -128,20 +129,23 @@
                     <el-col :span="5">
                       <el-upload
                         ref="upload"
-                        action="http://localhost:8080/api/MyContent/createPdf"
+                        action=""
                         :multiple="true"
                         :show-file-list="true"
                         :file-list="fileList"
-                        :accept="pdf"
-                        :limit="3"         
+                        accept=".PDF,.pdf"                    
+                        
                         :auto-upload="false"
+                        :on-change="uploadOnChange"
+                        :on-remove="uploadOnRemove"
+                  
                         >
                         <el-button slot="trigger">Choose file</el-button>
                       </el-upload>
                     </el-col>
-                    <el-col :span="19">
+                    <!--<el-col :span="19">
                       <el-input v-model="AddContentForm.UpdatePDFName"  :disabled="true"></el-input>
-                    </el-col>
+                    </el-col>-->
                   </el-row>
                   <!--<el-button type="text" @click="downloadFile">下载test</el-button>
                   <a class='download' :href='api/myContent/downloadpdf' download=""  title="下载">下载</a>-->
@@ -176,16 +180,19 @@ import GeneralService from "../../services/GeneralService";
 import UE from '../../components/ue/ue.vue';
 // import MyContentService from "../../services/MyContentService";
 import ContentService from "../../services/ContentService";
+import router from '../../router'
 
 export default {
   mounted() {
     this.getDetailList();
     this.getCategoryListData();
     this.getSEList();
+    
   },  
   components: {UE},
   data(){
     return {
+      ContentID:"",
       pageNum:1,//table第几页
       pageSize:5,  
       defaultMsg:"",
@@ -203,7 +210,7 @@ export default {
         serverUrl: "https://operationgwdev.bgycc.com/zuul/phantom-service-storage/ueditor/exec", //图片上传的地址
         //serverUrl:"http://localhost:8080/data/MyContent"
       },
-      fileList:[111111,222222222222,333333],
+      
       ue1: "ue1", // 不同编辑器必须不同的id
       ue2: "ue2",
       formStatus:0, 
@@ -229,14 +236,10 @@ export default {
         ContentCategory:"",
         ShortTitle: "",
         SearchTerm: "",
-        UpdatePDF: null,
-        UpdatePDFName: '',
-        UpdatePDFData:'',
         Content: "",
-        // file:null,
-        // fileName:'',
-        // fileData:null
       },
+      UploadFiles: [],
+      fileList:[],
       addContentFormRules: {
         ShortTitle: [
           { required: true, message: '请输入Short Title', trigger: 'blur'},
@@ -287,6 +290,51 @@ export default {
       };
   },
   methods: {
+    handleID(){
+      var fmRoutes 
+      var route ={
+        path: '/contentForms/3456',
+        name: 'test1111',
+        meta: { auth: true, title: 'test1111' },
+        component: () => import('../views/contentForms/Log111.vue')
+      }
+      
+      router.push(route)
+
+    },
+    getID(){
+      this.ContentID = Number(Math.random().toString().substr(3,6) );
+    },
+    uploadOnRemove(val){
+      console.log(val)
+    },
+    uploadOnChange(file){    
+      let fileID = this.UploadFiles.length+1
+      this.getCurrentTime()
+
+      let reader = new FileReader();
+      reader.readAsDataURL(file.raw);
+      let that = this
+
+ reader.onload = function () {
+   that.UploadFiles.push({
+        ContentID:that.ContentID,
+        FileID:fileID,
+        FileName:file.name,
+        FileData:reader.result,
+        UploadTime: that.currentTime,
+      })
+      }
+
+
+      
+      
+     
+      
+      
+      console.log(that.UploadFiles)
+      
+    },
     downloadFile(){
       //ContentService.downloadFile({filePath:"./contents/3333.pdf"})
       
@@ -314,7 +362,7 @@ export default {
       })
       return desc
     },
-    handleClose(){          
+    handleFormClose(){          
       //resetFields将form重置到mounted之后的状态, 对于编辑页面不适用
       //this.$refs.AddSEForm.resetFields()
       this.AddContentForm = {
@@ -331,7 +379,8 @@ export default {
       this.changeFlag = false
       this.dynamicTags = []
       this.dynamicTagIDs = []
-
+      this.UploadFiles = []
+      this.fileList = []
     },
 
     handleClose(tag) {
@@ -350,6 +399,21 @@ export default {
         .then((res) => {
           this.getCategoryList = res.data;
             //console.log("-=====-"+JSON.stringify(this.getCategoryList))
+        })
+        .catch(function (err) {
+          console.log(err);
+        });
+    },
+    getFileListData(data) {
+      ContentService.getFileList(data)
+        .then((res) => {
+          //this.UploadFiles = res.data;
+          console.log(res.data)
+          res.data.forEach(file => {
+            
+            this.fileList.push(file.FileName)
+          });
+          console.log(this.fileList)
         })
         .catch(function (err) {
           console.log(err);
@@ -383,6 +447,8 @@ export default {
     handleEdit(row) {
       this.dynamicTags = []
       this.dynamicTagIDs = []
+      this.ContentID = row.ContentID
+      this.getFileListData({ContentID:row.ContentID})
       var id = row.ContentCategory
       var idx = id.split(",")
       idx.forEach(id => {
@@ -397,39 +463,35 @@ export default {
       this.dialogCreateVisible = true;
       
       this.defaultMsg =row.ContentMessage;
-        this.AddContentForm = {
-          ContentID:row.ContentID,
-          SEID:row.SEID,
-          ContentCategory:row.ContentCategory,
-          ShortTitle: row.ShortTitle,
-          SearchTerm: row.SearchTerm,
-          UpdatePDF: null,
-          UpdatePDFName: '',
-          UpdatePDFData:'',
-          ContentMessage: row.ContentMessage,
-          CreateDt:row.CreateDt,
-          ModifyDt:row.ModifyDT
+      this.AddContentForm = {
+        ContentID:row.ContentID,
+        SEID:row.SEID,
+        ContentCategory:row.ContentCategory,
+        ShortTitle: row.ShortTitle,
+        SearchTerm: row.SearchTerm,
+        ContentMessage: row.ContentMessage,
+        CreateDt:row.CreateDt,
+        ModifyDt:row.ModifyDT
       };
+      
     },
-    handleDelete(SEID){
-      SEService.SEDelete({SEID:SEID}).then((res) => {
+    handleDelete(ContentID){
+      ContentService.myContentDelete({ContentID:ContentID}).then((res) => {
         this.$message({
           type: 'success',
           message: '删除成功!'
         });
-        this.dialogCreateVisible = false;
+        //this.dialogCreateVisible = false;
         this.getDetailList();
         // this.reload();
-        console.log("successful");
       }).catch((error) => {
         this.$message({
           type: 'info',
-          message: '已取消新增'+error
+          message: '删除失败'+error
         });
       })
     },
     changeTableSort(column){
-      console.log(column); 
       //获取字段名称和排序类型
       var fieldName = column.prop;
       var sortingType = column.order;
@@ -443,20 +505,20 @@ export default {
           
       //按照降序排序
       if(sortingType == "descending"){
-        this.getList = this.getList.sort((a, b) => //b[fieldName] - a[fieldName]
+        this.getSearchInfo = this.getSearchInfo.sort((a, b) => //b[fieldName] - a[fieldName]
           b[fieldName].localeCompare(a[fieldName])
         );
       }
       //按照升序排序
       else{
-        this.getList = this.getList.sort((a, b) => //a[fieldName] - b[fieldName]
+        this.getSearchInfo = this.getSearchInfo.sort((a, b) => //a[fieldName] - b[fieldName]
           a[fieldName].localeCompare(b[fieldName])
         );
       }
 
       //如果字段名称为“创建时间”，将时间戳格式的“创建时间”再转换为时间格式
       if(fieldName=="createTime"){
-        this.getList.map(item => {
+        this.getSearchInfo.map(item => {
           item.createTime = this.$moment(item.createTime).format(
             "YYYY-MM-DD HH:mm:ss"
           );
@@ -467,6 +529,7 @@ export default {
       return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left";
     },
     handleAdd() {
+    this.getID();
     this.dynamicTags =[];
     this.dynamicTags = [];
     this.formStatus = 1
@@ -478,27 +541,24 @@ export default {
         ContentCategory:"",
         ShortTitle: "",
         SearchTerm: "",
-        UpdatePDF: null,
-        UpdatePDFName: '',
-        UpdatePDFData:'',
         ContentMessage: "",
       };
     },
     beforeUpload(UpdatePDF) {
-      this.AddContentForm.UpdatePDF = UpdatePDF;
-      this.AddContentForm.UpdatePDFName = UpdatePDF.name;
+
       // this.fileSize = file.size;
       const extension = UpdatePDF.name.split(".").slice(-1) == "pdf";
       if (!extension) {
         this.$message.warning("上传模板只能是pdf格式!");
         return;
       }
+      
       let reader = new FileReader();
       reader.readAsDataURL(UpdatePDF);
-      let that = this;
       reader.onload = function () {
-        that.AddContentForm.UpdatePDFData = reader.result;
-      };
+        this.fileBody = reader.result
+      }
+      console.log(this.fileBody)
       return false; // 返回false不会自动上传
     },
     getCurrentTime(){
@@ -524,7 +584,7 @@ export default {
               this.$confirm('确认提交？', '提示', {}).then(async() => {
               await ContentService.myContentCreate(
                 {
-                  // ContentID: "100004",
+                  ContentID: this.ContentID,
                   SEID: this.AddContentForm.SEID,
                   SearchTerm: this.AddContentForm.SearchTerm,
                   ContentCategory: this.dynamicTagIDs.toString(),
@@ -533,10 +593,7 @@ export default {
                   TimeStamp: this.currentTime
             },
             await ContentService.ContentCreate({
-                contentId: "1",
-                fileId: "1",
-                fileName: this.AddContentForm.UpdatePDFName,
-                file: this.AddContentForm.UpdatePDFData,
+                file:this.UploadFiles
               })
               ).then((res) => {
               
@@ -546,11 +603,8 @@ export default {
                     message: '提交成功!'
                   });
                   this.dialogCreateVisible = false;
-                  this.formStatus = 0
                   this.getDetailList()
-                  this.dynamicTags = []
-                  this.dynamicTagIDs = []
-                  //this.handleClose()
+                  this.handleFormClose()
                 }              
               })
             }).catch((err) => {
@@ -594,11 +648,7 @@ export default {
                 });
                 this.dialogCreateVisible = false;
                 this.getDetailList();
-                //this.handleClose()
-                this.formStatus = 0
-                this.changeFlag = false,
-                this.dynamicTags = []
-                this.dynamicTagIDs = []
+                this.handleFormClose()
               }                
             })
           }).catch(() => {

@@ -2,6 +2,7 @@ const db = require('../models/Index')
 const logger = require('../logger/log4')
 var fs=require('fs');
 const Content = db.MyContent
+const ContentFile = db.MyContentFile
 const Category = db.MyContentCategory
 const SEList = db.SEList
 
@@ -72,11 +73,35 @@ module.exports = {
       logger.logger.fatal('Query MyContentCategory fail: '+error)
     }
   },
+  async getFileList (req, res) {
+    try {
+      const data = await ContentFile.findAll({where:{ContentID:req.query.ContentID}})
+      if (data) {
+        res.status(200).send({
+          value: 'MyContentFile',
+          data: data
+        })
+        logger.logger.info('Query MyContentFile: '+data.length+' records returned')
+      } else {
+        res.status(200).send({
+          code: 200,
+          error: '没有找到对应数据'
+        })
+        logger.logger.error('Query MyContentFile: No data found')
+      }
+    } catch (error) {
+      res.status(400).send({
+        code: 400,
+        error: '数据查询失败'
+      })
+      logger.logger.fatal('Query MyContentFile fail: '+error)
+    }
+  },
   async create (req, res) {
     try {   
       var maxID = await Content.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('ContentID')),'maxID']]})
       var newContent = {
-        ContentID: maxID.dataValues.maxID+1,
+        ContentID: req.body.ContentID,//maxID.dataValues.maxID+1,
         SEID: req.body.SEID,
         SearchTerm: req.body.SearchTerm,
         ContentCategory: req.body.ContentCategory,
@@ -128,27 +153,51 @@ module.exports = {
 
   async createPdf(req, res) {
     try {
-      logger.logger.info('req.body==>', req.body.file);
-      
-      var base64Data = req.body.file.replace(/^data:application\/pdf;base64,/, "");
-      var dataBuffer = Buffer.from(base64Data, 'base64');
-      fs.writeFile('.//contents//'+req.body.fileName, dataBuffer,function(err) {
+      console.log('req.body==>', req.body.file);
+      var path = './/contents//'+req.body.file[0].ContentID
+      fs.mkdir(path,{recursive:true},(err)=>{
         if(err){
-          logger.logger.info(err);
+            throw err;
         }else{
-          logger.logger.info(err);
+            console.log('ok!');
         }
-      })
+      });
+
+      req.body.file.forEach(async file => {
+        var fullPath = path+'//'+file.FileName
+        var base64Data = file.FileData.replace(/^data:application\/pdf;base64,/, "");
+        var dataBuffer = Buffer.from(base64Data, 'base64');
+        fs.writeFile(fullPath, dataBuffer,function(err) {
+          if(err){
+            logger.logger.fatal(err);
+          }else{
+            logger.logger.info('success~');
+          }
+        })
+
+        var newContentFile = {
+          ContentID: file.ContentID,
+          FileID: file.FileID,
+          FileName: file.FileName,
+          FilePath: path,
+          FileURL: 'http://localhost:3000/myContent/downloadpdf?file='+fullPath,
+          CreateDt: file.UploadTime
+        }
+
+        await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
+      });
+      
+
 
       res.status(200).send({
         code: 200,
         message: 'Content创建成功',
-        data: req.body.fileName
+        data: 'success upload'
       })
 
     } catch (error) {
-      res.status(500).send({
-        code: 500,
+      res.status(400).send({
+        code: 400,
         error: '程序异常: ' + error
       })
       //logger.logger.fatal("Create Content fail: " + newContent.ContentID + '/' + error)
@@ -170,5 +219,27 @@ module.exports = {
   fs.createReadStream(req.query.file).pipe(res);
 
  
+  },
+  
+  async delete (req, res) {
+    try {
+      await Content.destroy(
+        {
+          where: {
+            ContentID: req.query.ContentID
+          }
+        }
+      )
+      res.status(200).send({
+        message: '数据删除成功'
+      })
+      logger.logger.info("Delete Content: "+newContent.ContentID)
+    } catch (error) {
+      res.status(500).send({
+        code: 500,
+        error: '数据删除失败: ' + error
+      })
+      logger.logger.fatal("Delete Content fail: "+newContent.ContentID+'/'+error)
+    }
   }
 }

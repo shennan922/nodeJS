@@ -6,6 +6,10 @@ export default {
     const response = await req.request.get('/MyContent/getList')
     return response.data
   },
+  async getFileList (data) {
+    const response = await req.request.get('/MyContent/getFileList?ContentID='+data.ContentID)
+    return response.data
+  },
   async getCategoryList () {
     const response = await req.request.get('/MyContent/getCategory')
     return response.data
@@ -15,6 +19,10 @@ export default {
     return response.data
 
   },
+ async myContentDelete (data) {
+    const response = await req.request.get('/myContent/delete?ContentID='+data.ContentID)
+    return response.data
+  },  
   async myContentUpdate (data) {
     const response = await req.request.post('/myContent/update',data)
     return response.data
