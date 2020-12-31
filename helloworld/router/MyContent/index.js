@@ -4,7 +4,8 @@ const AuthenticatePolicy = require('../../policies/AuthenticatePolicy')
 /*
 router.use(function(req, res, next) 
 {
-    AuthenticatePolicy.isValidToken(req,res, next)   
+    // AuthenticatePolicy.isValidToken(req,res, next)  
+    next() 
 })*/
 router.get('/getList', MyContentController.getList)
 router.get('/getFileList', MyContentController.getFileList)
@@ -13,7 +14,7 @@ router.get('/delete',MyContentController.delete)
 router.post('/create', MyContentController.create)
 router.post('/update', MyContentController.update)
 router.post('/createPdf', MyContentController.createPdf)
-router.get('/downloadPdf', MyContentController.downloadPdf)
-
+router.post('/photoUpload', MyContentController.photoUpload)
+router.get('/photoUpload', MyContentController.testImg)
 
 module.exports = router

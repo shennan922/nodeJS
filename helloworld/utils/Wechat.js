@@ -21,7 +21,8 @@ async function updateAccessToken (appId,appSecret)
       APPSecret: appSecret,
       APPToken: wtoken.data.access_token      
     }
-    db.APPList.update(newToken,{where:{APPID: appId}})     
+    db.APPList.update(newToken,{where:{APPID: appId}})    
+    return wtoken.data.access_token
   }
   catch(error)
   {
@@ -135,17 +136,17 @@ module.exports = {
     data.media = fs.createReadStream(material)    
     request.post({url: `${config.appInfo.uploadPermOther}access_token=${token}&type=image`, formData:data}, function(err,response,body){
       if(err) {
-        logger.logger.error("upload image error: "+err.message)
-        return ''
+        logger.logger.error("upload image error: "+err.message)       
       }
       return JSON.parse(response.body).media_id
       })   
   }catch (error)
     {
       logger.logger.error("upload error: "+error.message)
+      return ''
     }
   },
-  async uploadImageText(token, material){ 
+  async uploadImageText(token, material,refresh=1){ 
     var data = {}
     //var data = 
     try
@@ -173,12 +174,18 @@ module.exports = {
           reject(error.message);
         }
         resolve(JSON.parse(body));
-      });   
-      return ticket.data        
-      
+      }); 
+      if(ticket.data.errcode==42001&&refresh==1){
+        token = await updateAccessToken(config.appInfo.appID,config.appInfo.secret)
+        return await this.uploadImageText(token, material,0)
+      }
+      else{
+        return ticket.data.media_id  
+      }                
   }catch (error)
     {
       logger.logger.error("upload image_text error: "+error.message)
+      return ''
     }
   },
   async uploadPermMaterial(req, res, next){ 
@@ -193,8 +200,6 @@ module.exports = {
          },
         "msgtype":"mpnews" 
      }
-    
-    
      var ticket =await axios.post(`${config.appInfo.sendMessageurl}access_token=${token}`, data, function (error, response, body) {
         if(error!==null){
           reject("获取access_token失败 检查getAccessToken函数");

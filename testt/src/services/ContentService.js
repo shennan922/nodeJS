@@ -35,6 +35,10 @@ export default {
     //  }
     const response = await req.request.post('/myContent/createPdf',data)
     return response.data
+  },
+  async myContentPhotoUpload (data) {
+    const response = await req.request.post('/myContent/photoUpload',data)
+    return response.data
   }
   ,
   async downloadFile (data) {

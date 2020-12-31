@@ -9,6 +9,7 @@ module.exports = (app) => {
   router.use('/general', require('./General'));
   router.use('/user', require('./User'));
   router.use('/myContent', require('./MyContent'));
+  router.use('/UE', require('./UE'));
   app.use('/', router);
   
 }

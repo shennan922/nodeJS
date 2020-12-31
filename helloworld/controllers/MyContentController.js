@@ -16,7 +16,7 @@ module.exports = {
   async getList (req, res) {
     try {
       var data = await Content.findAll({
-        attributes:['ContentID','SEID','SearchTerm','ContentCategory','ShortTitle','ContentMessage','CreateDt','ModifyDt'],
+        attributes:['ContentID','SEID','SearchTerm','ContentCategory','ShortTitle','ContentMessage','CreateDt','ModifyDt','PhotoName','PhotoPath'],
         include:[
           {
             model: SEList,
@@ -107,7 +107,9 @@ module.exports = {
         ContentCategory: req.body.ContentCategory,
         ShortTitle: req.body.ShortTitle,
         ContentMessage: req.body.ContentMessage,
-        CreateDt: req.body.TimeStamp
+        CreateDt: req.body.TimeStamp,
+        PhotoName:req.body.PhotoName,
+        PhotoPath:req.body.PhotoPath,
       }
       await Content.create(newContent)      
       
@@ -133,7 +135,9 @@ module.exports = {
         ContentCategory: req.body.ContentCategory,
         ShortTitle: req.body.ShortTitle,
         ContentMessage: req.body.ContentMessage,
-        ModifyDt: req.body.TimeStamp
+        ModifyDt: req.body.TimeStamp,
+        PhotoName:req.body.PhotoName,
+        PhotoPath:req.body.PhotoPath,
       }
       await Content.update(newContent,{where:{ContentID: req.body.ContentID}})
       
@@ -183,19 +187,16 @@ module.exports = {
           FileURL: 'http://localhost:3000/myContent/downloadpdf?file='+fullPath,
           CreateDt: file.UploadTime
         }
-
         await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
-      });
-      
-
+      });  
 
       res.status(200).send({
         code: 200,
         message: 'Content创建成功',
         data: 'success upload'
       })
-
-    } catch (error) {
+    } 
+    catch (error) {
       res.status(400).send({
         code: 400,
         error: '程序异常: ' + error
@@ -204,42 +205,65 @@ module.exports = {
     }
   },
 
-
   async downloadPdf(req, res) {
-
     res.set({
-
-        "Content-Type":"application/octet-stream;charset=base64",//告诉浏览器这是一个二进制文件
-        "Content-Disposition":"attachment; filename=xxx.pdf"//告诉浏览器这是一个需要下载的文件
-      
+      "Content-Type":"application/octet-stream;charset=base64",//告诉浏览器这是一个二进制文件
+      "Content-Disposition":"attachment; filename=xxx.pdf"//告诉浏览器这是一个需要下载的文件      
     });
-    //fs.createReadStream('./public/file/test.txt').pipe(res);
-  
-
-  fs.createReadStream(req.query.file).pipe(res);
-
- 
+    fs.createReadStream(req.query.file).pipe(res);
   },
   
   async delete (req, res) {
     try {
-      await Content.destroy(
-        {
-          where: {
-            ContentID: req.query.ContentID
-          }
-        }
-      )
+      await Content.destroy({where: {ContentID: req.query.ContentID}})
       res.status(200).send({
         message: '数据删除成功'
       })
       logger.logger.info("Delete Content: "+newContent.ContentID)
-    } catch (error) {
+    } 
+    catch (error) {
       res.status(500).send({
         code: 500,
         error: '数据删除失败: ' + error
       })
       logger.logger.fatal("Delete Content fail: "+newContent.ContentID+'/'+error)
     }
-  }
+  },
+
+  async photoUpload(req, res) {
+    try {
+      logger.logger.info('req.body==>', req.body.file);
+      console.log('req.body==>', req.body.fileName);
+      var base64Data = req.body.file.replace(/^data:image\/jpeg;base64,/, "");
+      var dataBuffer = Buffer.from(base64Data, 'base64');
+      fs.writeFile('.//images//'+req.body.fileName, dataBuffer,function(err) {
+        if(err){
+          logger.logger.info(err);
+        }else{
+          logger.logger.info(err);
+        }
+      })
+      res.status(200).send({
+        code: 200,
+        message: 'Content创建成功',
+        data: req.body.fileName
+      })
+    } catch (error) {
+      res.status(500).send({
+        code: 500,
+        error: '程序异常: ' + error
+      })
+      //logger.logger.fatal("Create Content fail: " + newContent.ContentID + '/' + error)
+    }
+  },
+  async testImg (req, res) {
+    res.status(200).send({
+      imageUrl: "http://localhost:3000/myContent/photoUpload",
+      imagePath: "C:/Workspace/nodeJS_new_1222/helloworld/public/ueditor/images",
+      imageFieldName: "upfile",
+      imageMaxSize: 2048,
+      imageAllowFiles: [".png", ".jpg", ".jpeg", ".gif", ".bmp"]
+    })
+  },
 }
+

@@ -3,6 +3,7 @@ const db = require('../models/Index')
 const logger = require('../logger/log4')
 const xml2js = require('xml2js');
 const msg = require('../utils/Msg');
+const we = require('../utils/Wechat');
 const config = require('../config')
 var fs=require('fs');
 var FormData = require('form-data');
@@ -206,13 +207,15 @@ module.exports = {
       logger.logger.error("upload error: "+error.message)
     }
   },
-  async uploadPermMaterial3(req, res, next){ 
+  async uploadPermMaterial(req, res, next){ 
     var uploadUrl = '';
     var material = 'helloworld/public/images/test.jpg'
     var type ='news'    
     var data = {}
     //var data = 
     var token = '40_UHfEselVhq6RkDWyh3W1VzTBGoKa7E2fQI2VNpCv3d7ISiCyFUutaiZ1YdAtbKNcq28TWz_l5qDddd8UXuDJ99UEe7S0Jr9n9tE_qAuMxFXqPCE8J2ApmvEksL4V8JnH728Be2LrrzfMm7U7YPDjADAKBP'
+  
+    
     try
     {
       material =  {
@@ -230,6 +233,7 @@ module.exports = {
         //若新增的是多图文素材，则此处应还有几段articles结构
     ]
     }
+    await we.uploadImageText(token,material)
     if(type === 'pic') uploadUrl = config.appInfo.uploadPermPics;
     if(type === 'other') uploadUrl = config.appInfo.uploadPermOther;
     if(type === 'news'){
@@ -268,7 +272,7 @@ module.exports = {
       logger.logger.error("upload error: "+error.message)
     }
   },
-  async uploadPermMaterial(req, res, next){ 
+  async uploadPermMaterial33(req, res, next){ 
     
     var token = '40_4ROYYyfp2I6G6ccvszmNvkfXDKV3RfJc-HdWVDl9MLzxLoIQIe_63v2mrCftpoorDw8bJhzHSz2tHOeIZ2dfSxFMxvvOG36N32mpdRlE52mzft-BOqCbq02Ioq2ADvgeghHlO36IN2fdxokvDOUhAJANYE'
     try
