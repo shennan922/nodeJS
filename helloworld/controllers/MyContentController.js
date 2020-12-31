@@ -15,7 +15,7 @@ module.exports = {
   async getList (req, res) {
     try {
       var data = await Content.findAll({
-        attributes:['ContentID','SEID','SearchTerm','ContentCategory','ShortTitle','ContentMessage','CreateDt','ModifyDt'],
+        attributes:['ContentID','SEID','SearchTerm','ContentCategory','ShortTitle','ContentMessage','CreateDt','ModifyDt','PhotoName','PhotoPath'],
         include:[
           {
             model: SEList,
@@ -82,7 +82,9 @@ module.exports = {
         ContentCategory: req.body.ContentCategory,
         ShortTitle: req.body.ShortTitle,
         ContentMessage: req.body.ContentMessage,
-        CreateDt: req.body.TimeStamp
+        CreateDt: req.body.TimeStamp,
+        PhotoName:req.body.PhotoName,
+        PhotoPath:req.body.PhotoPath,
       }
       await Content.create(newContent)      
       
@@ -108,7 +110,9 @@ module.exports = {
         ContentCategory: req.body.ContentCategory,
         ShortTitle: req.body.ShortTitle,
         ContentMessage: req.body.ContentMessage,
-        ModifyDt: req.body.TimeStamp
+        ModifyDt: req.body.TimeStamp,
+        PhotoName:req.body.PhotoName,
+        PhotoPath:req.body.PhotoPath,
       }
       await Content.update(newContent,{where:{ContentID: req.body.ContentID}})
       
@@ -126,7 +130,7 @@ module.exports = {
     }
   },
 
-  async createPdf(req, res) {
+  async  createPdf(req, res) {
     try {
       logger.logger.info('req.body==>', req.body.file);
       console.log('req.body==>', req.body.fileName);
@@ -154,5 +158,35 @@ module.exports = {
       })
       //logger.logger.fatal("Create Content fail: " + newContent.ContentID + '/' + error)
     }
+  },
+  async photoUpload(req, res) {
+    try {
+      logger.logger.info('req.body==>', req.body.file);
+      console.log('req.body==>', req.body.fileName);
+
+      var base64Data = req.body.file.replace(/^data:image\/jpeg;base64,/, "");
+      var dataBuffer = new Buffer(base64Data, 'base64');
+      fs.writeFile('.//images//'+req.body.fileName, dataBuffer,function(err) {
+        if(err){
+          logger.logger.info(err);
+        }else{
+          logger.logger.info(err);
+        }
+      })
+
+      res.status(200).send({
+        code: 200,
+        message: 'Content创建成功',
+        data: req.body.fileName
+      })
+
+    } catch (error) {
+      res.status(500).send({
+        code: 500,
+        error: '程序异常: ' + error
+      })
+      //logger.logger.fatal("Create Content fail: " + newContent.ContentID + '/' + error)
+    }
+  }
   }
 }

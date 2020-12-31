@@ -95,12 +95,12 @@
                     </el-option>
                   </el-select> 
                 </el-form-item>
-              <el-form-item label="Content Category" prop="ContentCategory">
+                <el-form-item label="Content Category" prop="ContentCategory">
                   <div>
-                  <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:90%;padding-left:0px" ref="categorySelect">
-                    <el-option
-                      v-for="item in getCategoryList" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
-                    </el-option> 
+                    <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:90%;padding-left:0px" ref="categorySelect">
+                      <el-option
+                        v-for="item in getCategoryList" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
+                      </el-option> 
                     </el-select> 
                     <el-button  class="button-new-tag" size="small" @click="showInput">+ </el-button>
                   </div>
@@ -114,14 +114,34 @@
                     {{tag}}
                    </el-tag>
                   </div>
-                </el-form-item>
-                   
+                </el-form-item>  
                 <el-form-item label="Short Title" prop="ShortTitle">
                   <el-input v-model="AddContentForm.ShortTitle" ></el-input>
                 </el-form-item>
                 <el-form-item label="Search Term" prop="SearchTerm" >
                   <el-input v-model="AddContentForm.SearchTerm"></el-input>
-                </el-form-item> 
+                </el-form-item>
+                <el-form-item label="Upload Photo" prop="UpdatePhotoData">
+                  <el-row>
+                    <el-col :span="5">
+                       <el-upload
+                          class="avatar-uploader"
+                          action="https://jsonplaceholder.typicode.com/posts/"
+                          :show-file-list="false"
+                          :on-change="handleChange"
+                          :on-success="handleAvatarSuccess"
+                          :before-upload="beforeAvatarUpload"
+                          ref="upload"
+                          >
+                          <!-- action="https://jsonplaceholder.typicode.com/posts/" -->
+                          <!-- :http-request="httpRequest" -->
+                          <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                      </el-upload>
+                    </el-col>
+                  </el-row>
+                </el-form-item>
+
                 <el-form-item label="Upload PDF">
                   <el-row>
                     <el-col :span="5">
@@ -193,8 +213,9 @@ export default {
         // 编辑器不自动被内容撑高
         autoHeightEnabled: false,
         //UEDITOR_HOME_URL: '/static/UE/',
-        serverUrl: "https://operationgwdev.bgycc.com/zuul/phantom-service-storage/ueditor/exec", //图片上传的地址
+        //serverUrl: "https://operationgwdev.bgycc.com/zuul/phantom-service-storage/ueditor/exec", //图片上传的地址
         //serverUrl:"http://localhost:8080/data/MyContent"
+        //serverUrl:'/api/ueditor/ueditor/ue'
       },
       ue1: "ue1", // 不同编辑器必须不同的id
       ue2: "ue2",
@@ -205,6 +226,7 @@ export default {
       dynamicTags:[],
       dynamicTagIDs:[],
       value:'',
+      imageUrl: '',
       ContentForm:{
         ContentID:"",
         SearchTerm:"",
@@ -214,6 +236,9 @@ export default {
         SEID:"",
         CreateDT:"",
         ModifyDT:"",
+        UpdatePhotoData:"",
+        UpdatePhotoName:"",
+        UpdatePhotoPath:"",
       },
       AddContentForm: {
         ContentID:"",
@@ -225,6 +250,10 @@ export default {
         UpdatePDFName: '',
         UpdatePDFData:'',
         Content: "",
+        UpdatePhoto: null,
+        UpdatePhotoName:'',
+        UpdatePhotoData:'',
+        UpdatePhotoPath:'',
         // file:null,
         // fileName:'',
         // fileData:null
@@ -307,6 +336,10 @@ export default {
         UpdatePDFName: '',
         UpdatePDFData:'',
         ContentMessage: "",
+        UpdatePhoto: null,
+        UpdatePhotoName:'',
+        UpdatePhotoData:'',
+        UpdatePhotoPath:'',
       }
       this.formStatus = 0 
       this.changeFlag = false
@@ -362,6 +395,7 @@ export default {
       this.pageNum = pageNum
     },
     handleEdit(row) {
+      this.imageUrl = '';
       this.dynamicTags = []
       this.dynamicTagIDs = []
       var id = row.ContentCategory
@@ -376,8 +410,11 @@ export default {
       })
       this.formStatus = 2;
       this.dialogCreateVisible = true;
-      
       this.defaultMsg =row.ContentMessage;
+      //this.imageUrl = 'blob:http://localhost:8080/f94350d5-54e8-40f7-bfc1-e0edf4876855';
+      //this.imageUrl = "http://dummyimage.com/100x50";
+      this.imageUrl = row.PhotoPath;
+      
         this.AddContentForm = {
           ContentID:row.ContentID,
           SEID:row.SEID,
@@ -389,7 +426,9 @@ export default {
           UpdatePDFData:'',
           ContentMessage: row.ContentMessage,
           CreateDt:row.CreateDt,
-          ModifyDt:row.ModifyDT
+          ModifyDt:row.ModifyDT,
+          PhotoName:row.UpdatePhotoName,
+          PhotoPath:row.UpdatePhotoData,
       };
     },
     handleDelete(SEID){
@@ -448,11 +487,11 @@ export default {
       return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left";
     },
     handleAdd() {
-    this.dynamicTags =[];
-    this.dynamicTags = [];
-    this.formStatus = 1
-    this.dialogCreateVisible = true;
-    //this.dynamicTagIDs =[];
+      this.imageUrl = '';
+      this.dynamicTags =[];
+      this.dynamicTags = [];
+      this.formStatus = 1
+      this.dialogCreateVisible = true;
       this.defaultMsg ="";
       this.AddContentForm = {
         SEID:"",
@@ -463,6 +502,9 @@ export default {
         UpdatePDFName: '',
         UpdatePDFData:'',
         ContentMessage: "",
+        UpdatePhoto: null,
+        UpdatePhotoName:'',
+        UpdatePhotoData:''
       };
     },
     beforeUpload(UpdatePDF) {
@@ -482,6 +524,52 @@ export default {
       };
       return false; // 返回false不会自动上传
     },
+    handleChange(res, file) {
+      this.file = file.slice(-1);
+    },
+    handleAvatarSuccess(res,file) {
+      this.imageUrl = URL.createObjectURL(file.raw);
+      //上传成功之后清除历史记录  
+      this.$refs.upload.clearFiles();  
+      //this.AddContentForm.UpdatePhotoPath = this.imageUrl;
+    },
+    beforeAvatarUpload(UpdatePhoto) {
+      const isJPG = UpdatePhoto.type === 'image/jpeg';
+      const isLt2M = UpdatePhoto.size / 1024 / 1024 < 0.03;
+
+        if (!isJPG) {
+          this.$message.error('上传头像图片只能是 JPG 格式!');
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 30KB!');
+        }
+        return isJPG && isLt2M;
+
+        this.AddContentForm.UpdatePhoto = UpdatePhoto;
+        this.AddContentForm.UpdatePhotoName = UpdatePhoto.name;
+        
+        const reader = new FileReader();
+        reader.readAsDataURL(UpdatePhoto);
+        const that = this;
+        reader.onload = function () {
+          that.AddContentForm.UpdatePhotoData = reader.result;
+        };
+    },
+    // httpRequest(data) {
+    //   const reader = new FileReader();
+    //     let _this = this  // 这里要转一下是因为在下面的function里 this的指向发生了变化
+    //     let rd = new FileReader()
+    //     let file = data.file
+    //     rd.readAsDataURL(file)
+    //     rd.onloadend = function(e) {
+    //       _this.AddContentForm.UpdatePhotoData = this.result
+    //       console.log(_this.AddContentForm.UpdatePhotoData,88888888);
+    //     }
+    //     this.imageUrl = this.result;
+    //     this.handleAvatarSuccess(data);
+
+    // },
+
     getCurrentTime(){
       var myDate = new Date()
       var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
@@ -499,7 +587,6 @@ export default {
       this.AddContentForm.ContentMessage = this.$refs.ue.getUEContent(); // 调用子组件方法
       //获取当前系统时间
       this.getCurrentTime();
-
         this.$refs.AddContentForm.validate((valid) => {
            if (valid) {
               this.$confirm('确认提交？', '提示', {}).then(async() => {
@@ -511,13 +598,21 @@ export default {
                   ContentCategory: this.dynamicTagIDs.toString(),
                   ShortTitle: this.AddContentForm.ShortTitle,
                   ContentMessage: this.AddContentForm.ContentMessage,
-                  TimeStamp: this.currentTime
+                  TimeStamp: this.currentTime,
+                  PhotoName:this.AddContentForm.UpdatePhotoName,
+                  PhotoPath:this.AddContentForm.UpdatePhotoData,
             },
             await ContentService.ContentCreate({
                 contentId: "1",
                 fileId: "1",
                 fileName: this.AddContentForm.UpdatePDFName,
                 file: this.AddContentForm.UpdatePDFData,
+              }),
+            await ContentService.myContentPhotoUpload({
+                contentId: "1",
+                fileId: "1",
+                fileName: this.AddContentForm.UpdatePhotoName,
+                file: this.AddContentForm.UpdatePhotoData,
               })
               ).then((res) => {
               
@@ -531,6 +626,7 @@ export default {
                   this.getDetailList()
                   this.dynamicTags = []
                   this.dynamicTagIDs = []
+                  this.imageUrl = '';
                   //this.handleClose()
                 }              
               })
@@ -560,7 +656,15 @@ export default {
                   ShortTitle: this.AddContentForm.ShortTitle,
                   ContentMessage: this.AddContentForm.ContentMessage,
                   TimeStamp: this.currentTime,
-              }
+                  PhotoName:this.AddContentForm.UpdatePhotoName,
+                  PhotoPath:this.AddContentForm.UpdatePhotoData,
+              },
+              await ContentService.myContentPhotoUpload({
+                contentId: "1",
+                fileId: "1",
+                fileName: this.AddContentForm.UpdatePhotoName,
+                file: this.AddContentForm.UpdatePhotoData,
+              })
             ).then((res) => {
               // if (res.code == 400){
               //   this.$message({
@@ -690,12 +794,35 @@ export default {
   .el-dialog__body{
     padding: 3% 5% 0px 5%;
   }  
-  
+   .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+  }
+  .avatar {
+    width: 178px;
+    height: 178px;
+    display: block;
+  }
 
 }
 .el-tag {
   margin-right: 10px;
-  } 
+  }
+ 
 
   
 </style>

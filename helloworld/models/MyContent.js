@@ -38,7 +38,15 @@ module.exports = (sequelize, DataTypes) => {
     ModifyDt: {
       type: DataTypes.DATE,      
       field: 'ModifyDt'
-    }
+    },
+    PhotoName: {
+      type: DataTypes.STRING,      
+      field: 'PhotoName'
+    },
+    PhotoPath: {
+      type: DataTypes.STRING(1000000),      
+      field: 'PhotoPath'
+    },
   },
     {
       sequelize,
