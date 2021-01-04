@@ -128,7 +128,7 @@
                     <el-col :span="5">
                        <el-upload
                           class="avatar-uploader"
-                          action="https://jsonplaceholder.typicode.com/posts/"
+                          action="https://testopenapi.nbdeli.com/crm/customer/saveChannelLogoFile"
                           :show-file-list="false"
                           :on-change="handleChange"
                           :on-success="handleAvatarSuccess"
@@ -318,10 +318,10 @@ export default {
     handleID(){
       var fmRoutes 
       var route ={
-        path: '/contentForms/3456',
-        name: 'test1111',
-        meta: { auth: true, title: 'test1111' },
-        component: () => import('../views/contentForms/Log111.vue')
+        // path: '/contentForms/3456',
+        // name: 'test1111',
+        // meta: { auth: true, title: 'test1111' },
+        // component: () => import('../views/contentForms/Log111.vue')
       }
       
       router.push(route)
@@ -610,16 +610,19 @@ export default {
     },
     beforeAvatarUpload(UpdatePhoto) {
       const isJPG = UpdatePhoto.type === 'image/jpeg';
-      const isLt2M = UpdatePhoto.size / 1024 / 1024 < 0.03;
-
+      const isLt2M = UpdatePhoto.size / 1024 / 1024 < 0.2;
+      if(!isJPG || !isLt2M)
+      {
         if (!isJPG) {
           this.$message.error('上传头像图片只能是 JPG 格式!');
         }
         if (!isLt2M) {
-          this.$message.error('上传头像图片大小不能超过 30KB!');
+          this.$message.error('上传头像图片大小不能超过 200KB!');
         }
         return isJPG && isLt2M;
-
+      }
+      else
+      {
         this.AddContentForm.UpdatePhoto = UpdatePhoto;
         this.AddContentForm.UpdatePhotoName = UpdatePhoto.name;
         
@@ -629,6 +632,7 @@ export default {
         reader.onload = function () {
           that.AddContentForm.UpdatePhotoData = reader.result;
         };
+      }
     },
     // httpRequest(data) {
     //   const reader = new FileReader();
