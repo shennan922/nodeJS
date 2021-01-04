@@ -14,7 +14,11 @@ router.get('/delete',MyContentController.delete)
 router.post('/create', MyContentController.create)
 router.post('/update', MyContentController.update)
 router.post('/createPdf', MyContentController.createPdf)
+router.post('/uploadPdf', MyContentController.uploadPdf)
 router.post('/photoUpload', MyContentController.photoUpload)
 router.get('/photoUpload', MyContentController.testImg)
+router.get('/downloadpdf', MyContentController.downloadPdf)
+router.get('/downloadImg', MyContentController.downloadImg)
 
 module.exports = router
+

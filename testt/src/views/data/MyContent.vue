@@ -149,13 +149,13 @@
                     <el-col :span="5">
                       <el-upload
                         ref="upload"
-                        action=""
+                        action="http://localhost:3000/myContent/uploadPdf"
                         :multiple="true"
                         :show-file-list="true"
                         :file-list="fileList"
                         accept=".PDF,.pdf"                    
-                        
-                        :auto-upload="false"
+                        :data="uploadData"
+                        :auto-upload="true"
                         :on-change="uploadOnChange"
                         :on-remove="uploadOnRemove"
                   
@@ -167,8 +167,8 @@
                       <el-input v-model="AddContentForm.UpdatePDFName"  :disabled="true"></el-input>
                     </el-col>-->
                   </el-row>
-                  <!--<el-button type="text" @click="downloadFile">下载test</el-button>
-                  <a class='download' :href='api/myContent/downloadpdf' download=""  title="下载">下载</a>-->
+                  <el-button type="text" @click="downloadFile">下载test</el-button>
+                  <!--<a class='download' :href='api/myContent/downloadpdf' download=""  title="下载">下载</a>-->
                 </el-form-item>
                 <el-form-item label="Content" prop="ContentMessage">
                   <div>
@@ -264,6 +264,10 @@ export default {
         Content: "",
       },
       UploadFiles: [],
+      uploadData:{
+        ContentID:"",
+        UploadTime: "",
+      },
       fileList:[],
       addContentFormRules: {
         ShortTitle: [
@@ -322,54 +326,47 @@ export default {
         // name: 'test1111',
         // meta: { auth: true, title: 'test1111' },
         // component: () => import('../views/contentForms/Log111.vue')
-      }
-      
+      }      
       router.push(route)
-
     },
     getID(){
       this.ContentID = Number(Math.random().toString().substr(3,6) );
     },
-    uploadOnRemove(val){
+    uploadOnRemove(file){
       console.log(val)
     },
     uploadOnChange(file){    
-      let fileID = this.UploadFiles.length+1
+      //let fileID = this.UploadFiles.length+1
       this.getCurrentTime()
-
+      /*
       let reader = new FileReader();
       reader.readAsDataURL(file.raw);
       let that = this
-
- reader.onload = function () {
-   that.UploadFiles.push({
-        ContentID:that.ContentID,
-        FileID:fileID,
-        FileName:file.name,
-        FileData:reader.result,
-        UploadTime: that.currentTime,
-      })
-      }
-
-
       
-      
-     
-      
-      
-      console.log(that.UploadFiles)
-      
+      reader.onload = function () {
+        that.UploadFiles.push({
+          ContentID:that.ContentID,
+          FileID:fileID,
+          FileName:file.name,
+          FileData:reader.result,
+          UploadTime: that.currentTime,
+        })
+      }    
+      */
+     this.uploadData.ContentID = this.ContentID
+     this.uploadData.UploadTime = this.currentTime
     },
     downloadFile(){
       //ContentService.downloadFile({filePath:"./contents/3333.pdf"})
-      
+      ContentService.downloadImg({filePath:"./images/test2.jpg"})
+      /*
       let link = document.createElement('a');
       link.style.display = 'none';
       link.href = 'http://localhost:3000/myContent/downloadpdf?file=./contents/3333.pdf';
       link.setAttribute('download', 'aaa.pdf');
       document.body.appendChild(link);
       link.click();
-      
+      */
     },
     onTagClose(tag){
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag),1)
@@ -474,7 +471,7 @@ export default {
       this.pageNum = pageNum
     },
     handleEdit(row) {
-      this.imageUrl = '';
+      this.imageUrl = 'http://localhost:3000/myContent/downloadImg?ContentID=174189';
       this.dynamicTags = []
       this.dynamicTagIDs = []
       this.ContentID = row.ContentID
@@ -633,6 +630,7 @@ export default {
           that.AddContentForm.UpdatePhotoData = reader.result;
         };
       }
+   
     },
     // httpRequest(data) {
     //   const reader = new FileReader();
@@ -680,18 +678,20 @@ export default {
                   TimeStamp: this.currentTime,
                   PhotoName:this.AddContentForm.UpdatePhotoName,
                   PhotoPath:this.AddContentForm.UpdatePhotoData,
-            },
-            await ContentService.ContentCreate({
+                },
+            /*
+              await ContentService.ContentCreate({
                 file:this.UploadFiles
               }),
-            await ContentService.myContentPhotoUpload({
+              
+              await ContentService.myContentPhotoUpload({
                 contentId: "1",
                 fileId: "1",
                 fileName: this.AddContentForm.UpdatePhotoName,
                 file: this.AddContentForm.UpdatePhotoData,
               })
-              ).then((res) => {
-              
+              */
+              ).then((res) => {              
                 if (res.code == 200){
                   this.$message({
                     type: 'success',
