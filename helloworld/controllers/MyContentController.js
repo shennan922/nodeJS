@@ -298,17 +298,15 @@ module.exports = {
     fs.createReadStream(req.query.file).pipe(res);   
   },
   
-  async downloadImg(req, res) {
-    
+  async downloadImg(req, res) {    
     res.set({
       "Content-Type":"application/jpeg",//告诉浏览器这是一个二进制文件
       "Content-Disposition":"attachment; filename=xxx.jpg"//告诉浏览器这是一个需要下载的文件      
-    });
-    //fs.createReadStream(req.query.file).pipe(res);   
-    
+    });  
 
+    fs.createReadStream('.//images//'+req.params.ContentID).pipe(res); 
+    /*
     Content.findByPk(req.params.ContentID).then((img)=>{
-      //res.status(200).send(img.PhotoPath)
       fs.createReadStream('.//contents//'+req.params.ContentID+'//'+img.PhotoName).pipe(res);   
     }).catch((err)=>{
       res.status(400).send({
@@ -317,7 +315,11 @@ module.exports = {
         message:'fail: '+err
       })
     })
+    */
+
+
   },
+
   async delete (req, res) {
     try {
       await Content.destroy({where: {ContentID: req.query.ContentID}})
