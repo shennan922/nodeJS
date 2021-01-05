@@ -127,6 +127,46 @@ module.exports = {
       logger.logger.fatal("Create Content fail: "+newContent.SEID+'/'+error)
     }
   },
+  async uploadPdf(req,res){
+    let form = new formidable.IncomingForm()
+    form.encoding = 'utf-8' // 编码
+    form.keepExtensions = true // 保留扩展名
+    form.parse(req, async (err, fields, files) => {
+      if(err) return next(err)
+      
+      var pathNew = './/contents//'+fields.ContentID
+      var pathFUll = pathNew + '//'+files.file.name
+      fs.mkdir(pathNew,{recursive:true},(err)=>{
+        if(err){
+            throw err;
+        }else{
+            console.log('ok!');
+        }
+      });
+      fs.rename(files.file.path,pathFUll,(err)=>{if(err) return next(err)})
+
+      var newContentFile = {
+        ContentID: fields.ContentID,
+        FileID: fields.FileID,
+        FileName: files.file.name,
+        FilePath: pathNew,
+        FileURL: 'http://localhost:3000/myContent/downloadpdf?file='+pathFUll,
+        CreateDt: fields.UploadTime
+      }
+      await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
+    })
+    
+    
+
+
+    
+
+    res.status(200).send({
+      code: 200,
+      message: 'Content创建成功',
+      data: 'success upload'
+    })
+  },
   
   async update (req, res) {
     try {
@@ -204,6 +244,27 @@ module.exports = {
       })
       //logger.logger.fatal("Create Content fail: " + newContent.ContentID + '/' + error)
     }
+  },
+  async downloadImg(req, res) {    
+    res.set({
+      "Content-Type":"application/jpeg",//告诉浏览器这是一个二进制文件
+      "Content-Disposition":"attachment; filename=xxx.jpg"//告诉浏览器这是一个需要下载的文件      
+    });  
+
+    fs.createReadStream('.//images//'+req.params.ContentID).pipe(res); 
+    /*
+    Content.findByPk(req.params.ContentID).then((img)=>{
+      fs.createReadStream('.//contents//'+req.params.ContentID+'//'+img.PhotoName).pipe(res);   
+    }).catch((err)=>{
+      res.status(400).send({
+        code: 400,
+        data:null,
+        message:'fail: '+err
+      })
+    })
+    */
+
+
   },
 
   async downloadPdf(req, res) {
