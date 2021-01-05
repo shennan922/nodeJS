@@ -244,7 +244,7 @@ module.exports = {
         logger.logger.error("upload error: "+error.message)
       }
   },
-    async getusers(req, res, next)
+  async getusers(req, res, next)
 	{
 		const token1 = '40_XIaLpyYiJm26PQJqQmiS_j3RSS-KxfWKgvbhUZtfkInFWBWFa-C2catxzAg6bdgKHRVpy5tdNLMjlm46gaGZNjuFXRvtps6ANmqIvGKjYxLb2zWfFIZHllfs-unjhTYjJmkksm5UlyXe4feyPSWiAAAILP'
 		wtoken =await axios.get(`${base.wxapi}/user/get?access_token=${token1}&next_openid=`, function (error, response, body) {
