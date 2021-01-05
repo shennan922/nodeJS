@@ -6,6 +6,7 @@ const ContentFile = db.MyContentFile
 const Category = db.MyContentCategory
 const SEList = db.SEList
 var formidable = require('formidable')
+var weChat = require('../utils/Wechat')
 
 Content.belongsTo(SEList, {
   foreignKey: 'SEID',
@@ -101,6 +102,8 @@ module.exports = {
   async create (req, res) {
     try {   
       var maxID = await Content.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('ContentID')),'maxID']]})
+      var mediaID = weChat.uploadImage(req.headers.authorization.split(' ')[1],'.//contents//'+req.body.ContentID+'//'+req.body.PhotoName)
+
       var newContent = {
         ContentID: req.body.ContentID,//maxID.dataValues.maxID+1,
         SEID: req.body.SEID,
@@ -111,9 +114,12 @@ module.exports = {
         CreateDt: req.body.TimeStamp,
         PhotoName:req.body.PhotoName,
         PhotoPath:req.body.PhotoPath,
+        ImgID:mediaID,
+        TextID:''
       }
          
-      
+      var mediaID = weChat.uploadImage(req.headers.authorization.split(' ')[1],'.//contents//'+req.body.ContentID+'//'+req.body.PhotoName)
+
       var pathNew = './/contents//'+req.body.ContentID
       var pathFUll = pathNew + '//'+req.body.PhotoName
       fs.mkdir(pathNew,{recursive:true},(err)=>{
