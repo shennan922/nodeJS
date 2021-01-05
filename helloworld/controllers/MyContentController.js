@@ -119,7 +119,7 @@ module.exports = {
       fs.mkdir(pathNew,{recursive:true},(err)=>{
         if(err){throw err;}
       });
-      console.log(pathFUll)
+
       var base64Data = req.body.PhotoPath.replace(/^data:image\/jpeg;base64,/, "");
       var dataBuffer = Buffer.from(base64Data, 'base64');
       fs.writeFile(pathFUll, dataBuffer,function(err) {
@@ -161,12 +161,20 @@ module.exports = {
 
       let pathNew = './/contents//'+req.body.ContentID
       let pathFUll = pathNew + '//'+req.body.PhotoName
-      let imgOld = await Content.findByPk(req.body.ContentID)
-
-      fs.unlink(pathNew+'//'+imgOld.PhotoName, function(err){
+      fs.mkdir(pathNew,{recursive:true},(err)=>{
         if(err){throw err;}
-        console.log('文件:'+pathNew+'//'+imgOld.PhotoName+'删除成功！');
+      });
+      
+      await Content.findByPk(req.body.ContentID,(imgOld)=>{
+        if(imgOld.PhotoName){
+          fs.unlink(pathNew+'//'+imgOld.PhotoName, function(err){
+            if(err){throw err;}
+            console.log('文件:'+pathNew+'//'+imgOld.PhotoName+'删除成功！');
+          })
+        }
       })
+
+      
 
       var base64Data = req.body.PhotoPath.replace(/^data:image\/jpeg;base64,/, "");
       var dataBuffer = Buffer.from(base64Data, 'base64');
