@@ -18,7 +18,7 @@ router.post('/uploadPdf', MyContentController.uploadPdf)
 router.post('/photoUpload', MyContentController.photoUpload)
 router.get('/photoUpload', MyContentController.testImg)
 router.get('/downloadpdf', MyContentController.downloadPdf)
-router.get('/downloadImg', MyContentController.downloadImg)
+router.get('/downloadImg/:ContentID', MyContentController.downloadImg)
 
 module.exports = router
 

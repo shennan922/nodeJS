@@ -164,24 +164,21 @@ module.exports = {
       fs.mkdir(pathNew,{recursive:true},(err)=>{
         if(err){throw err;}
       });
-      
-      await Content.findByPk(req.body.ContentID,(imgOld)=>{
-        if(imgOld.PhotoName){
-          fs.unlink(pathNew+'//'+imgOld.PhotoName, function(err){
-            if(err){throw err;}
-            console.log('文件:'+pathNew+'//'+imgOld.PhotoName+'删除成功！');
-          })
-        }
-      })
 
-      
+      let imgOld = await Content.findByPk(req.body.ContentID)
+      if(imgOld.PhotoName){
+        fs.unlink(pathNew+'//'+imgOld.PhotoName, function(err){
+          if(err){logger.logger.fatal(err+'-'+pathNew+'//'+imgOld.PhotoName);}
+          console.log('文件:'+pathNew+'//'+imgOld.PhotoName+'删除成功！');
+        })
+      }
 
       var base64Data = req.body.PhotoPath.replace(/^data:image\/jpeg;base64,/, "");
       var dataBuffer = Buffer.from(base64Data, 'base64');
-      fs.writeFile(pathFUll, dataBuffer,function(err) {
-        if(err){
+      fs.writeFileSync(pathFUll, dataBuffer, function (err) {
+        if (err) {
           logger.logger.info('img upload success');
-        }else{
+        } else {
           logger.logger.fatal(err);
         }
       })
@@ -192,13 +189,13 @@ module.exports = {
         code: 200,
         message: 'Content更新成功'
       })
-      logger.logger.info("Update Content: "+newContent.ContentID)
+      logger.logger.info("Update Content: "+req.body.ContentID)
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '程序异常: ' + error
       })
-      logger.logger.fatal("Update Content fail: "+newContent.ContentID+'/'+error)
+      logger.logger.fatal("Update Content fail: "+req.body.ContentID+'/'+error)
     }
   },
 
@@ -310,9 +307,9 @@ module.exports = {
     //fs.createReadStream(req.query.file).pipe(res);   
     
 
-    Content.findByPk(req.query.ContentID).then((img)=>{
+    Content.findByPk(req.params.ContentID).then((img)=>{
       //res.status(200).send(img.PhotoPath)
-      fs.createReadStream('.//contents//'+req.query.ContentID+'//'+img.PhotoName).pipe(res);   
+      fs.createReadStream('.//contents//'+req.params.ContentID+'//'+img.PhotoName).pipe(res);   
     }).catch((err)=>{
       res.status(400).send({
         code: 400,
