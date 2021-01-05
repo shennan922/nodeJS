@@ -38,6 +38,9 @@ router.post('/photoUpload', ueditor(path.join(__dirname, '../../public'), functi
         // console.log('config.json')
         res.setHeader('Content-Type', 'application/json');
         res.redirect('/ueditor/jsp/config.json');
+        // var img_url = '/images';
+        // res.ue_up(img_url); //你只要输入要保存的地址 。保存操作交给ueditor来做
+        // res.setHeader('Content-Type', 'text/html');//IE8下载需要设置返回头尾text/html 不然json返回文件会被直接下载打开
     }
 }))
 router.get('/photoUpload',ueditor(path.join(__dirname, '../../public'), function (req, res, next) {
@@ -137,8 +140,8 @@ router.get('/photoUpload',ueditor(path.join(__dirname, '../../public'), function
     }
 }))
 router.post('/uploadPdf', MyContentController.uploadPdf)
-router.get('/downloadpdf', MyContentController.downloadPdf)
-router.get('/downloadImg/:ContentID', MyContentController.downloadImg)
+// router.get('/downloadpdf', MyContentController.downloadPdf)
+// router.get('/downloadImg/:ContentID', MyContentController.downloadImg)
 
 module.exports = router
 
