@@ -135,5 +135,9 @@ router.get('/photoUpload',ueditor(path.join(__dirname, 'public'), function (req,
         })
     }
 }))
+router.post('/uploadPdf', MyContentController.uploadPdf)
+router.get('/downloadpdf', MyContentController.downloadPdf)
+router.get('/downloadImg/:ContentID', MyContentController.downloadImg)
 
 module.exports = router
+
