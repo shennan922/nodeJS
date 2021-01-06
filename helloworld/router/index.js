@@ -10,6 +10,7 @@ module.exports = (app) => {
   router.use('/user', require('./User'));
   router.use('/myContent', require('./MyContent'));
   router.use('/UE', require('./UE'));
+  router.use('/images', require('./Download'));
   app.use('/', router);
   
 }

@@ -729,12 +729,12 @@ export default {
                   PhotoName:this.AddContentForm.UpdatePhotoName,
                   PhotoPath:this.AddContentForm.UpdatePhotoData,
               },
-              await ContentService.myContentPhotoUpload({
-                contentId: "1",
-                fileId: "1",
-                fileName: this.AddContentForm.UpdatePhotoName,
-                file: this.AddContentForm.UpdatePhotoData,
-              })
+              // await ContentService.myContentPhotoUpload({
+              //   contentId: "1",
+              //   fileId: "1",
+              //   fileName: this.AddContentForm.UpdatePhotoName,
+              //   file: this.AddContentForm.UpdatePhotoData,
+              // })
             ).then((res) => {
               // if (res.code == 400){
               //   this.$message({

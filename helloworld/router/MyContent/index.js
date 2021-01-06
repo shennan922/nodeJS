@@ -1,5 +1,6 @@
 const MyContentController = require('../../controllers/MyContentController')
 const router = require('express').Router()
+const config = require('../../config')
 const AuthenticatePolicy = require('../../policies/AuthenticatePolicy')
 var ueditor = require('ueditor');
 var path = require("path")
@@ -24,13 +25,13 @@ router.post('/photoUpload', ueditor(path.join(__dirname, 'public'), function (re
  
         var imgname = req.ueditor.filename;
  
-        var img_url = '../../../public/images/';
+        var img_url = '/images';
         res.ue_up(img_url); //你只要输入要保存的地址 。保存操作交给ueditor来做
         res.setHeader('Content-Type', 'text/html');//IE8下载需要设置返回头尾text/html 不然json返回文件会被直接下载打开
     }
     //  客户端发起图片列表请求
     else if (req.query.action === 'listimage') {
-        var dir_url = '../../../../public/images/';
+        var dir_url = '/images';
         res.ue_list(dir_url); // 客户端会列出 dir_url 目录下的所有图片
     }
     // 客户端发起其它请求
@@ -38,12 +39,15 @@ router.post('/photoUpload', ueditor(path.join(__dirname, 'public'), function (re
         // console.log('config.json')
         res.setHeader('Content-Type', 'application/json');
         res.redirect('/ueditor/jsp/config.json');
+        // var img_url = '/images';
+        // res.ue_up(img_url); //你只要输入要保存的地址 。保存操作交给ueditor来做
+        // res.setHeader('Content-Type', 'text/html');//IE8下载需要设置返回头尾text/html 不然json返回文件会被直接下载打开
     }
 }))
-router.get('/photoUpload',ueditor(path.join(__dirname, 'public'), function (req, res, next) {
+router.get('/photoUpload',ueditor(path.join(__dirname, '../../public'), function (req, res, next) {
 
     if (req.query.action === 'listimage') {
-        var dir_url = '../../../../public/images/';
+        var dir_url = '/images';
         res.ue_list(dir_url); // 客户端会列出 dir_url 目录下的所有图片
     }
     // 客户端发起其它请求
@@ -58,7 +62,7 @@ router.get('/photoUpload',ueditor(path.join(__dirname, 'public'), function (req,
             "imageCompressEnable": true, /* 是否压缩图片,默认是true */
             "imageCompressBorder": 1600, /* 图片压缩最长边限制 */
             "imageInsertAlign": "none", /* 插入的图片浮动方式 */
-            "imageUrlPrefix": "http://localhost:3000", /* 图片访问路径前缀 */
+            "imageUrlPrefix": config.host, /* 图片访问路径前缀 */
             "imagePathFormat": "/ueditor/php/upload/image/{yyyy}{mm}{dd}/{time}{rand:6}", /* 上传保存路径,可以自定义保存路径和文件名格式 */
                                         /* {filename} 会替换成原文件名,配置这项需要注意中文乱码问题 */
                                         /* {rand:6} 会替换成随机数,后面的数字是随机数的位数 */
@@ -118,7 +122,7 @@ router.get('/photoUpload',ueditor(path.join(__dirname, 'public'), function (req,
             "imageManagerActionName": "listimage", /* 执行图片管理的action名称 */
             "imageManagerListPath": "/ueditor/php/upload/image/", /* 指定要列出图片的目录 */
             "imageManagerListSize": 20, /* 每次列出文件数量 */
-            "imageManagerUrlPrefix": "http://localhost:3000", /* 图片访问路径前缀 */
+            "imageManagerUrlPrefix": config.host, /* 图片访问路径前缀 */
             "imageManagerInsertAlign": "none", /* 插入的图片浮动方式 */
             "imageManagerAllowFiles": [".png", ".jpg", ".jpeg", ".gif", ".bmp"], /* 列出的文件类型 */
             /* 列出指定目录下的文件 */
@@ -137,8 +141,8 @@ router.get('/photoUpload',ueditor(path.join(__dirname, 'public'), function (req,
     }
 }))
 router.post('/uploadPdf', MyContentController.uploadPdf)
-router.get('/downloadpdf', MyContentController.downloadPdf)
-router.get('/downloadImg/:ContentID', MyContentController.downloadImg)
+// router.get('/downloadpdf', MyContentController.downloadPdf)
+// router.get('/downloadImg/:ContentID', MyContentController.downloadImg)
 
 module.exports = router
 

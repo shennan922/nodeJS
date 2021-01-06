@@ -39,6 +39,7 @@ module.exports = {
     sendMessageurlpre:'https://api.weixin.qq.com/cgi-bin/message/mass/preview?',
     sendMessageurl:'https://api.weixin.qq.com/cgi-bin/message/mass/sendall?',
     expire_seconds:604800
-  }
+  },
+  host:'http://localhost:3000'
   
 }

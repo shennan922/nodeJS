@@ -309,9 +309,9 @@ module.exports = {
     res.set({
       "Content-Type":"application/jpeg",//告诉浏览器这是一个二进制文件
       "Content-Disposition":"attachment; filename=xxx.jpg"//告诉浏览器这是一个需要下载的文件      
-    });  
-
-    fs.createReadStream('.//images//'+req.params.ContentID).pipe(res); 
+    });
+    // fs.createReadStream('helloworld/public/images/'+req.params.ContentID).pipe(res); 
+    fs.createReadStream('public/images/'+req.params.ContentID).pipe(res); 
     /*
     Content.findByPk(req.params.ContentID).then((img)=>{
       fs.createReadStream('.//contents//'+req.params.ContentID+'//'+img.PhotoName).pipe(res);   
