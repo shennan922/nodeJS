@@ -7,12 +7,35 @@ const Category = db.MyContentCategory
 const SEList = db.SEList
 var formidable = require('formidable')
 var weChat = require('../utils/Wechat')
+const config = require('../config')
 
 Content.belongsTo(SEList, {
   foreignKey: 'SEID',
   targetKey: 'SEID',
   as: 'SE'
 });
+async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTitle,ContentMessage){
+  var files = await ContentFile.findAll({where:{ContentID:ContentID},raw:true})
+  let text = []
+  
+  files.forEach(file => {
+    text.push({"name":file.FileName,"url":file.FileURL})
+  });
+  let str = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+ShortTitle+'</title></head>'
+      str += '<body><h3>'+ShortTitle+'</h3>'
+      str += '<table border="0">'
+      str += '<tr><td style="width: 150px;">SE</td><td style="width: 250px;">'+SEID+'</td></tr>'
+      str += '<tr><td>Content Category</td><td>'+ContentCategory+'</td></tr>'
+      str += '<tr><td>Search Term</td><td>'+SearchTerm+'</td></tr>'
+      if(text.length > 0){
+        text.forEach(text => {
+          str += '<tr><td>Attachmnet</td><td><a class=\'download\' href=\''+text.url+'\'>'+text.name+'</a></br></td></tr>'
+        });        
+      }
+      str += '<tr><td>Content</td><td><div style="width:400px; border:1px solid #000">'+ContentMessage+'</div></td></tr>'
+      str += '</table></body></html>'
+  return str
+}
 
 module.exports = {
   async getList (req, res) {
@@ -101,60 +124,66 @@ module.exports = {
   },
   async create (req, res) {
     try {   
-      var maxID = await Content.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('ContentID')),'maxID']]})
-      var mediaID = weChat.uploadImage(req.headers.authorization.split(' ')[1],'.//contents//'+req.body.ContentID+'//'+req.body.PhotoName)
-
-      var newContent = {
-        ContentID: req.body.ContentID,//maxID.dataValues.maxID+1,
-        SEID: req.body.SEID,
-        SearchTerm: req.body.SearchTerm,
-        ContentCategory: req.body.ContentCategory,
-        ShortTitle: req.body.ShortTitle,
-        ContentMessage: req.body.ContentMessage,
-        CreateDt: req.body.TimeStamp,
-        PhotoName:req.body.PhotoName,
-        PhotoPath:req.body.PhotoPath,
-        ImgID:mediaID,
-        TextID:''
-      }
-         
-      var mediaID = weChat.uploadImage(req.headers.authorization.split(' ')[1],'.//contents//'+req.body.ContentID+'//'+req.body.PhotoName)
-
-      var pathNew = './/contents//'+req.body.ContentID
-      var pathFUll = pathNew + '//'+req.body.PhotoName
-      fs.mkdir(pathNew,{recursive:true},(err)=>{
-        if(err){throw err;}
-      });
-
-      var base64Data = req.body.PhotoPath.replace(/^data:image\/jpeg;base64,/, "");
-      var dataBuffer = Buffer.from(base64Data, 'base64');
-      fs.writeFile(pathFUll, dataBuffer,function(err) {
-        if(err){
-          logger.logger.info('img upload success');
-        }else{
-          logger.logger.fatal(err);
+      //let maxID = await Content.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('ContentID')),'maxID']]})
+      let token = await weChat.getAccessToken(Date.now(),config.appInfo.appID)
+      let content = await generateContent(req.body.ContentID,
+        req.body.SEID,
+        req.body.SearchTerm,
+        req.body.ContentCategory,
+        req.body.ShortTitle,
+        req.body.ContentMessage)
+      let mediaID = await weChat.uploadImage(token,'.//contents//'+req.body.ContentID+'//'+req.body.PhotoName).then(async mid =>{
+        let material = {
+          "articles": [{
+            "title": req.body.ShortTitle,
+            "thumb_media_id": mid,
+            "author": 'sean',
+            "digest": 'zhaiyao',
+            "show_cover_pic": 1,
+            "content":  content,
+            "content_source_url": '',
+            "need_open_comment":1,
+            "only_fans_can_comment":1
+          },]
         }
-      })
+        let textID = await weChat.uploadImageText(token,material,1)
 
-      await Content.create(newContent)   
+        let newContent = {
+          ContentID: req.body.ContentID,//maxID.dataValues.maxID+1,
+          SEID: req.body.SEID,
+          SearchTerm: req.body.SearchTerm,
+          ContentCategory: req.body.ContentCategory,
+          ShortTitle: req.body.ShortTitle,
+          ContentMessage: req.body.ContentMessage,
+          CreateDt: req.body.TimeStamp,
+          PhotoName:req.body.PhotoName,
+          PhotoPath:req.body.PhotoPath,
+          ImgID:mid,
+          TextID:textID
+        }
+  
+        await Content.create(newContent)   
+  
+        res.status(200).send({
+          code: 200,
+          message: 'Content创建成功'
+        })
+        logger.logger.info("Create Content: "+newContent.ContentID)
 
-      res.status(200).send({
-        code: 200,
-        message: 'Content创建成功'
+        //weChat.uploadPermMaterial(token,'rg-P4AQ-1Njrj6-brqd5dE92gigNUP9Mefd1-qSpphs','oJVgv6ZH9l1Jq0BEO3K0QpYZD98I')
       })
-      logger.logger.info("Create Content: "+newContent.ContentID)
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '程序异常: ' + error
       })
-      logger.logger.fatal("Create Content fail: "+newContent.SEID+'/'+error)
+      logger.logger.fatal("Create Content fail: "+req.body.SEIContentID+'/'+error)
     }
   },
   
   async update (req, res) {
     try {
-      var newContent = {
+      let newContent = {
         SEID: req.body.SEID,
         SearchTerm: req.body.SearchTerm,
         ContentCategory: req.body.ContentCategory,
@@ -164,30 +193,6 @@ module.exports = {
         PhotoName:req.body.PhotoName,
         PhotoPath:req.body.PhotoPath,
       }
-
-      let pathNew = './/contents//'+req.body.ContentID
-      let pathFUll = pathNew + '//'+req.body.PhotoName
-      fs.mkdir(pathNew,{recursive:true},(err)=>{
-        if(err){throw err;}
-      });
-
-      let imgOld = await Content.findByPk(req.body.ContentID)
-      if(imgOld.PhotoName){
-        fs.unlink(pathNew+'//'+imgOld.PhotoName, function(err){
-          if(err){logger.logger.fatal(err+'-'+pathNew+'//'+imgOld.PhotoName);}
-          console.log('文件:'+pathNew+'//'+imgOld.PhotoName+'删除成功！');
-        })
-      }
-
-      var base64Data = req.body.PhotoPath.replace(/^data:image\/jpeg;base64,/, "");
-      var dataBuffer = Buffer.from(base64Data, 'base64');
-      fs.writeFileSync(pathFUll, dataBuffer, function (err) {
-        if (err) {
-          logger.logger.info('img upload success');
-        } else {
-          logger.logger.fatal(err);
-        }
-      })
 
       await Content.update(newContent,{where:{ContentID: req.body.ContentID}})
       
@@ -222,10 +227,11 @@ module.exports = {
         }
       });
       fs.rename(files.file.path,pathFUll,(err)=>{if(err) return next(err)})
+      let maxID = await ContentFile.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('FileID')),'maxID']],where:{ContentID:fields.ContentID}})
 
       var newContentFile = {
         ContentID: fields.ContentID,
-        FileID: fields.FileID,
+        FileID: maxID.FileID==undefined?0:maxID.FileID+1,
         FileName: files.file.name,
         FilePath: pathNew,
         FileURL: 'http://localhost:3000/myContent/downloadpdf?file='+pathFUll,
@@ -234,11 +240,6 @@ module.exports = {
       await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
     })
     
-    
-
-
-    
-
     res.status(200).send({
       code: 200,
       message: 'Content创建成功',
@@ -340,6 +341,46 @@ module.exports = {
         error: '数据删除失败: ' + error
       })
       logger.logger.fatal("Delete Content fail: "+newContent.ContentID+'/'+error)
+    }
+  },
+
+  async imageUpload(req, res) {
+    try {
+      let form = new formidable.IncomingForm()
+      form.keepExtensions = true // 保留扩展名
+      form.parse(req, async (err, fields, files) => {
+        console.log(fields)
+        if(err) return next(err)        
+        var pathNew = './/contents//'+fields.ContentID
+        var pathFUll = pathNew + '//'+files.file.name
+        fs.mkdir(pathNew,{recursive:true},(err)=>{
+          if(err){
+              throw err;
+          }else{
+              console.log('ok!');
+          }
+        });
+
+        let imgOld = await Content.findByPk(req.body.ContentID)
+        if(imgOld){
+          fs.unlink(pathNew+'//'+imgOld.PhotoName, function(err){
+            if(err){logger.logger.fatal(err+'-'+pathNew+'//'+imgOld.PhotoName);}
+            console.log('文件:'+pathNew+'//'+imgOld.PhotoName+'删除成功！');
+          })
+        }
+
+        fs.rename(files.file.path,pathFUll,(err)=>{if(err) return next(err)})
+      })
+      res.status(200).send({
+        code: 200,
+        message: '封面图片创建成功',
+        data: req.body.fileName
+      })
+    } catch (error) {
+      res.status(500).send({
+        code: 500,
+        error: '程序异常: ' + error
+      })
     }
   },
 

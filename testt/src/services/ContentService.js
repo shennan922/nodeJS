@@ -76,29 +76,29 @@ export default {
     return response.data
   },
   async downloadImg (data) {
-  const resData = await req.request.get('/myContent/downloadImg?ContentID='+data.ContentID,{responseType: 'blob'});
-  console.log(resData.data)
+    const resData = await req.request.get('/myContent/downloadImg?ContentID='+data.ContentID,{responseType: 'blob'});
+    console.log(resData.data)
 
-  if (resData) {
-    var blob = new Blob([resData.data], { type: "image/jpeg"})
-    //var blob = new Blob(["\uFEFF1,2,3,4,5,6"], { type: "text/csv" });
-    console.log(blob)
-    const fileName = 'xxx.jpg'//this.weatherTitleInfo.replace(/-/g,"").replace(" ","_") + ".pdf";
-    let url = window.URL.createObjectURL(blob);
+    if (resData) {
+      var blob = new Blob([resData.data], { type: "image/jpeg"})
+      //var blob = new Blob(["\uFEFF1,2,3,4,5,6"], { type: "text/csv" });
+      console.log(blob)
+      const fileName = 'xxx.jpg'//this.weatherTitleInfo.replace(/-/g,"").replace(" ","_") + ".pdf";
+      let url = window.URL.createObjectURL(blob);
 
+      
+      let link = document.createElement('a');
+      link.style.display = 'none';
+      link.href = url;
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      
+      //window.open(url)
+    } else {
+        this.$message.warning('下载失败');
+    }
     
-    let link = document.createElement('a');
-    link.style.display = 'none';
-    link.href = url;
-    link.setAttribute('download', fileName);
-    document.body.appendChild(link);
-    link.click();
-    
-     //window.open(url)
-  } else {
-      this.$message.warning('下载失败');
-  }
-  
   }
 }
 

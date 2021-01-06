@@ -12,6 +12,10 @@ module.exports = {
         target: process.env.VUE_APP_NEWWECHAT_SERVER,
         pathRewrite: { '^/wechat': ''}
       },
+      '/data': {
+        target: process.env.VUE_APP_MOCK_SERVER,
+        pathRewrite: { '^/data': ''}
+      },
     }
   },
   chainWebpack: config => {

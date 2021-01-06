@@ -25,6 +25,7 @@
     /**
     * 配置项主体。注意，此处所有涉及到路径的配置别遗漏URL变量。
     */
+    alert(URL)
     window.UEDITOR_CONFIG = {
         //URL:'/static/UE/',
         //为编辑器实例添加一个路径，这个不能被注释
@@ -33,8 +34,8 @@
         // 服务器统一请求接口路径
         //, serverUrl: URL + "php/controller.php",
         //,serverUrl: URL + "jsp/controller.jsp"
-        //, serverUrl: "api/ue/upload"
-        ,serverUrl:"http://localhost:3000/myContent/photoUpload?action=config&&noCache=1609404339284"
+        , serverUrl: "/data/myContent/photoUpload"
+        //,serverUrl:"http://localhost:3000/myContent/photoUpload?action=config&&noCache=1609404339284"
         //工具栏上的所有的功能按钮和下拉框，可以在new编辑器的实例时选择自己需要的从新定义
          ,toolbars: [[
             'fullscreen', 'source', '|', 'undo', 'redo', '|',

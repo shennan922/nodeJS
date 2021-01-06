@@ -128,15 +128,14 @@
                     <el-col :span="5">
                        <el-upload
                           class="avatar-uploader"
-                          action="https://testopenapi.nbdeli.com/crm/customer/saveChannelLogoFile"
+                          action="http://localhost:3000/myContent/imageUpload"
                           :show-file-list="false"
                           :on-change="handleChange"
                           :on-success="handleAvatarSuccess"
                           :before-upload="beforeAvatarUpload"
+                          :data="{ContentID}"
                           ref="upload"
                           >
-                          <!-- action="https://jsonplaceholder.typicode.com/posts/" -->
-                          <!-- :http-request="httpRequest" -->
                           <img v-if="imageUrl" :src="imageUrl" class="avatar">
                           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                       </el-upload>
@@ -597,7 +596,7 @@ export default {
       return false; // 返回false不会自动上传
     },
     handleChange(res, file) {
-      this.file = file.slice(-1);
+      //this.file = file.slice(-1);
     },
     handleAvatarSuccess(res,file) {
       this.imageUrl = URL.createObjectURL(file.raw);
@@ -630,7 +629,6 @@ export default {
           that.AddContentForm.UpdatePhotoData = reader.result;
         };
       }
-   
     },
     // httpRequest(data) {
     //   const reader = new FileReader();

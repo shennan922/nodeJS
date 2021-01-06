@@ -47,6 +47,14 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(1000000),      
       field: 'PhotoPath'
     },
+    ImgID: {
+      type: DataTypes.STRING(400),      
+      field: 'ImgID'
+    },
+    TextID: {
+      type: DataTypes.STRING(400),      
+      field: 'TextID'
+    },
   },
     {
       sequelize,
