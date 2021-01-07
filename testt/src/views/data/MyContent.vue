@@ -103,14 +103,14 @@
                       v-for="item in getCategoryList" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
                     </el-option> 
                     </el-select> 
-                    <el-button  class="button-new-tag" size="small" @click="showInput">+ </el-button>
+                    <el-button  class="button-new-tag" size="small" @click="showInput">+</el-button>
                   </div>
                   <div style="margin-top:5px">
                     <el-tag
                     :key="tag"
                     v-for="tag in dynamicTags"
                     :closable="true"
-                    :size="medium"
+                    
                     @close="onTagClose(tag)"
                     >
                     {{tag}}
@@ -337,6 +337,7 @@ export default {
     uploadOnChange(file){    
       //let fileID = this.UploadFiles.length+1
       this.getCurrentTime()
+      console.log(this.fileList)
       /*
       let reader = new FileReader();
       reader.readAsDataURL(file.raw);
@@ -412,11 +413,16 @@ export default {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
     },
     showInput() {
-     var name =this.getCategoryList.find((item)=>{//这里的selectList就是上面遍历的数据源
+      var name =this.getCategoryList.find((item)=>{//这里的selectList就是上面遍历的数据源
           return item.CategoryID === this.$refs.categorySelect.value;//筛选出匹配数据
       }).CategoryDesc
-     this.dynamicTags.push(name)
-     this.dynamicTagIDs.push(this.$refs.categorySelect.value)
+
+      if(this.dynamicTags.find(tag=>{return tag === name})){
+        this.$message.error('请勿重复添加');
+      }else{
+        this.dynamicTags.push(name)
+        this.dynamicTagIDs.push(this.$refs.categorySelect.value)
+      }      
     },
     
     getCategoryListData() {
@@ -436,7 +442,7 @@ export default {
           console.log(res.data)
           res.data.forEach(file => {
             
-            this.fileList.push(file.FileName)
+            this.fileList.push({"name":file.FileName})
           });
           console.log(this.fileList)
         })
@@ -470,7 +476,6 @@ export default {
       this.pageNum = pageNum
     },
     handleEdit(row) {
-      this.imageUrl = 'http://localhost:3000/myContent/downloadImg?ContentID=174189';
       this.dynamicTags = []
       this.dynamicTagIDs = []
       this.ContentID = row.ContentID
@@ -488,8 +493,6 @@ export default {
       this.formStatus = 2;
       this.dialogCreateVisible = true;
       this.defaultMsg =row.ContentMessage;
-      //this.imageUrl = 'blob:http://localhost:8080/f94350d5-54e8-40f7-bfc1-e0edf4876855';
-      //this.imageUrl = "http://dummyimage.com/100x50";
       this.imageUrl = row.PhotoPath;
       
       this.AddContentForm = {

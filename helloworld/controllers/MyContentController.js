@@ -168,9 +168,7 @@ module.exports = {
           code: 200,
           message: 'Content创建成功'
         })
-        logger.logger.info("Create Content: "+newContent.ContentID)
-
-        //weChat.uploadPermMaterial(token,'rg-P4AQ-1Njrj6-brqd5dE92gigNUP9Mefd1-qSpphs','oJVgv6ZH9l1Jq0BEO3K0QpYZD98I')
+        logger.logger.info("Create Content: "+newContent.ContentID)        
       })
     } catch (error) {
       res.status(500).send({
