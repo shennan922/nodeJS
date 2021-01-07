@@ -3,6 +3,7 @@ const logger = require('../logger/log4')
 
 const MyPush = db.MyPush
 const MyContent = db.MyContent
+const SEList = db.SEList
 
 MyPush.belongsTo(SEList, {
   foreignKey: 'SEID',
@@ -39,13 +40,13 @@ module.exports = {
   },
   async create (req, res) {
     try {
-      if(await SEList.findOne({where: {SEID:req.body.SEID}})){
-        res.status(200).send({
-          code: 400,
-          message: 'SE ID已经存在'
-        })
-      }
-      else{
+      // if(await SEList.findOne({where: {SEID:req.body.SEID}})){
+      //   res.status(200).send({
+      //     code: 400,
+      //     message: 'SE ID已经存在'
+      //   })
+      // }
+      //else{
         var newPush = {
           PushID: req.body.PushID,
           SEID: req.body.SEID,    
@@ -75,11 +76,11 @@ module.exports = {
           });
         }
         */
-      }
+     // }
       
       res.status(200).send({
         code: 200,
-        message: 'SE创建成功'
+        message: 'My Push创建成功'
       })
       logger.logger.info("Create MyPushList: "+newSE.SEID)
     } catch (error) {
@@ -111,7 +112,7 @@ module.exports = {
       
       res.status(200).send({
         code: 200,
-        message: 'SE更新成功'
+        message: 'MyPush更新成功'
       })
       logger.logger.info("Update MyPushList: "+newSE.SEID)
     } catch (error) {
