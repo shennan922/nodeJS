@@ -42,13 +42,13 @@ module.exports = {
   },
   async create (req, res) {
     try {
-      if(await SEList.findOne({where: {SEID:req.body.SEID}})){
-        res.status(200).send({
-          code: 400,
-          message: 'SE ID已经存在'
-        })
-      }
-      else{
+      // if(await SEList.findOne({where: {SEID:req.body.SEID}})){
+      //   res.status(200).send({
+      //     code: 400,
+      //     message: 'SE ID已经存在'
+      //   })
+      // }
+      //else{
         var newPush = {
           PushID: req.body.PushID,
           SEID: req.body.SEID,    
@@ -80,11 +80,11 @@ module.exports = {
           });
         }
         
-      }
+     // }
       
       res.status(200).send({
         code: 200,
-        message: 'MyPushList创建成功'
+        message: 'My Push创建成功'
       })
       logger.logger.info("Create MyPushList: "+req.body.PushID)
     } catch (error) {
@@ -116,7 +116,7 @@ module.exports = {
       
       res.status(200).send({
         code: 200,
-        message: 'SE更新成功'
+        message: 'MyPush更新成功'
       })
       logger.logger.info("Update MyPushList: "+req.body.PushID)
     } catch (error) {

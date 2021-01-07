@@ -10,26 +10,28 @@
           </div>
           
           <el-table 
-            :model="SEForm" 
-            :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
+            :model="MyPushForm" 
+            :data="getMyPushList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
             :header-cell-style="tableHeaderColor" 
-            @sort-change="changeTableSort" class="formSE"
+            @sort-change="changeTableSort" class="formMyPush"
               
             :row-key="(row)=>{ return row.SEID}"
             
             ref="SeTable"
           >
             <el-table-column min-width="10%" prop="SEID" label="SEID"></el-table-column>
-            <el-table-column min-width="15%" prop="SEName" label="Greetings" ></el-table-column>
-            <el-table-column min-width="15%" prop="City" label="Categorized"></el-table-column>
-            <el-table-column min-width="15%" prop="Hospital" label="Schedule Date"></el-table-column>
-            <el-table-column min-width="15%" prop="Department" label="Schedule Time"></el-table-column>
-            <el-table-column min-width="15%" prop="MLName" label="Priority"></el-table-column>
-            <el-table-column min-width="15%" prop="TeamName" label="Request Type"></el-table-column>
+            <el-table-column min-width="15%" prop="Greeting" label="Greetings" ></el-table-column>
+            <el-table-column min-width="15%" prop="Categorized" label="Categorized"></el-table-column>
+            <el-table-column min-width="15%" prop="ScheduleDate" label="Schedule Date"></el-table-column>
+            <el-table-column min-width="15%" prop="ScheduleTime" label="Schedule Time"></el-table-column>
+            <el-table-column min-width="15%" prop="Priority" label="Priority"></el-table-column>
+            <el-table-column min-width="15%" prop="RequestType" label="Request Type"></el-table-column>
             <el-table-column min-width="15%" label="Operation">
               <template slot-scope="scope">
-                <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
-                <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
+                <!-- @click="handleEdit(scope.row)" -->
+                <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit"  plain><i class="el-icon-edit"></i>Edit</el-button>
+                <el-button size="mini" type="info"  plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
+                <!-- @click="handleDelete(scope.row.SEID)" -->
               </template>
             </el-table-column>
           </el-table>
@@ -41,13 +43,13 @@
               :page-sizes="[1, 5, 10]"
               :page-size="pageSize"
               layout="total, sizes, prev, pager, next, jumper"
-              :total= "getSEList.length">
+              :total= "getMyPushList.length">
             </el-pagination>
           </div>
         </el-col>
       </el-row>
        <!--增加My Push页面-->
-      <el-dialog :title ="formStatus==1?'New My Push':'Update My Push'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogMyPush" style="width:125%;margin-left:-200px;height:600px">
+      <el-dialog :title ="formStatus==1?'New My Push':'Update My Push'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleMyPushClose" :close-on-click-modal="false" class="dialogMyPush" style="width:125%;margin-left:-200px;height:600px">
           <el-form 
           ref="AddMyPushForm"
           :model="AddMyPushForm" 
@@ -65,15 +67,15 @@
                     </el-option>
                   </el-select> 
                 </el-form-item>
-                <el-form-item label="Greetings" prop="Greetings" >
-                  <el-input v-model="AddMyPushForm.Greetings"></el-input>
+                <el-form-item label="Greetings" prop="Greeting" >
+                  <el-input v-model="AddMyPushForm.Greeting"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="10" class="el-col_MyPush">
                 <h2 class="h2title">Settings</h2>
                 <el-form-item label="Categorized" prop="Categorized">
-                  <el-radio v-model="radio" label="1" style="margin-top:15px">Type1</el-radio>
-                  <el-radio v-model="radio" label="2" style="margin-top:15px">Type2</el-radio>
+                  <el-radio v-model="AddMyPushForm.Categorized" label="1" style="margin-top:15px">Type1</el-radio>
+                  <el-radio v-model="AddMyPushForm.Categorized" label="2" style="margin-top:15px">Type2</el-radio>
                 </el-form-item>
                 <el-form-item label="Scheduled" prop="Scheduled">
                   <el-checkbox v-model="AddMyPushForm.Scheduled" ></el-checkbox>
@@ -85,9 +87,9 @@
                   <el-input v-model="AddMyPushForm.ScheduleTime"></el-input>
                 </el-form-item>
                 <el-form-item label="Priority" prop="Priority">
-                  <el-select v-model="AddMyPushForm.SEID" clearable placeholder="请选择" style="width:100%;padding-left:0px">
+                  <el-select v-model="AddMyPushForm.Priority" clearable placeholder="请选择" style="width:100%;padding-left:0px">
                     <el-option
-                      v-for="item in getSEListAll" :key="item.SEID" :label="item.SEName" :value="item.SEID">
+                      v-for="item in getPriorityData" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                   </el-select> 
                 </el-form-item>
@@ -102,13 +104,13 @@
               <div class = "myPushCheckBox">
                 <el-form-item>
                   <p>
-                    <el-radio v-model="radio" style="float:left;margin-left:-60px" label="4">Standing Request(s)</el-radio>
+                    <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="4">Standing Request(s)</el-radio>
                   </p>
                   <p>
-                    <el-radio v-model="radio" style="float:left;margin-left:-60px" label="5">One Time Request(s)(Please privode below information)</el-radio>
+                    <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="5">One Time Request(s)(Please privode below information)</el-radio>
                   </p>
                   <p>
-                    <el-radio v-model="radio" style="float:left;margin-left:-60px;margin-buttom:10px" label="6">Virtual Meeting Request(s)(Please privode below information)</el-radio>
+                    <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="6">Virtual Meeting Request(s)(Please privode below information)</el-radio>
                   </p>
                 </el-form-item>
               </div>
@@ -122,7 +124,7 @@
               :model="ContentForm" 
               :data="getChooseContentData" border 
               :header-cell-style="contentTableHeaderColor"
-              class="formSE"  
+              class="formMyPush"  
               :row-key="(row)=>{ return row.SEID}" 
               ref="SeTable"
               style="margin-top:10px"
@@ -132,7 +134,7 @@
               <el-table-column min-width="20%" prop="ShortTitle" label="Short Title"></el-table-column>
               <el-table-column min-width="20%" prop="ShortTitle" label="Content Title"></el-table-column>
               <el-table-column min-width="16%" prop="SearchTerm" label="Search Term"></el-table-column>
-              <el-table-column min-width="19%" prop="MLName" label="12EQueryName"></el-table-column>
+              <!-- <el-table-column min-width="19%" prop="MLName" label="12EQueryName"></el-table-column> -->
               <el-table-column min-width="15%" prop="CreateDt" label="Create Date"></el-table-column>
               <el-table-column min-width="20%" label="Operation">
                 <template slot-scope="scope">
@@ -154,30 +156,28 @@
       <el-dialog title ="请选择Content" 
       :visible.sync="dialogChooseContentVisible" 
       v-if="dialogChooseContentVisible" 
-      @close="handleClose" 
+      @close="handleChooseContentClose" 
       :close-on-click-modal="false" 
       class="dialogMyPush">
           <el-form 
-          ref="AddMyPushForm"
-          :model="AddMyPushForm" 
+          ref="ContentForm"
+          :model="ContentForm" 
           label-width="105px"
           label-position="left"          
           >
             <el-row>
-              <el-col class="el-col_MyPush">
-                <el-form-item label="Select Content" prop="SEID">
-                  <el-select v-model="getContentData.ContentID" clearable placeholder="请选择" style="width:40%;padding-left:0px">
-                    <el-option
-                      v-for="item in getContentData" :key="item.ContentID" :label="item.ContentID" :value="item.ContentID">
-                    </el-option>
-                  </el-select> 
-                </el-form-item>
+              <el-col>
+                  <el-transfer
+                    :titles="['可选择', '已选择']"
+                    v-model="getContentData.ContentID"
+                    :data="contentData"
+                    style="text-align: left; display: inline-block">
+                  </el-transfer>  
               </el-col>
             </el-row>
           </el-form>
           <div style="margin-right:10px" slot="footer" class="dialog-footer">
             <el-button @click.native="contentConfirm" type="primary">Confirm</el-button>
-            <!-- <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button> -->
          </div>
 
       </el-dialog>
@@ -186,6 +186,8 @@
 
 <script src="Content/jquery-1.9.1.min.js"></script>
 <script src="Content/vue/dist/vue.js"></script>
+<script src="//unpkg.com/vue/dist/vue.js"></script>
+<script src="//unpkg.com/element-ui@2.14.1/lib/index.js"></script>
 
 <script>
 import SEService from "../../services/SEService";
@@ -193,16 +195,18 @@ import MLService from "../../services/MLService";
 import GeneralService from "../../services/GeneralService";
 import WechatService from "../../services/WechatService";
 import ContentService from "../../services/ContentService";
+import MyPushService from "../../services/MyPushService";
+
 
 export default {
   inject:['reload'],
   name: "MySE",
   mounted() {
     this.getDetailList();
-    this.getSEList1();
+    this.getSEList();
     this.getContentList(); 
   },  
-  
+
   data() {
     return {
       dialogCreateVisible:false,  //详细页面显示/隐藏
@@ -216,8 +220,7 @@ export default {
       searchTableInfo:"",         //模糊搜索框
       getSearchInfo:[],           //模糊搜索结果
       pageNum:1,                  //table第几页
-      pageSize:5,                 //table每页几条数据
-      QRurl:'',                   //动态生成二维码链接     
+      pageSize:8,                 //table每页几条数据   
       SEForm: {                   //table数据源
         SEID:"",
         SEName:"",
@@ -236,9 +239,20 @@ export default {
         MLID: "",
         TeamID: ""
       },
+      MyPushForm: {                //详细页面数据源
+        SEID:"",
+        Greeting:"",
+        Categorized: "",
+        Scheduled: "",
+        Priotity: "",
+        RequestType: "",
+        ScheduleDate:"",
+        ScheduleTime:"",
+        ContentId: ""
+      },
       AddMyPushForm: {                //详细页面数据源
         SEID:"",
-        Greetings:"",
+        Greeting:"",
         Categorized: "",
         Scheduled: "",
         Priotity: "",
@@ -265,32 +279,39 @@ export default {
       getContentData:[],          //ContentList
       getChooseContentData:[],    //被选择的Content
       currentContentID:'',
+      getContentIdData:[],        //所有ContentId
+      getContentLableData:[],
+      contentData:[],
+      MyPushID:"",
+      getPriorityData:[{
+          value: '1',
+          label: 'High'
+        }, {
+          value: '2',
+          label: 'Medium'
+        }, {
+          value: '3',
+          label: 'low'
+        }],
+
+      value: [],
+      currentTime:"",
       rows: [],                   //SE接口返回数据
-      getMLList: [],              //ML接口返回数据
-      getTeam: [],                //Team接口返回数据
-      getHospital:[],             //Hospital接口返回数据
-      getGeoTree:[],              //GeoTree接口返回数据
-      defaultProps: {             //多级下拉菜单赋值
-        children: "children",
-        label: "NodeDesc",
-        value:"NodeID",
-      },
       getSEListAll:[],
       addMyPushFormRules: {           //详细页面校验规则
-        Greetings: [
-          { required: true, message: 'SEID', trigger: 'change'}
+        Greeting: [
+          { required: true, message: '请填写Greetings', trigger: 'change'}
         ]    
       },
+       //data: this.contentData,
+        value: [],
+        filterMethod(query, item) {
+          return item.this.getContentIdData.indexOf(query) > -1;
+        }
     };
   },
 
   watch: {
-    // 'AddSEForm.CityID'(city) {
-    //   if(this.changeFlag){
-    //     city = city[2]
-    //   }
-    //   this.filterHospital(city)
-    // },
     'getContentData.ContentID'(ContentID) {
       //this.filterContent(ContentID)
       this.currentContentID = ContentID;
@@ -303,14 +324,16 @@ export default {
       }
       else
       {
+          this.AddMyPushForm.ScheduleDate = '';
+          this.AddMyPushForm.ScheduleTime = '';
           this.dialogScheduleDate = false;
-          this.dialogScheduleTime = false;
+          this.dialogScheduleTime = false;  
       }
     }
   },
 
-  methods: {   
-    getSEList1() {
+  methods: {  
+    getSEList() {
       SEService.getSEList("")
         .then((res) => {
           this.getSEListAll = res.data;
@@ -324,17 +347,32 @@ export default {
       ContentService.getList("")
       .then((res) => {
         this.getContentData = res.data;
-        //console.log("this.getContentData:" + JSON.stringify(this.getContentData));
+        for(var item of this.getContentData){
+            this.getContentIdData.push(item.ContentID);
+            this.getContentLableData.push(item.ContentID);
+        }
+        this.getContentLableData.forEach((contentId, index) => {
+          this.contentData.push({
+            label: ""+contentId+"",
+            key: ""+contentId+"",
+            value:""+contentId+"",
+            getContentIdData: ""+this.getContentIdData[index]+"",
+          });
+        });
+        //console.log("this.contentData:" + JSON.stringify(this.contentData));
       })
       .catch(function (err) {
         console.log("err"+err);
       });
    },
+   getID(){
+      this.MyPushID = Number(Math.random().toString().substr(3,6) );
+    },
     selectContent(){
       this.dialogChooseContentVisible=true;
     },
     contentConfirm(){
-      this.filterContent(this.currentContentID)
+      this.filterContent();
       this.dialogChooseContentVisible=false;
     },
     handleChange(flag){
@@ -405,7 +443,8 @@ export default {
     },
     handleAdd() {
       this.formStatus = 1
-      this.dialogCreateVisible = true;   
+      this.dialogCreateVisible = true; 
+      this.getID(); 
     },
     handleEdit(row) {
       this.formStatus = 2
@@ -434,34 +473,57 @@ export default {
         });
       })
     },
-    handleClose(){            
+    handleMyPushClose(){            
       //resetFields将form重置到mounted之后的状态, 对于编辑页面不适用
-      //this.$refs.AddSEForm.resetFields()   
-      this.AddSEForm = {
+      this.AddMyPushForm = {
         SEID:"",
-        SEName:"",
-        CityID: "",
-        HospitalID: "",
-        DepID: "",
-        MLID: "",
-        TeamID: ""
-      }
+        Greeting:"",
+        Categorized: "",
+        Scheduled: "",
+        Priotity: "",
+        RequestType: "",
+        ScheduleDate:"",
+        ScheduleTime:"",
+        ContentId: ""
+      },
+      this.getChooseContentData=[];
       this.formStatus = 0 
       this.changeFlag = false
     },
+    handleChooseContentClose(){
+
+    },
+     getCurrentTime(){
+      var myDate = new Date()
+      var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
+      var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
+      var dataToDate = myDate.getFullYear() + '-' + month + '-' + day
+      var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
+      var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
+      var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
+      var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
+      this.currentTime = createDate;
+    },
     async createSubmit(formStatus) {
-      this.$refs.AddSEForm.validate((valid) => {
+      this.getCurrentTime();
+      this.$refs.AddMyPushForm.validate((valid) => {
         if (valid) {
           this.$confirm('确认提交？', '提示', {}).then(async() => {    
-            await SEService.SECreate(
+            await MyPushService.myPushCreate(
               {
-                SEID: this.AddSEForm.SEID,
-                SEName: this.AddSEForm.SEName,
-                City: this.AddSEForm.CityID[2],
-                Hospital: this.AddSEForm.HospitalID,
-                Department: this.AddSEForm.DepID,
-                MLName: this.AddSEForm.MLID,
-                Team:this.AddSEForm.TeamID
+                  PushID:this.MyPushID,
+                  SEID: this.AddMyPushForm.SEID,   
+                  Greeting:this.AddMyPushForm.Greeting,
+                  Categorized: this.AddMyPushForm.Categorized,
+                  Priority:this.AddMyPushForm.Priotity,
+                  IsScheduled: this.AddMyPushForm.Scheduled,
+                  ScheduleDate: this.AddMyPushForm.ScheduleDate,
+                  ScheduleTime: this.AddMyPushForm.ScheduleTime,
+                  RequestType: this.AddMyPushForm.RequestType,
+                  ContentID: this.AddMyPushForm.ContentId,
+                  MeetingID: "",
+                  CreateDt: this.currentTime,
+                  ModifyDt: "",
               }
             ).then((res) => {
               if (res.code == 400){
@@ -478,7 +540,7 @@ export default {
                 this.dialogCreateVisible = false;
                 this.formStatus = 0
                 this.getDetailList()
-                this.handleClose()
+                //this.handleClose()
               }              
             })
           }).catch((err) => {
@@ -490,7 +552,6 @@ export default {
         }
       })
     },
-
     async updateSubmit(formStatus) {
       this.$refs.AddSEForm.validate((valid) => {
         if (valid) {
@@ -519,7 +580,7 @@ export default {
                 this.dialogCreateVisible = false;
                 this.formStatus = 0
                 this.getDetailList();
-                this.handleClose()
+                //this.handleClose()
               }                
             })
           }).catch(() => {
@@ -531,29 +592,32 @@ export default {
         }
       })
     },
-
     getDetailList() {
-      SEService.getSEList("")
+      MyPushService.getMyPushList("")
         .then((res) => {
-          //this.getSearchInfo = res.data;
-
+          this.getSearchInfo = res.data;
         })
         .catch(function (err) {
           console.log("err"+err);
         });
     }, 
-    filterContent(ContentID){
-      for(var item of this.getContentData){
-        var contentId=item.ContentID;
-        if(contentId == ContentID){
-          this.getChooseContentData.push(item);
-           console.log("this.getChooseContentData:" + this.getChooseContentData);
+    filterContent(){
+      //alert(this.currentContentID);
+      for(var i = 0; i<this.currentContentID.length;i++)
+      {
+        var ContentID = this.currentContentID[i];
+        for(var item of this.getContentData){
+          var contentId=item.ContentID;
+          if(contentId == ContentID){
+            this.getChooseContentData.push(item);
+            //console.log("this.getChooseContentData:" + this.getChooseContentData);
+          }
         }
-      }
+      }  
     },
   },
   computed: {
-      getSEList () {
+      getMyPushList () {
         const searchTableInfo = this.searchTableInfo
         if (searchTableInfo) {
           return this.getSearchInfo.filter(data => {
@@ -607,7 +671,7 @@ export default {
 body .el-table th.gutter{
   display: table-cell!important;
 }
-/deep/.formSE{
+/deep/.formMyPush{
   width: 100%;
   // .el-table__body-wrapper .el_table_body
   // .table__header{
