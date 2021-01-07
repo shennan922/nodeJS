@@ -75,13 +75,13 @@
                   <el-radio v-model="radio" label="1" style="margin-top:15px">Type1</el-radio>
                   <el-radio v-model="radio" label="2" style="margin-top:15px">Type2</el-radio>
                 </el-form-item>
-                <el-form-item label="Scheduled" prop="Scheduled" >
-                  <el-checkbox v-model="checked"></el-checkbox>
+                <el-form-item label="Scheduled" prop="Scheduled">
+                  <el-checkbox v-model="AddMyPushForm.Scheduled" ></el-checkbox>
                 </el-form-item>
-                <el-form-item label="ScheduleDate" prop="ScheduleDate" >
+                <el-form-item label="ScheduleDate" prop="ScheduleDate"   v-if="dialogScheduleDate" :visible.sync="dialogScheduleDate"  >
                   <el-input v-model="AddMyPushForm.ScheduleDate"></el-input>
                 </el-form-item>
-                <el-form-item label="ScheduleTime" prop="ScheduleTime" >
+                <el-form-item label="ScheduleTime" prop="ScheduleTime"  v-if="dialogScheduleTime" :visible.sync="dialogScheduleTime">
                   <el-input v-model="AddMyPushForm.ScheduleTime"></el-input>
                 </el-form-item>
                 <el-form-item label="Priority" prop="Priority">
@@ -117,30 +117,31 @@
             <el-row>
               <el-button @click.native="selectContent" type="primary" style="float:left;padding-buttom:15px">Select Content</el-button>
             </el-row>
+            <!-- show table -->
             <el-table 
-              :model="SEForm" 
-              :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
-              :header-cell-style="tableHeaderColor"
+              :model="ContentForm" 
+              :data="getChooseContentData" border 
+              :header-cell-style="contentTableHeaderColor"
               class="formSE"  
               :row-key="(row)=>{ return row.SEID}" 
               ref="SeTable"
               style="margin-top:10px"
             >
               <el-table-column min-width="10%" prop="SEID" label="SE"></el-table-column>
-              <el-table-column min-width="15%" prop="SEName" label="Category" ></el-table-column>
-              <el-table-column min-width="20%" prop="City" label="Short Title"></el-table-column>
-              <el-table-column min-width="20%" prop="Hospital" label="Content Title"></el-table-column>
-              <el-table-column min-width="15%" prop="Department" label="Search Term"></el-table-column>
-              <el-table-column min-width="15%" prop="MLName" label="12E Query Name"></el-table-column>
-              <el-table-column min-width="15%" prop="TeamName" label="Create Date"></el-table-column>
-              <el-table-column min-width="15%" label="Operation">
+              <el-table-column min-width="15%" prop="ContentCategory" label="Category" ></el-table-column>
+              <el-table-column min-width="20%" prop="ShortTitle" label="Short Title"></el-table-column>
+              <el-table-column min-width="20%" prop="ShortTitle" label="Content Title"></el-table-column>
+              <el-table-column min-width="16%" prop="SearchTerm" label="Search Term"></el-table-column>
+              <el-table-column min-width="19%" prop="MLName" label="12EQueryName"></el-table-column>
+              <el-table-column min-width="15%" prop="CreateDt" label="Create Date"></el-table-column>
+              <el-table-column min-width="20%" label="Operation">
                 <template slot-scope="scope">
-                  <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
-                  <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
+                  <el-button size="mini" type="info" style="width:15px" @click="handleDelete(scope.row.SEID)" plain ><i class="el-icon-top"></i></el-button>
+                  <el-button size="mini" type="info" style="width:15px" @click="handleDelete(scope.row.SEID)" plain ><i class="el-icon-bottom"></i></el-button>
+                  <el-button size="mini" type="info" style="width:15px" @click="handleDelete(scope.row.SEID)" plain><i class="el-icon-delete"></i></el-button>
                 </template>
               </el-table-column>
             </el-table>
-          
           </el-form>
           <div style="margin-right:10px" slot="footer" class="dialog-footer">
             <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
@@ -206,6 +207,8 @@ export default {
     return {
       dialogCreateVisible:false,  //详细页面显示/隐藏
       dialogChooseContentVisible:false,  //选择Content页面显示/隐藏
+      dialogScheduleDate:false,
+      dialogScheduleTime:false,
       formStatus:0,               //详细页面状态: 0-隐藏/1-新增/2-编辑
       changeFlag:false,           //编辑页面回显/手动选择
       getHosData:[],              //根据city筛选hospital
@@ -244,9 +247,24 @@ export default {
         ScheduleTime:"",
         ContentId: ""
       },
+      ContentForm:{
+        ContentID:"",
+        SearchTerm:"",
+        ContentCategory:"",
+        ShortTitle:"",
+        ContentMessage:"",
+        SEID:"",
+        CreateDT:"",
+        ModifyDT:"",
+        UpdatePhotoData:"",
+        UpdatePhotoName:"",
+        UpdatePhotoPath:"",
+      },
       radio: '',
       checked:'',
-      getContentData:[],
+      getContentData:[],          //ContentList
+      getChooseContentData:[],    //被选择的Content
+      currentContentID:'',
       rows: [],                   //SE接口返回数据
       getMLList: [],              //ML接口返回数据
       getTeam: [],                //Team接口返回数据
@@ -266,17 +284,30 @@ export default {
     };
   },
 
-  // watch: {
-  //   'AddSEForm.CityID'(city) {
-  //     if(this.changeFlag){
-  //       city = city[2]
-  //     }
-  //     this.filterHospital(city)
-  //   },
-  //   'AddSEForm.HospitalID'(hospital) {
-  //     this.filterDeparement(hospital)
-  //   }
-  // },
+  watch: {
+    // 'AddSEForm.CityID'(city) {
+    //   if(this.changeFlag){
+    //     city = city[2]
+    //   }
+    //   this.filterHospital(city)
+    // },
+    'getContentData.ContentID'(ContentID) {
+      //this.filterContent(ContentID)
+      this.currentContentID = ContentID;
+    },
+    'AddMyPushForm.Scheduled'(checked){
+      if(checked == true)
+      {
+          this.dialogScheduleDate = true;
+          this.dialogScheduleTime = true;
+      }
+      else
+      {
+          this.dialogScheduleDate = false;
+          this.dialogScheduleTime = false;
+      }
+    }
+  },
 
   methods: {   
     getSEList1() {
@@ -293,7 +324,7 @@ export default {
       ContentService.getList("")
       .then((res) => {
         this.getContentData = res.data;
-        console.log("this.getContentData:" + JSON.stringify(this.getContentData));
+        //console.log("this.getContentData:" + JSON.stringify(this.getContentData));
       })
       .catch(function (err) {
         console.log("err"+err);
@@ -303,10 +334,9 @@ export default {
       this.dialogChooseContentVisible=true;
     },
     contentConfirm(){
+      this.filterContent(this.currentContentID)
       this.dialogChooseContentVisible=false;
-      
-    }
-    ,
+    },
     handleChange(flag){
       if(flag=='city'){
         this.AddSEForm.HospitalID = ''
@@ -369,6 +399,9 @@ export default {
     //设置表头行的样式
     tableHeaderColor({ row, column, rowIndex, columnIndex }) {
       return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left";
+    },
+    contentTableHeaderColor({ row, column, rowIndex, columnIndex }) {
+      return "color:#FFFFFF;background-color:#409EFF;font-wight:100;font-size:15px;text-align:left";
     },
     handleAdd() {
       this.formStatus = 1
@@ -509,22 +542,12 @@ export default {
           console.log("err"+err);
         });
     }, 
-    filterHospital(NodeID){
-      this.getHosData = [];
-      for(var item of this.getHospital.data){
-        var cityId=item.CityID;
-        var level=item.Level;
-        if(cityId == NodeID && level == 1){
-          this.getHosData.push(item);
-        }
-      }
-    },
-    filterDeparement(NodeID){
-      this.getDepData=[];
-      for(var item of this.getHospital.data){
-        var parentId=item.ParentNodeID;
-        if(parentId == NodeID){
-          this.getDepData.push(item);
+    filterContent(ContentID){
+      for(var item of this.getContentData){
+        var contentId=item.ContentID;
+        if(contentId == ContentID){
+          this.getChooseContentData.push(item);
+           console.log("this.getChooseContentData:" + this.getChooseContentData);
         }
       }
     },
