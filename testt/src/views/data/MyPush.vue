@@ -28,10 +28,8 @@
             <el-table-column min-width="15%" prop="RequestType" label="Request Type"></el-table-column>
             <el-table-column min-width="15%" label="Operation">
               <template slot-scope="scope">
-                <!-- @click="handleEdit(scope.row)" -->
-                <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit"  plain><i class="el-icon-edit"></i>Edit</el-button>
-                <el-button size="mini" type="info"  plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
-                <!-- @click="handleDelete(scope.row.SEID)" -->
+                <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handlePushEdit(scope.row)"  plain><i class="el-icon-edit"></i>Edit</el-button>
+                <el-button size="mini" type="info" @click="handlePushDelete(scope.row)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -244,7 +242,7 @@ export default {
         Greeting:"",
         Categorized: "",
         Scheduled: "",
-        Priotity: "",
+        Priority: "",
         RequestType: "",
         ScheduleDate:"",
         ScheduleTime:"",
@@ -255,7 +253,7 @@ export default {
         Greeting:"",
         Categorized: "",
         Scheduled: "",
-        Priotity: "",
+        Priority: "",
         RequestType: "",
         ScheduleDate:"",
         ScheduleTime:"",
@@ -480,7 +478,7 @@ export default {
         Greeting:"",
         Categorized: "",
         Scheduled: "",
-        Priotity: "",
+        Priority: "",
         RequestType: "",
         ScheduleDate:"",
         ScheduleTime:"",
@@ -508,19 +506,23 @@ export default {
       this.getCurrentTime();
       this.$refs.AddMyPushForm.validate((valid) => {
         if (valid) {
-          this.$confirm('确认提交？', '提示', {}).then(async() => {    
+          this.$confirm('确认提交？', '提示', {}).then(async() => {  
+            let content = []  
+            this.getChooseContentData.forEach(ct => {
+              content.push(ct.ContentID)
+            });
             await MyPushService.myPushCreate(
               {
                   PushID:this.MyPushID,
                   SEID: this.AddMyPushForm.SEID,   
                   Greeting:this.AddMyPushForm.Greeting,
                   Categorized: this.AddMyPushForm.Categorized,
-                  Priority:this.AddMyPushForm.Priotity,
+                  Priority:this.AddMyPushForm.Priority,
                   IsScheduled: this.AddMyPushForm.Scheduled,
                   ScheduleDate: this.AddMyPushForm.ScheduleDate,
                   ScheduleTime: this.AddMyPushForm.ScheduleTime,
                   RequestType: this.AddMyPushForm.RequestType,
-                  ContentID: this.AddMyPushForm.ContentId,
+                  ContentID: content.toString(),//this.AddMyPushForm.ContentId,
                   MeetingID: "",
                   CreateDt: this.currentTime,
                   ModifyDt: "",

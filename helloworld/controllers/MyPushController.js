@@ -66,19 +66,19 @@ module.exports = {
         }
         await MyPush.create(newPush)
         
-        if(req.body.IsScheduled == 0){
+        //if(req.body.IsScheduled == ''){
           req.body.ContentID.split(",").forEach(async ctid => {
             let content = await MyContent.findByPk(ctid)
             let token =await weChat.getAccessToken(Date.now(),config.appInfo.appID)
 
             console.log(content.TextID)
-            weChat.pushContentPreview(token,content.TextID,'oJVgv6ZH9l1Jq0BEO3K0QpYZD98I')
+            weChat.pushContentPreview(token,content.TextID,'oJVgv6e0Ob6vBRU7UdlwdeUG0HYM')
             //bochao - oJVgv6ZH9l1Jq0BEO3K0QpYZD98I
             //shennan - oJVgv6a8CT5JWPbaS-21t2cp_NNk
             //david - oJVgv6e0Ob6vBRU7UdlwdeUG0HYM
             //xintong - oJVgv6VS8300wzNDG0oCM8M6JNCo
           });
-        }
+        //}
         
      // }
       
