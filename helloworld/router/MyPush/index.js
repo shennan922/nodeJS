@@ -5,7 +5,7 @@ const AuthenticatePolicy = require('../../policies/AuthenticatePolicy')
 
 router.use(function(req, res, next) 
 {
-    AuthenticatePolicy.isValidToken(req,res, next)  
+    //AuthenticatePolicy.isValidToken(req,res, next)  
     next() 
 })
 router.get('/getList', MyPushController.getList)

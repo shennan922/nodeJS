@@ -72,6 +72,31 @@ module.exports = {
       logger.logger.error("init token error: "+error.message)    
     }    
   },
+  async updateAccessToken (appId,appSecret)
+  {
+    try {
+      //const APP =  db.APPList.findByPk(req.params.id)
+      const url = `${config.appInfo.wxapi}/token?grant_type=client_credential&appid=${appId}&secret=${appSecret}`
+      wtoken =await axios.get(url, function (error, response, body) {
+        if(error!==null){
+          reject("获取access_token失败 检查getAccessToken函数");
+        }
+        resolve(JSON.parse(body));
+      });
+      var newToken = {
+        APPID: appId,
+        APPSecret: appSecret,
+        APPToken: wtoken.data.access_token      
+      }
+      db.APPList.update(newToken,{where:{APPID: appId}})    
+      return wtoken.data.access_token
+    }
+    catch(error)
+    {
+      logger.logger.error("update access token error: "+error.message) 
+    }
+  
+  },
   async  getAccessToken (timestamp,appId)
   {
     try
@@ -165,6 +190,7 @@ module.exports = {
           if(error){
             reject(error);
           }else{
+            console.log(JSON.parse(body))
             resolve(JSON.parse(body).media_id);              
           }
         });
@@ -220,6 +246,7 @@ module.exports = {
     //var token = '40_4ROYYyfp2I6G6ccvszmNvkfXDKV3RfJc-HdWVDl9MLzxLoIQIe_63v2mrCftpoorDw8bJhzHSz2tHOeIZ2dfSxFMxvvOG36N32mpdRlE52mzft-BOqCbq02Ioq2ADvgeghHlO36IN2fdxokvDOUhAJANYE'
     try
     {
+      console.log(mediaID)
       data =  {
         "touser":openID,
         "mpnews":{              
@@ -233,6 +260,7 @@ module.exports = {
         }
         resolve(JSON.parse(body));
       });  
+      console.log(ticket)
       return  ticket.data
     }catch (error)
     {

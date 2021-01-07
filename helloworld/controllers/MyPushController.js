@@ -1,8 +1,11 @@
 const db = require('../models/Index')
 const logger = require('../logger/log4')
+var weChat = require('../utils/Wechat')
+const config = require('../config')
 
 const MyPush = db.MyPush
 const MyContent = db.MyContent
+const SEList = db.SEList
 
 MyPush.belongsTo(SEList, {
   foreignKey: 'SEID',
@@ -62,32 +65,34 @@ module.exports = {
           ModifyDt: null
         }
         await MyPush.create(newPush)
-        /*
+        
         if(req.body.IsScheduled == 0){
-          req.body.ContentID.split(",").forEach(ctid => {
-            let content = MyContent.findByPk(ctid)
-            console.log(content)
-            console.log(content.textID)
-            //weChat.uploadPermMaterial(token,content.textID,'oJVgv6ZH9l1Jq0BEO3K0QpYZD98I')
+          req.body.ContentID.split(",").forEach(async ctid => {
+            let content = await MyContent.findByPk(ctid)
+            let token =await weChat.getAccessToken(Date.now(),config.appInfo.appID)
+
+            console.log(content.TextID)
+            weChat.pushContentPreview(token,content.TextID,'oJVgv6ZH9l1Jq0BEO3K0QpYZD98I')
             //bochao - oJVgv6ZH9l1Jq0BEO3K0QpYZD98I
-            //shennan
+            //shennan - oJVgv6a8CT5JWPbaS-21t2cp_NNk
             //david - oJVgv6e0Ob6vBRU7UdlwdeUG0HYM
+            //xintong - oJVgv6VS8300wzNDG0oCM8M6JNCo
           });
         }
-        */
+        
       }
       
       res.status(200).send({
         code: 200,
-        message: 'SE创建成功'
+        message: 'MyPushList创建成功'
       })
-      logger.logger.info("Create MyPushList: "+newSE.SEID)
+      logger.logger.info("Create MyPushList: "+req.body.PushID)
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '程序异常: ' + error
       })
-      logger.logger.fatal("Create MyPushList fail: "+newSE.SEID+'/'+error)
+      logger.logger.fatal("Create MyPushList fail: "+req.body.PushID+'/'+error)
     }
   },
   async update (req, res) {
@@ -113,13 +118,13 @@ module.exports = {
         code: 200,
         message: 'SE更新成功'
       })
-      logger.logger.info("Update MyPushList: "+newSE.SEID)
+      logger.logger.info("Update MyPushList: "+req.body.PushID)
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '程序异常: ' + error
       })
-      logger.logger.fatal("Update MyPushList fail: "+newSE.SEID+'/'+error)
+      logger.logger.fatal("Update MyPushList fail: "+req.body.PushID+'/'+error)
     }
   },
   async delete (req, res) {
@@ -134,13 +139,13 @@ module.exports = {
       res.status(200).send({
         message: '数据删除成功'
       })
-      logger.logger.info("Delete MyPushList: "+newSE.SEID)
+      logger.logger.info("Delete MyPushList: "+req.body.PushID)
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '数据删除失败: ' + error
       })
-      logger.logger.fatal("Delete MyPushList fail: "+newSE.SEID+'/'+error)
+      logger.logger.fatal("Delete MyPushList fail: "+req.body.PushID+'/'+error)
     }
   }
 }

@@ -213,7 +213,7 @@ export default {
     return {
       ContentID:"",
       pageNum:1,//table第几页
-      pageSize:5,  
+      pageSize:10,  
       defaultMsg:"",
       currentTime:"",
       config: {

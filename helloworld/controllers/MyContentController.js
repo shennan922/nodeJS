@@ -125,7 +125,7 @@ module.exports = {
   async create (req, res) {
     try {   
       //let maxID = await Content.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('ContentID')),'maxID']]})
-      let token = await weChat.getAccessToken(Date.now(),config.appInfo.appID)
+      let token =await weChat.updateAccessToken(config.appInfo.appID,config.appInfo.secret)//await weChat.getAccessToken(Date.now(),config.appInfo.appID)
       let content = await generateContent(req.body.ContentID,
         req.body.SEID,
         req.body.SearchTerm,
