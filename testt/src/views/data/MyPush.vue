@@ -16,14 +16,15 @@
             @sort-change="changeTableSort" class="formMyPush"
             ref="SeTable"
           >
+            <el-table-column min-width="10%" prop="PushID" label="PushID" sortable></el-table-column>
             <el-table-column min-width="10%" prop="SEID" label="SEID"></el-table-column>
             <el-table-column min-width="15%" prop="Greeting" label="Greetings" ></el-table-column>
             <el-table-column min-width="15%" prop="Categorized" label="Categorized" :formatter="categorizedFormat"></el-table-column>
             <el-table-column min-width="15%" prop="ScheduleDate" label="Schedule Date"></el-table-column>
             <el-table-column min-width="15%" prop="ScheduleTime" label="Schedule Time"></el-table-column>
-            <el-table-column min-width="15%" prop="Priority" label="Priority" :formatter="priorityFormat"></el-table-column>
+            <el-table-column min-width="15%" prop="Priority" label="Priority" sortable :formatter="priorityFormat"></el-table-column>
             <el-table-column min-width="15%" prop="RequestType" label="Request Type" :formatter="requestTypeFormat"></el-table-column>
-            <el-table-column min-width="15%" label="Operation">
+            <el-table-column min-width="18%" label="Operation">
               <template>
                 <!-- @click="handlePushEdit(scope.row)" -->
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" plain><i class="el-icon-edit"></i>Edit</el-button>
@@ -52,7 +53,8 @@
           :model="AddMyPushForm" 
           :rules="formStatus!=0?addMyPushFormRules:null"  
           label-width="105px"
-          label-position="left"          
+          label-position="left"
+                    
           >
             <el-row>
               <el-col :span="10" class="el-col_MyPush">
@@ -236,6 +238,7 @@ export default {
         TeamID: ""
       },
       MyPushForm: {                //详细页面数据源
+        PushID:"",
         SEID:"",
         Greeting:"",
         Categorized: "",
@@ -247,6 +250,7 @@ export default {
         ContentId: ""
       },
       AddMyPushForm: {                //详细页面数据源
+        PushID:"",
         SEID:"",
         Greeting:"",
         Categorized: "",
@@ -793,6 +797,11 @@ body .el-table th.gutter{
   .h2title{
     text-align:left
   }
+  // .el-form-item__label:before{
+  //     content: '*';
+  //       color: red;
+  //       margin-left: -8%;
+  // } 
 }
  
 .block{
@@ -813,7 +822,15 @@ body .el-table th.gutter{
   .el-checkbox{
      float:left
   }
+  .el-form-item__lable::before{
+    margin-left: -8% !important;
+  }
 }
+// class.el-form-item__label:before{
+//       content: '*';
+//         color: red;
+//         margin-left: -8%;
+// }
 
 .myPushCheckBox{
   width:40%;
@@ -827,7 +844,7 @@ body .el-table th.gutter{
 }
  
 .searchBox{
-  width: 13%;
+  width: 14%;
   float: right;
   padding: 5px;
 }
