@@ -121,8 +121,7 @@
               :model="ContentForm" 
               :data="getChooseContentData" border 
               :header-cell-style="contentTableHeaderColor"
-              class="formMyPush"  
-              :row-key="(row)=>{ return row.SEID}" 
+              class="formMyPush" 
               ref="SeTable"
               style="margin-top:10px"
             >
@@ -135,8 +134,8 @@
               <el-table-column min-width="15%" prop="CreateDt" label="Create Date"></el-table-column>
               <el-table-column min-width="20%" label="Operation">
                 <template slot-scope="scope">
-                  <el-button size="mini" type="info" style="width:15px" @click="handleMoveUp(scope.$index,scope.row)" plain ><i class="el-icon-top" style="margin-left:-6px"></i></el-button>
-                  <el-button size="mini" type="info" style="width:15px" @click="handleMoveDown(scope.$index,scope.row)" plain ><i class="el-icon-bottom" style="margin-left:-6px"></i></el-button>
+                  <el-button size="mini" type="info" style="width:15px" @click="handleMoveUp(scope.$index,scope.row)" :disabled="scope.$index===0" plain ><i class="el-icon-top" style="margin-left:-6px"></i></el-button>
+                  <el-button size="mini" type="info" style="width:15px" @click="handleMoveDown(scope.$index,scope.row)" :disabled="scope.$index===(getChooseContentData.length-1)" plain ><i class="el-icon-bottom" style="margin-left:-6px"></i></el-button>
                   <el-button size="mini" type="info" style="width:15px" @click="handleDelete(scope.$index, getChooseContentData)" plain><i class="el-icon-delete" style="margin-left:-6px"></i></el-button>
                 </template>
               </el-table-column>
@@ -217,7 +216,7 @@ export default {
       searchTableInfo:"",         //模糊搜索框
       getSearchInfo:[],           //模糊搜索结果
       pageNum:1,                  //table第几页
-      pageSize:8,                 //table每页几条数据   
+      pageSize:5,                 //table每页几条数据   
       SEForm: {                   //table数据源
         SEID:"",
         SEName:"",
@@ -633,7 +632,7 @@ export default {
                 this.getDetailList()
                 this.handleMyPushClose()
                 this.currentContentID = ""
-                this.getContentList();
+                //this.getContentList();
               }              
             })
           }).catch((err) => {
