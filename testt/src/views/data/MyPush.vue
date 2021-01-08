@@ -46,107 +46,110 @@
         </el-col>
       </el-row>
        <!--增加My Push页面-->
-      <el-dialog :title ="formStatus==1?'New My Push':'Update My Push'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleMyPushClose" :close-on-click-modal="false" class="dialogMyPush" style="width:125%;margin-left:-200px;height:600px">
-          <el-form 
-          ref="AddMyPushForm"
-          :model="AddMyPushForm" 
-          :rules="formStatus!=0?addMyPushFormRules:null"  
-          label-width="105px"
-          label-position="left"          
-          >
-            <el-row>
-              <el-col :span="10" class="el-col_MyPush">
-                <h2 class="h2title">Greeting</h2>
-                <el-form-item label="Select SE" prop="SEID">
-                  <el-select v-model="AddMyPushForm.SEID" clearable placeholder="请选择" style="width:100%;padding-left:0px">
-                    <el-option
-                      v-for="item in getSEListAll" :key="item.SEID" :label="item.SEName" :value="item.SEID">
-                    </el-option>
-                  </el-select> 
-                </el-form-item>
-                <el-form-item label="Greetings" prop="Greeting" >
-                  <el-input v-model="AddMyPushForm.Greeting"></el-input>
-                </el-form-item>
-              </el-col>
-              <el-col :span="10" class="el-col_MyPush">
-                <h2 class="h2title">Settings</h2>
-                <el-form-item label="Categorized" prop="Categorized">
-                  <el-radio v-model="AddMyPushForm.Categorized" label="1" style="margin-top:15px">Type1</el-radio>
-                  <el-radio v-model="AddMyPushForm.Categorized" label="2" style="margin-top:15px">Type2</el-radio>
-                </el-form-item>
-                <el-form-item label="Scheduled" prop="Scheduled">
-                  <el-checkbox v-model="AddMyPushForm.Scheduled" ></el-checkbox>
-                </el-form-item>
-                <el-form-item label="ScheduleDate" prop="ScheduleDate"   v-if="dialogScheduleDate" :visible.sync="dialogScheduleDate"  >
-                  <el-input v-model="AddMyPushForm.ScheduleDate"></el-input>
-                </el-form-item>
-                <el-form-item label="ScheduleTime" prop="ScheduleTime"  v-if="dialogScheduleTime" :visible.sync="dialogScheduleTime">
-                  <el-input v-model="AddMyPushForm.ScheduleTime"></el-input>
-                </el-form-item>
-                <el-form-item label="Priority" prop="Priority">
-                  <el-select v-model="AddMyPushForm.Priority" clearable placeholder="请选择" style="width:100%;padding-left:0px">
-                    <el-option
-                      v-for="item in getPriorityData" :key="item.value" :label="item.label" :value="item.value">
-                    </el-option>
-                  </el-select> 
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <!-- request type title -->
-            <el-row>
-              <h2 style="float:left;margin-left:5%">Please specify the request(choose one request type)</h2>
-            </el-row>
-            <!-- request type checkbox -->
-            <el-row>
-              <div class = "myPushCheckBox">
-                <el-form-item>
-                  <p>
-                    <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="4">Standing Request(s)</el-radio>
-                  </p>
-                  <p>
-                    <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="5">One Time Request(s)(Please privode below information)</el-radio>
-                  </p>
-                  <p>
-                    <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="6">Virtual Meeting Request(s)(Please privode below information)</el-radio>
-                  </p>
-                </el-form-item>
-              </div>
-            </el-row>
-            <!-- select content button -->
-            <el-row>
-              <el-button @click.native="selectContent" type="primary" style="float:left;padding-buttom:15px">Select Content</el-button>
-            </el-row>
-            <!-- show table -->
-            <el-table 
-              :model="ContentForm" 
-              :data="getChooseContentData" border 
-              :header-cell-style="contentTableHeaderColor"
-              class="formMyPush"  
-              :row-key="(row)=>{ return row.SEID}" 
-              ref="SeTable"
-              style="margin-top:10px"
-            >
-              <el-table-column min-width="10%" prop="SEID" label="SE"></el-table-column>
-              <el-table-column min-width="15%" prop="ContentCategory" label="Category" ></el-table-column>
-              <el-table-column min-width="20%" prop="ShortTitle" label="Short Title"></el-table-column>
-              <el-table-column min-width="20%" prop="ShortTitle" label="Content Title"></el-table-column>
-              <el-table-column min-width="16%" prop="SearchTerm" label="Search Term"></el-table-column>
-              <!-- <el-table-column min-width="19%" prop="MLName" label="12EQueryName"></el-table-column> -->
-              <el-table-column min-width="15%" prop="CreateDt" label="Create Date"></el-table-column>
-              <el-table-column min-width="20%" label="Operation">
-                <template slot-scope="scope">
-                  <el-button size="mini" type="info" style="width:15px" @click="handleMoveUp(scope.$index,scope.row)" plain ><i class="el-icon-top" style="margin-left:-6px"></i></el-button>
-                  <el-button size="mini" type="info" style="width:15px" @click="handleMoveDown(scope.$index,scope.row)" plain ><i class="el-icon-bottom" style="margin-left:-6px"></i></el-button>
-                  <el-button size="mini" type="info" style="width:15px" @click="handleDelete(scope.$index, getChooseContentData)" plain><i class="el-icon-delete" style="margin-left:-6px"></i></el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-form>
-          <div style="margin-right:10px" slot="footer" class="dialog-footer">
-            <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
-            <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
-         </div>
-
+      <el-dialog :title ="formStatus==1?'New My Push':'Update My Push'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleMyPushClose" :close-on-click-modal="false" :lock-scroll="true" class="dialogMyPush" style="width:125%;margin-left:-200px;">
+        <!--<div style="height:60vh;overflow:auto;" class="scrollbar">
+          <el-scrollbar style="height:100%; overflow-x:hidden;">-->
+            <el-form 
+            ref="AddMyPushForm"
+            :model="AddMyPushForm" 
+            :rules="formStatus!=0?addMyPushFormRules:null"  
+            label-width="105px"
+            label-position="left"          
+            >          
+              <el-row>
+                <el-col :span="10" class="el-col_MyPush">
+                  <h2 class="h2title">Greeting</h2>
+                  <el-form-item label="Select SE" prop="SEID">
+                    <el-select v-model="AddMyPushForm.SEID" clearable placeholder="请选择" style="width:100%;padding-left:0px">
+                      <el-option
+                        v-for="item in getSEListAll" :key="item.SEID" :label="item.SEName" :value="item.SEID">
+                      </el-option>
+                    </el-select> 
+                  </el-form-item>
+                  <el-form-item label="Greetings" prop="Greeting" >
+                    <el-input v-model="AddMyPushForm.Greeting"></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="10" class="el-col_MyPush">
+                  <h2 class="h2title">Settings</h2>
+                  <el-form-item label="Categorized" prop="Categorized">
+                    <el-radio v-model="AddMyPushForm.Categorized" label="1" style="margin-top:15px">Type1</el-radio>
+                    <el-radio v-model="AddMyPushForm.Categorized" label="2" style="margin-top:15px">Type2</el-radio>
+                  </el-form-item>
+                  <el-form-item label="Scheduled" prop="Scheduled">
+                    <el-checkbox v-model="AddMyPushForm.Scheduled" ></el-checkbox>
+                  </el-form-item>
+                  <el-form-item label="ScheduleDate" prop="ScheduleDate"   v-if="dialogScheduleDate" :visible.sync="dialogScheduleDate"  >
+                    <el-input v-model="AddMyPushForm.ScheduleDate"></el-input>
+                  </el-form-item>
+                  <el-form-item label="ScheduleTime" prop="ScheduleTime"  v-if="dialogScheduleTime" :visible.sync="dialogScheduleTime">
+                    <el-input v-model="AddMyPushForm.ScheduleTime"></el-input>
+                  </el-form-item>
+                  <el-form-item label="Priority" prop="Priority">
+                    <el-select v-model="AddMyPushForm.Priority" clearable placeholder="请选择" style="width:100%;padding-left:0px">
+                      <el-option
+                        v-for="item in getPriorityData" :key="item.value" :label="item.label" :value="item.value">
+                      </el-option>
+                    </el-select> 
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <!-- request type title -->
+              <el-row>
+                <h2 style="float:left;margin-left:5%">Please specify the request(choose one request type)</h2>
+              </el-row>
+              <!-- request type checkbox -->
+              <el-row>
+                <div class = "myPushCheckBox">
+                  <el-form-item>
+                    <p>
+                      <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="4">Standing Request(s)</el-radio>
+                    </p>
+                    <p>
+                      <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="5">One Time Request(s)(Please privode below information)</el-radio>
+                    </p>
+                    <p>
+                      <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="6">Virtual Meeting Request(s)(Please privode below information)</el-radio>
+                    </p>
+                  </el-form-item>
+                </div>
+              </el-row>
+              <!-- select content button -->
+              <el-row>
+                <el-button @click.native="selectContent" type="primary" style="float:left;padding-buttom:15px">Select Content</el-button>
+              </el-row>
+              <!-- show table -->
+              <el-table 
+                :model="ContentForm" 
+                :data="getChooseContentData" border 
+                :header-cell-style="contentTableHeaderColor"
+                class="formMyPush"  
+                :row-key="(row)=>{ return row.SEID}" 
+                ref="SeTable"
+                style="margin-top:10px"
+              >
+                <el-table-column min-width="10%" prop="SEID" label="SE"></el-table-column>
+                <el-table-column min-width="15%" prop="ContentCategory" label="Category" ></el-table-column>
+                <el-table-column min-width="20%" prop="ShortTitle" label="Short Title"></el-table-column>
+                <el-table-column min-width="20%" prop="ShortTitle" label="Content Title"></el-table-column>
+                <el-table-column min-width="16%" prop="SearchTerm" label="Search Term"></el-table-column>
+                <!-- <el-table-column min-width="19%" prop="MLName" label="12EQueryName"></el-table-column> -->
+                <el-table-column min-width="15%" prop="CreateDt" label="Create Date"></el-table-column>
+                <el-table-column min-width="20%" label="Operation">
+                  <template slot-scope="scope">
+                    <el-button size="mini" type="info" style="width:15px" @click="handleMoveUp(scope.$index,scope.row)" plain ><i class="el-icon-top" style="margin-left:-6px"></i></el-button>
+                    <el-button size="mini" type="info" style="width:15px" @click="handleMoveDown(scope.$index,scope.row)" plain ><i class="el-icon-bottom" style="margin-left:-6px"></i></el-button>
+                    <el-button size="mini" type="info" style="width:15px" @click="handleDelete(scope.$index, getChooseContentData)" plain><i class="el-icon-delete" style="margin-left:-6px"></i></el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-form>
+            <div style="margin-right:10px" slot="footer" class="dialog-footer">
+              <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
+              <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
+            </div>
+          <!--</el-scrollbar>
+        </div>-->
       </el-dialog>
 
        <!--选择My Content-->
@@ -695,6 +698,7 @@ export default {
         });
     }, 
     filterContent(){
+      this.getChooseContentData = []
       for(var i = 0; i<this.currentContentID.length;i++)
       {
         var ContentID = this.currentContentID[i];

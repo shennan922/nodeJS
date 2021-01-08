@@ -79,112 +79,112 @@
         </el-col>
       </el-row>
       <!--增加Content页面-->
-      <el-dialog :title ="formStatus==1?'Create a New Paper':'Update a Paper'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent" @close="handleFormClose" :close-on-click-modal="false" :modal-append-to-body="false">
-          <el-form 
-          ref="AddContentForm"
-          :model="AddContentForm" 
-          :rules="formStatus!=0?addContentFormRules:null"    
-          label-width="130px"
-          >
-           <!-- :rules="addContentFormRules" -->
-            <el-row>
-              <el-col class="el-col_Content">
-                <el-form-item label="SE" prop="SEID">
-                  <el-select v-model="AddContentForm.SEID" clearable placeholder="请选择" style="width:100%;padding-left:0px">
-                    <el-option
-                      v-for="item in getSEListAll" :key="item.SEID" :label="item.SEName" :value="item.SEID">
-                    </el-option>
-                  </el-select> 
-                </el-form-item>
-              <el-form-item label="Content Category" prop="ContentCategory">
-                  <div>
-                  <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:90%;padding-left:0px" ref="categorySelect">
-                    <el-option
-                      v-for="item in getCategoryList" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
-                    </el-option> 
+      <el-dialog :title ="formStatus==1?'Create a New Paper':'Update a Paper'" :lock-scroll="true" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent" @close="handleFormClose" :close-on-click-modal="false" :modal-append-to-body="false">
+        <!--<div style="height:70vh;overflow:auto;" class="scrollbar">
+          <el-scrollbar style="height:100%; overflow-x:hidden;">-->
+            <el-form 
+            ref="AddContentForm"
+            :model="AddContentForm" 
+            :rules="formStatus!=0?addContentFormRules:null"    
+            label-width="130px"
+            >
+            <!-- :rules="addContentFormRules" -->
+              <el-row>
+                <el-col class="el-col_Content">
+                  <el-form-item label="SE" prop="SEID">
+                    <el-select v-model="AddContentForm.SEID" clearable placeholder="请选择" style="width:100%;padding-left:0px">
+                      <el-option
+                        v-for="item in getSEListAll" :key="item.SEID" :label="item.SEName" :value="item.SEID">
+                      </el-option>
                     </el-select> 
-                    <el-button  class="button-new-tag" size="small" @click="showInput">+</el-button>
-                  </div>
-                  <div style="margin-top:5px">
-                    <el-tag
-                    :key="tag"
-                    v-for="tag in dynamicTags"
-                    :closable="true"
-                    
-                    @close="onTagClose(tag)"
-                    >
-                    {{tag}}
-                   </el-tag>
-                  </div>
-                </el-form-item>
-                <el-form-item label="Short Title" prop="ShortTitle">
-                  <el-input v-model="AddContentForm.ShortTitle" ></el-input>
-                </el-form-item>
-                <el-form-item label="Search Term" prop="SearchTerm" >
-                  <el-input v-model="AddContentForm.SearchTerm"></el-input>
-                </el-form-item> 
-                <el-form-item label="Upload Photo" prop="UpdatePhotoData">
-                  <el-row>
-                    <el-col :span="5">
-                       <el-upload
-                          class="avatar-uploader"
-                          action="http://localhost:3000/myContent/imageUpload"
-                          :show-file-list="false"
-                          :on-change="handleChange"
-                          :on-success="handleAvatarSuccess"
-                          :before-upload="beforeAvatarUpload"
-                          :data="{ContentID}"
+                  </el-form-item>
+                <el-form-item label="Content Category" prop="ContentCategory">
+                    <div>
+                    <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:90%;padding-left:0px" ref="categorySelect">
+                      <el-option
+                        v-for="item in getCategoryList" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
+                      </el-option> 
+                      </el-select> 
+                      <el-button  class="button-new-tag" size="small" @click="showInput">+</el-button>
+                    </div>
+                    <div style="margin-top:5px">
+                      <el-tag
+                      :key="tag"
+                      v-for="tag in dynamicTags"
+                      :closable="true"
+                      
+                      @close="onTagClose(tag)"
+                      >
+                      {{tag}}
+                    </el-tag>
+                    </div>
+                  </el-form-item>
+                  <el-form-item label="Short Title" prop="ShortTitle">
+                    <el-input v-model="AddContentForm.ShortTitle" ></el-input>
+                  </el-form-item>
+                  <el-form-item label="Search Term" prop="SearchTerm" >
+                    <el-input v-model="AddContentForm.SearchTerm"></el-input>
+                  </el-form-item> 
+                  <el-form-item label="Upload Photo" prop="UpdatePhotoData">
+                    <el-row>
+                      <el-col :span="5">
+                        <el-upload
+                            class="avatar-uploader"
+                            action="http://localhost:3000/myContent/imageUpload"
+                            :show-file-list="false"
+                            :on-change="handleChange"
+                            :on-success="handleAvatarSuccess"
+                            :before-upload="beforeAvatarUpload"
+                            :data="{ContentID}"
+                            ref="upload"
+                            >
+                            <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                        </el-upload>
+                      </el-col>
+                    </el-row>
+                  </el-form-item>
+
+                  <el-form-item label="Upload PDF">
+                    <el-row>
+                      <el-col :span="5">
+                        <el-upload
                           ref="upload"
+                          action="http://localhost:3000/myContent/uploadPdf"
+                          :multiple="true"
+                          :show-file-list="true"
+                          :file-list="fileList"
+                          accept=".PDF,.pdf"                    
+                          :data="uploadData"
+                          :auto-upload="true"
+                          :on-change="uploadOnChange"
+                          :on-remove="uploadOnRemove"
+                    
                           >
-                          <img v-if="imageUrl" :src="imageUrl" class="avatar">
-                          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-                      </el-upload>
-                    </el-col>
-                  </el-row>
-                </el-form-item>
-
-                <el-form-item label="Upload PDF">
-                  <el-row>
-                    <el-col :span="5">
-                      <el-upload
-                        ref="upload"
-                        action="http://localhost:3000/myContent/uploadPdf"
-                        :multiple="true"
-                        :show-file-list="true"
-                        :file-list="fileList"
-                        accept=".PDF,.pdf"                    
-                        :data="uploadData"
-                        :auto-upload="true"
-                        :on-change="uploadOnChange"
-                        :on-remove="uploadOnRemove"
-                  
-                        >
-                        <el-button slot="trigger">Choose file</el-button>
-                      </el-upload>
-                    </el-col>
-                    <!--<el-col :span="19">
-                      <el-input v-model="AddContentForm.UpdatePDFName"  :disabled="true"></el-input>
-                    </el-col>-->
-                  </el-row>
-                  <el-button type="text" @click="downloadFile">下载test</el-button>
-                  <!--<a class='download' :href='api/myContent/downloadpdf' download=""  title="下载">下载</a>-->
-                </el-form-item>
-                <el-form-item label="Content" prop="ContentMessage">
-                  <div>
-                    <UE :defaultMsg=defaultMsg :config=config :id=ue1 ref="ue"></UE>
-                  </div>
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>
-          <!-- <div style="margin-right:10px" slot="footer">
-            <el-button @click.native="createSubmit"  type="primary">Submit</el-button>
-         </div> -->
-         <div style="margin-right:10px" slot="footer" class="dialog-footer">
-            <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
-            <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
-         </div>
-
+                          <el-button slot="trigger">Choose file</el-button>
+                        </el-upload>
+                      </el-col>
+                      <!--<el-col :span="19">
+                        <el-input v-model="AddContentForm.UpdatePDFName"  :disabled="true"></el-input>
+                      </el-col>-->
+                    </el-row>
+                    <el-button type="text" @click="downloadFile">下载test</el-button>
+                    <!--<a class='download' :href='api/myContent/downloadpdf' download=""  title="下载">下载</a>-->
+                  </el-form-item>
+                  <el-form-item label="Content" prop="ContentMessage">
+                    <div>
+                      <UE :defaultMsg=defaultMsg :config=config :id=ue1 ref="ue"></UE>
+                    </div>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-form>
+            <div style="margin-right:10px" slot="footer" class="dialog-footer">
+                <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
+                <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
+            </div>
+          <!--</el-scrollbar>
+        </div>-->
       </el-dialog>
   </div>
 </template>

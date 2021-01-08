@@ -21,10 +21,10 @@ async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTi
   files.forEach(file => {
     text.push({"name":file.FileName,"url":file.FileURL})
   });
-  let str = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+ShortTitle+'</title></head>'
-      str += '<body><h3>'+ShortTitle+'</h3>'
-      str += '<table border="0">'
-      str += '<tr><td style="width: 150px;">SE</td><td style="width: 250px;">'+SEID+'</td></tr>'
+  let str = '<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>'
+      str += '<title>'+ShortTitle+'</title></head>'
+      str += '<body><div style="text-align:left"><h3>'+ShortTitle+'</h3><table border="0">'
+      str += '<tr><td style="width: 30%;">SE</td><td style="width: 65%;">'+SEID+'</td></tr>'
       str += '<tr><td>Content Category</td><td>'+ContentCategory+'</td></tr>'
       str += '<tr><td>Search Term</td><td>'+SearchTerm+'</td></tr>'
       if(text.length > 0){
@@ -32,8 +32,8 @@ async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTi
           str += '<tr><td>Attachmnet</td><td><a class=\'download\' href=\''+text.url+'\'>'+text.name+'</a></br></td></tr>'
         });        
       }
-      str += '<tr><td>Content</td><td><div style="width:400px; border:1px solid #000">'+ContentMessage+'</div></td></tr>'
-      str += '</table></body></html>'
+      str += '<tr><td>Content</td><td><div style="width:80%; border:1px solid #000"><p>'+ContentMessage+'</p></div></td></tr>'
+      str += '</table></div></body></html>'
   return str
 }
 
@@ -132,6 +132,7 @@ module.exports = {
         req.body.ContentCategory,
         req.body.ShortTitle,
         req.body.ContentMessage)
+        console.log(content)
       let mediaID = await weChat.uploadImage(token,'.//contents//'+req.body.ContentID+'//'+req.body.PhotoName).then(async mid =>{
         let material = {
           "articles": [{
