@@ -14,22 +14,21 @@
             :data="getMyPushList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
             :header-cell-style="tableHeaderColor" 
             @sort-change="changeTableSort" class="formMyPush"
-              
-            :row-key="(row)=>{ return row.SEID}"
-            
             ref="SeTable"
           >
             <el-table-column min-width="10%" prop="SEID" label="SEID"></el-table-column>
             <el-table-column min-width="15%" prop="Greeting" label="Greetings" ></el-table-column>
-            <el-table-column min-width="15%" prop="Categorized" label="Categorized"></el-table-column>
+            <el-table-column min-width="15%" prop="Categorized" label="Categorized" :formatter="categorizedFormat"></el-table-column>
             <el-table-column min-width="15%" prop="ScheduleDate" label="Schedule Date"></el-table-column>
             <el-table-column min-width="15%" prop="ScheduleTime" label="Schedule Time"></el-table-column>
-            <el-table-column min-width="15%" prop="Priority" label="Priority"></el-table-column>
-            <el-table-column min-width="15%" prop="RequestType" label="Request Type"></el-table-column>
+            <el-table-column min-width="15%" prop="Priority" label="Priority" :formatter="priorityFormat"></el-table-column>
+            <el-table-column min-width="15%" prop="RequestType" label="Request Type" :formatter="requestTypeFormat"></el-table-column>
             <el-table-column min-width="15%" label="Operation">
-              <template slot-scope="scope">
-                <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handlePushEdit(scope.row)"  plain><i class="el-icon-edit"></i>Edit</el-button>
-                <el-button size="mini" type="info" @click="handlePushDelete(scope.row)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
+              <template>
+                <!-- @click="handlePushEdit(scope.row)" -->
+                <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" plain><i class="el-icon-edit"></i>Edit</el-button>
+                <el-button size="mini" type="info" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
+                <!-- @click="handlePushDelete(scope.row)" -->
               </template>
             </el-table-column>
           </el-table>
@@ -136,9 +135,9 @@
               <el-table-column min-width="15%" prop="CreateDt" label="Create Date"></el-table-column>
               <el-table-column min-width="20%" label="Operation">
                 <template slot-scope="scope">
-                  <el-button size="mini" type="info" style="width:15px" @click="handleDelete(scope.row.SEID)" plain ><i class="el-icon-top"></i></el-button>
-                  <el-button size="mini" type="info" style="width:15px" @click="handleDelete(scope.row.SEID)" plain ><i class="el-icon-bottom"></i></el-button>
-                  <el-button size="mini" type="info" style="width:15px" @click="handleDelete(scope.row.SEID)" plain><i class="el-icon-delete"></i></el-button>
+                  <el-button size="mini" type="info" style="width:15px" @click="handleMoveUp(scope.$index,scope.row)" plain ><i class="el-icon-top" style="margin-left:-6px"></i></el-button>
+                  <el-button size="mini" type="info" style="width:15px" @click="handleMoveDown(scope.$index,scope.row)" plain ><i class="el-icon-bottom" style="margin-left:-6px"></i></el-button>
+                  <el-button size="mini" type="info" style="width:15px" @click="handleDelete(scope.$index, getChooseContentData)" plain><i class="el-icon-delete" style="margin-left:-6px"></i></el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -281,6 +280,7 @@ export default {
       getContentLableData:[],
       contentData:[],
       MyPushID:"",
+      newProcessRouteDtos:[],
       getPriorityData:[{
           value: '1',
           label: 'High'
@@ -291,7 +291,7 @@ export default {
           value: '3',
           label: 'low'
         }],
-
+      isAdd:"true",
       value: [],
       currentTime:"",
       rows: [],                   //SE接口返回数据
@@ -311,7 +311,6 @@ export default {
 
   watch: {
     'getContentData.ContentID'(ContentID) {
-      //this.filterContent(ContentID)
       this.currentContentID = ContentID;
     },
     'AddMyPushForm.Scheduled'(checked){
@@ -335,13 +334,16 @@ export default {
       SEService.getSEList("")
         .then((res) => {
           this.getSEListAll = res.data;
-          //console.log("getSEListAll:" + JSON.stringify(this.getSEListAll));
         })
         .catch(function (err) {
           console.log("err"+err);
         });
     },
     getContentList() {
+      this.getContentData = [];
+      this.getContentIdData =[];
+      this.getContentLableData =[];
+      this.contentData =[];
       ContentService.getList("")
       .then((res) => {
         this.getContentData = res.data;
@@ -357,13 +359,12 @@ export default {
             getContentIdData: ""+this.getContentIdData[index]+"",
           });
         });
-        //console.log("this.contentData:" + JSON.stringify(this.contentData));
       })
       .catch(function (err) {
         console.log("err"+err);
       });
    },
-   getID(){
+    getID(){
       this.MyPushID = Number(Math.random().toString().substr(3,6) );
     },
     selectContent(){
@@ -382,7 +383,55 @@ export default {
         this.AddSEForm.DepID = ''
       }
     },
-
+    //上移
+    handleMoveUp(index, row) {
+      var that = this
+      if (index > 0) {
+        // 获取当前点击的上一条数据
+        const upDate = that.getChooseContentData[index - 1]
+        // 移除上一条数据
+        that.getChooseContentData.splice(index - 1, 1)
+        // 把上一条数据插入当前点击的位置
+        that.getChooseContentData.splice(index, 0, upDate)
+      }
+    },
+    // 下移
+    handleMoveDown(index, row) {
+      var that = this
+      const downDate = that.getChooseContentData[index + 1]
+      that.getChooseContentData.splice(index + 1, 1)
+      that.getChooseContentData.splice(index, 0, downDate)
+    },
+    categorizedFormat(row){
+      if (row.Categorized === 1) {
+        return "Type1";
+      } 
+      else {
+        return "Type2";
+      }
+    },
+    priorityFormat(row){
+      if (row.Priority === 1) {
+        return "High";
+      } 
+      else if (row.Priority === 2){
+        return "Medium";
+      }
+      else{
+        return "Low";
+      }
+    },
+    requestTypeFormat(row){
+      if (row.RequestType === 4) {
+        return "Standing Request";
+      } 
+      else if (row.RequestType === 5){
+        return "One Time Request";
+      }
+      else{
+        return "Meeting Request";
+      }
+    },
     //select回调，判断当前下拉框是否展示
     handleChangeFlag(val) {
       if(val){
@@ -457,19 +506,57 @@ export default {
         TeamID: row.TeamID
       };
     },
-    handleDelete(SEID){
-      SEService.SEDelete({SEID:SEID}).then((res) => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        });
-        this.getDetailList();
-      }).catch((error) => {
-        this.$message({
-          type: 'info',
-          message: '已取消新增'+error
-        });
-      })
+    handleDelete (index, rows) {
+        rows.splice(index, 1);
+        // this.currentContentID =[];
+        // this.getContentIdData = [];
+        // this.getContentLableData =[];
+        // this.contentData =[];
+        
+        // for(var i = 0; i<this.getChooseContentData.length;i++)
+        // {
+        //     var ContentID = this.getChooseContentData[i].ContentID;
+        //     this.currentContentID.push(ContentID);
+        // } 
+        // //重新给contentData赋值
+        // //console.log("this.getChooseContentData111111111111:" + JSON.stringify(this.getChooseContentData));
+        // // console.log("this.currentContentID11111111:" + this.currentContentID);
+        // for(var i = 0; i<this.getChooseContentData.length;i++)
+        // {
+        //   var existContentId = this.getChooseContentData[i].ContentID;
+        //   for(var item of this.getContentData){
+        //     var itemContentId = item.ContentID
+        //     if(itemContentId == existContentId){
+
+        //     }
+        //     else{
+        //       if(this.getContentIdData.includes(itemContentId)){
+        //           console.log(1)
+        //       }
+        //       else{
+        //         this.getContentIdData.push(itemContentId);
+        //       }  
+        //       if(this.getContentLableData.includes(itemContentId)){
+        //           console.log(2)
+        //       }
+        //       else{
+        //         this.getContentLableData.push(itemContentId); 
+        //       }
+                
+        //     }
+        //   }
+        // }
+        // //console.log("this.getContentIdData:" + JSON.stringify(this.getContentIdData));
+        // //console.log("this.getContentLableData:" + JSON.stringify(this.getContentLableData));
+        //  this.getContentLableData.forEach((contentId, index) => {
+        //   this.contentData.push({
+        //     label: ""+contentId+"",
+        //     key: ""+contentId+"",
+        //     value:""+contentId+"",
+        //     getContentIdData: ""+this.getContentIdData[index]+"",
+        //   });
+        // })
+        //console.log("this.contentData:" + JSON.stringify(this.contentData));
     },
     handleMyPushClose(){            
       //resetFields将form重置到mounted之后的状态, 对于编辑页面不适用
@@ -484,7 +571,9 @@ export default {
         ScheduleTime:"",
         ContentId: ""
       },
+      this.getContentList();
       this.getChooseContentData=[];
+      this.currentContentID = [];
       this.formStatus = 0 
       this.changeFlag = false
     },
@@ -542,7 +631,9 @@ export default {
                 this.dialogCreateVisible = false;
                 this.formStatus = 0
                 this.getDetailList()
-                //this.handleClose()
+                this.handleMyPushClose()
+                this.currentContentID = ""
+                this.getContentList();
               }              
             })
           }).catch((err) => {
@@ -582,7 +673,7 @@ export default {
                 this.dialogCreateVisible = false;
                 this.formStatus = 0
                 this.getDetailList();
-                //this.handleClose()
+                this.handleMyPushClose()
               }                
             })
           }).catch(() => {
@@ -604,7 +695,6 @@ export default {
         });
     }, 
     filterContent(){
-      //alert(this.currentContentID);
       for(var i = 0; i<this.currentContentID.length;i++)
       {
         var ContentID = this.currentContentID[i];
@@ -612,7 +702,6 @@ export default {
           var contentId=item.ContentID;
           if(contentId == ContentID){
             this.getChooseContentData.push(item);
-            //console.log("this.getChooseContentData:" + this.getChooseContentData);
           }
         }
       }  
@@ -683,11 +772,7 @@ body .el-table th.gutter{
   .el-table__body{
     table-layout: auto;
   } 
-    
   
-  // .table__header{
-  //   table-layout: auto;
-  // }
 }
 /deep/.dialogMyPush{
   .el-dialog__header{
