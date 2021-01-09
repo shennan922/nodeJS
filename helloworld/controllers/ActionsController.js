@@ -4,6 +4,7 @@ const logger = require('../logger/log4')
 const xml2js = require('xml2js');
 const msg = require('../utils/Msg');
 const we = require('../utils/Wechat');
+const meetting = require('../utils/Meetting');
 const config = require('../config')
 var fs=require('fs');
 var FormData = require('form-data');
@@ -208,69 +209,8 @@ module.exports = {
     }
   },
   async uploadPermMaterial(req, res, next){ 
-    var uploadUrl = '';
-    var material = 'helloworld/public/images/test.jpg'
-    var type ='news'    
-    var data = {}
-    //var data = 
-    var token = '40_UHfEselVhq6RkDWyh3W1VzTBGoKa7E2fQI2VNpCv3d7ISiCyFUutaiZ1YdAtbKNcq28TWz_l5qDddd8UXuDJ99UEe7S0Jr9n9tE_qAuMxFXqPCE8J2ApmvEksL4V8JnH728Be2LrrzfMm7U7YPDjADAKBP'
-  
     
-    try
-    {
-      material =  {
-        "articles": [{
-        "title": 'seantest',
-        "thumb_media_id": 'rg-P4AQ-1Njrj6-brqd5dEQTLot2ogyhX2HwbYEyrPU',
-        "author": 'sean',
-        "digest": 'zhaiyao',
-        "show_cover_pic": 1,
-        "content": 'zheshiceshiwenzhang',
-        "content_source_url": 'www.baidu.com',
-        "need_open_comment":1,
-        "only_fans_can_comment":1
-    },
-        //若新增的是多图文素材，则此处应还有几段articles结构
-    ]
-    }
-    await we.uploadImageText(token,material)
-    if(type === 'pic') uploadUrl = config.appInfo.uploadPermPics;
-    if(type === 'other') uploadUrl = config.appInfo.uploadPermOther;
-    if(type === 'news'){
-      uploadUrl = config.appInfo.uploadPermNews;
-      data = material
-    }else{
-      data.media = fs.createReadStream(material)
-    }
-    /*request.post({url: `${uploadUrl}access_token=${token}`, data}, function(err,response,body){
-      if(err) {
-          console.log('上传图片失败' , err);
-          return
-      }
-      let rdata = {
-          media_id: JSON.parse(response.body).media_id,         
-          type: 'image'
-      }　　　　　　
-         // return rdata
-         res.send({
-          code: 200,
-          id: rdata        
-        })
-      }) */
-     var ticket =await axios.post(`${uploadUrl}access_token=${token}`, data, function (error, response, body) {
-        if(error!==null){
-          reject("获取access_token失败 检查getAccessToken函数");
-        }
-        resolve(JSON.parse(body));
-      });   
-      res.send({
-        code: 200,
-        id: ticket.data        
-      })
-  }catch (error)
-    {
-      logger.logger.error("upload error: "+error.message)
-    }
+        await meetting.creatMeeting()
   },
   async uploadPermMaterial33(req, res, next){ 
     

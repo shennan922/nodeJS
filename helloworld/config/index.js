@@ -27,6 +27,13 @@ module.exports = {
     notFound: 404,
     internalError: 500
   },
+  meettingInfo:
+  {
+    X_TC_Key: "z0otjcWCO1ghNvGqvNS5XKXFK4sq06E5",
+    AppId: "210010383",
+    secret:"HTVTGbIdJqLrnDU26hZLIfKdaz5lWKMbMY37JOqtpUhghp82",
+    url:"https://api.meeting.qq.com/v1/meetings"
+  },
   appInfo:{
     appID: "wx43ce1ba96c04fd5c", 
     secret: "59d51309664e12b4dc7b69f37c60b945", 
