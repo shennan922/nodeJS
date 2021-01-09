@@ -17,6 +17,8 @@ router.get('/delete',MyContentController.delete)
 router.post('/create', MyContentController.create)
 router.post('/update', MyContentController.update)
 router.post('/createPdf', MyContentController.createPdf)
+//router.post('/deletePdf', MyContentController.deletePdf)
+router.post('/imageUpload', MyContentController.imageUpload)
 router.post('/photoUpload', ueditor(path.join(__dirname, '../../public'), function (req, res, next) {
     // ueditor 客户发起上传图片请求
     if (req.query.action === 'uploadimage') {

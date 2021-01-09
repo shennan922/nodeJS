@@ -56,7 +56,7 @@
         </el-col>
       </el-row>
        <!--增加SE页面-->
-      <el-dialog :title ="formStatus==1?'New SE':'Update SE'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogSE">
+      <el-dialog :title ="formStatus==1?'New SE':'Update SE'" :lock-scroll="true" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogSE">
           <el-form 
           ref="AddSEForm"
           :model="AddSEForm" 

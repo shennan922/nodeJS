@@ -11,6 +11,7 @@ module.exports = (app) => {
   router.use('/myContent', require('./MyContent'));
   router.use('/UE', require('./UE'));
   router.use('/images', require('./Download'));
+  router.use('/myPush', require('./MyPush'));
   app.use('/', router);
   
 }

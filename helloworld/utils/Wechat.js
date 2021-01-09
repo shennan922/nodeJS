@@ -4,6 +4,8 @@ const logger = require('../logger/log4')
 const NodeRSA = require('node-rsa');
 const axios = require('axios')
 var urlencode = require('urlencode');
+const fs = require('fs')
+var request = require('request')
 
 async function updateAccessToken (appId,appSecret)
 {
@@ -70,7 +72,52 @@ module.exports = {
       logger.logger.error("init token error: "+error.message)    
     }    
   },
-
+  async updateAccessToken (appId,appSecret)
+  {
+    try {
+      //const APP =  db.APPList.findByPk(req.params.id)
+      const url = `${config.appInfo.wxapi}/token?grant_type=client_credential&appid=${appId}&secret=${appSecret}`
+      wtoken =await axios.get(url, function (error, response, body) {
+        if(error!==null){
+          reject("获取access_token失败 检查getAccessToken函数");
+        }
+        resolve(JSON.parse(body));
+      });
+      var newToken = {
+        APPID: appId,
+        APPSecret: appSecret,
+        APPToken: wtoken.data.access_token      
+      }
+      db.APPList.update(newToken,{where:{APPID: appId}})    
+      return wtoken.data.access_token
+    }
+    catch(error)
+    {
+      logger.logger.error("update access token error: "+error.message) 
+    }
+  
+  },
+  async  getAccessToken (timestamp,appId)
+  {
+    try
+    {
+      // wechat = 'V4AN5dTnfjdedsKPrtBsRFdEUJFVs48aiYSalrL3w1x6dhoimXralgylULYrisCb5cO62+86ywj+T810FOC+SDgI4ZFYnT4PNcOoc1HqV3XB2ES6htB3NTu1bai1YfprSs0CQe25JAH6HXAsCg9GDlAbGmk6xBJn95RM8WLVmhk='
+      
+      if(Date.now()-timestamp>7200*1000)
+      {
+        return ''
+      }
+      else
+      {
+        const app = await db.APPList.findByPk(appId)
+        return app.APPToken
+      }
+    }
+    catch(error)
+    {
+      logger.logger.error("get access token error: "+error.message) 
+    }
+  },
   async uploadPermMaterial(type,material,token){
     var that = this;
     var form = {}
@@ -129,46 +176,53 @@ module.exports = {
     }
   },
   async uploadImage(token, material){ 
-    var material = 'helloworld/public/images/test123.jpg'   
+    //var material = 'helloworld/public/images/test123.jpg'   
     var data = {}
     try
     { 
-    data.media = fs.createReadStream(material)    
-    request.post({url: `${config.appInfo.uploadPermOther}access_token=${token}&type=image`, formData:data}, function(err,response,body){
-      if(err) {
-        logger.logger.error("upload image error: "+err.message)       
-      }
-      return JSON.parse(response.body).media_id
-      })   
-  }catch (error)
+      data.media = fs.createReadStream(material)  
+      let options = {
+        url: `${config.appInfo.uploadPermOther}access_token=${token}&type=image` ,
+        formData: data
+      };
+      return new Promise(function(resolve, reject){
+        request.post(options , function(error,response,body){
+          if(error){
+            reject(error);
+          }else{
+            console.log(JSON.parse(body))
+            resolve(JSON.parse(body).media_id);              
+          }
+        });
+      });
+    }catch (error)
     {
       logger.logger.error("upload error: "+error.message)
       return ''
     }
   },
+  
   async uploadImageText(token, material,refresh=1){ 
     var data = {}
-    //var data = 
-    try
-    {
-      material =  {
+    try{
+      /*
+      material = {
         "articles": [{
-        "title": 'seantest',
-        "thumb_media_id": 'rg-P4AQ-1Njrj6-brqd5dEQTLot2ogyhX2HwbYEyrPU',
-        "author": 'sean',
-        "digest": 'zhaiyao',
-        "show_cover_pic": 1,
-        "content": 'zheshiceshiwenzhang',
-        "content_source_url": 'www.baidu.com',
-        "need_open_comment":1,
-        "only_fans_can_comment":1
-    },
-      
-    ]
-    }
-     uploadUrl = config.appInfo.uploadPermNews;
-     data = material
-     var ticket =await axios.post(`${config.appInfo.uploadPermNews}access_token=${token}`, data, function (error, response, body) {
+          "title": 'seantest',
+          "thumb_media_id": 'rg-P4AQ-1Njrj6-brqd5dEQTLot2ogyhX2HwbYEyrPU',
+          "author": 'sean',
+          "digest": 'zhaiyao',
+          "show_cover_pic": 1,
+          "content": 'zheshiceshiwenzhang',
+          "content_source_url": 'www.baidu.com',
+          "need_open_comment":1,
+          "only_fans_can_comment":1
+        },]
+      }
+      */
+      uploadUrl = config.appInfo.uploadPermNews;
+      data = material
+      var ticket =await axios.post(`${config.appInfo.uploadPermNews}access_token=${token}`, data, function (error, response, body) {
         if(error!==null){
           logger.logger.error("upload image_text error: "+error.message)
           reject(error.message);
@@ -182,32 +236,33 @@ module.exports = {
       else{
         return ticket.data.media_id  
       }                
-  }catch (error)
+    }catch (error)
     {
       logger.logger.error("upload image_text error: "+error.message)
       return ''
     }
   },
-  async uploadPermMaterial(req, res, next){ 
-    
-    var token = '40_4ROYYyfp2I6G6ccvszmNvkfXDKV3RfJc-HdWVDl9MLzxLoIQIe_63v2mrCftpoorDw8bJhzHSz2tHOeIZ2dfSxFMxvvOG36N32mpdRlE52mzft-BOqCbq02Ioq2ADvgeghHlO36IN2fdxokvDOUhAJANYE'
+  async pushContentPreview(token,mediaID,openID){     
+    //var token = '40_4ROYYyfp2I6G6ccvszmNvkfXDKV3RfJc-HdWVDl9MLzxLoIQIe_63v2mrCftpoorDw8bJhzHSz2tHOeIZ2dfSxFMxvvOG36N32mpdRlE52mzft-BOqCbq02Ioq2ADvgeghHlO36IN2fdxokvDOUhAJANYE'
     try
     {
+      console.log(mediaID)
       data =  {
-        "touser":"oJVgv6a8CT5JWPbaS-21t2cp_NNk",
+        "touser":openID,
         "mpnews":{              
-          "media_id":"rg-P4AQ-1Njrj6-brqd5dEVIDdRjwT9hUjUsEphGRd4"               
+          "media_id":mediaID               
          },
         "msgtype":"mpnews" 
      }
-     var ticket =await axios.post(`${config.appInfo.sendMessageurl}access_token=${token}`, data, function (error, response, body) {
+     var ticket =await axios.post(`${config.appInfo.sendMessageurlpre}access_token=${token}`, data, function (error, response, body) {
         if(error!==null){
           reject("获取access_token失败 检查getAccessToken函数");
         }
         resolve(JSON.parse(body));
       });  
+      console.log(ticket)
       return  ticket.data
-  }catch (error)
+    }catch (error)
     {
       logger.logger.error("upload error: "+error.message)
     }
@@ -295,7 +350,8 @@ module.exports = {
 	},
   async updateAllTokens()
   {
-    /*try{
+    /*
+    try{
       var apps = await db.APPList.findAll()
       if (apps.length==0)
       {
@@ -309,7 +365,8 @@ module.exports = {
       
     }catch(error){
       logger.logger.error("update access tokens error: "+error.message) 
-    }*/
+    }
+    */
   }
 
 }
