@@ -29,10 +29,11 @@ module.exports = {
   },
   meettingInfo:
   {
-    X_TC_Key: "z0otjcWCO1ghNvGqvNS5XKXFK4sq06E5",
-    AppId: "210010383",
-    secret:"HTVTGbIdJqLrnDU26hZLIfKdaz5lWKMbMY37JOqtpUhghp82",
-    url:"https://api.meeting.qq.com/v1/meetings"
+    X_TC_Key: 'DDN9mu0QWkfKIaoHTFBs8yLpQbl8yl4n',
+    AppId: '210010383',
+    secret:'vUIxLu1MBycGhvAe5CyqVlQdPvHaj2VKquqaW6gEHJwP0nyz',
+    SDKId:'16100009891',
+    url:'https://api.meeting.qq.com/v1/meetings'
   },
   appInfo:{
     appID: "wx43ce1ba96c04fd5c", 

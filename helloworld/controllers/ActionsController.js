@@ -210,7 +210,96 @@ module.exports = {
   },
   async uploadPermMaterial(req, res, next){ 
     
-        await meetting.creatMeeting()
+    var type =3
+    var meeting_api = require('../utils/Meetting')(config.meettingInfo.X_TC_Key, config.meettingInfo.secret, config.meettingInfo.AppId,config.meettingInfo.SDKId);
+    if (type==1){
+      const sample_create_req = {
+        userid: 'admin',       //调用方用于标示用户的唯一 ID（例如企业用户可以为企业账户英文名、个人用户可以为手机号等）
+        instanceid: 1,          //用户的终端设备类型。[1:PC, 2:Mac, 3:Android, 4:iOS, 5:Web, 6:iPad, 7:Android Pad, 8:小程序] 
+        subject: 'tester\'s meeting',   //会议主题
+        type: 0,                        //会议类型 0-预约， 1-快速
+        hosts: [{ userid: 'admin' }],   //会议主持人的用户 ID，如果没有指定，主持人将被设定为上文的 userid，即 API 调用者。
+       // invitees: [{ userid: 'test1', is_anonymous: true, neck_name: 'anonimity' }, { userid: 'guest1' }, { userid: 'guest2' }], //邀请的参会者，可为空
+        invitees: [],
+        start_time: Math.floor(Date.now() / 1000) + '',             //预约会议的开始时间(以秒为单位的标准时间戳)
+        end_time: Math.floor(Date.now() / 1000) + 7200 + '',        //预约会议的结束时间(以秒为单位的标准时间戳)
+    
+        password: '1111',                                           //会议密码，可不填
+        settings: {                                                 //会议媒体参数配置
+            mute_enable_join: true,                                 //入会时静音
+            allow_unmute_self: false,                                //允许参会者取消静音
+            mute_all: false,                                        //全体静音 
+            host_video: true,                                       //主持人视频
+            participant_video: false,                               //参会者视频
+            enable_record: false,                                   //开启录播
+            play_ivr_on_leave: false,                               //参会者离开时播放提示音
+            play_ivr_on_join: false,                                //有新的与会者加入时播放提示音
+            live_url: false                                         //开启直播
+        }
+    };
+    meeting_api.create_meeting(sample_create_req)
+    .then((res) => {
+        console.log('create meeting ok, response:\n',  JSON.stringify(res, null, 4));
+    })
+    .catch((e) => {
+        console.log(e);
+    });
+
+    }else if(type==2){
+
+      var params = {
+        meeting_id: '14751167459700626889',
+        modify_meeting_req: {
+            subject: 'changed meeting',  //会议主题
+            userid: 'admin',    //会议创建者id
+            instanceid: 1,              //用户的终端设备类型。[1:PC, 2:Mac, 3:Android, 4:iOS, 5:Web, 6:iPad, 7:Android Pad, 8:小程序]
+            hosts: ["admin"],           //会议主持人的用户 ID，如果没有指定，主持人将被设定为上文的 userid，即 API 调用者。
+          //  invitees: ["test2", "guest", "guest2"],
+            start_time: Math.floor(Date.now() / 1000) + '',             //预约会议的开始时间(以秒为单位的标准时间戳)
+            end_time: Math.floor(Date.now() / 1000) + 7200 + '',        //预约会议的结束时间(以秒为单位的标准时间戳)
+            password: '1111',                                           //会议密码，可不填
+    
+            settings: {                                                 //会议媒体参数配置
+                mute_enable_join: true,                                 //入会时静音
+                allow_unmute_self: false,                                //允许参会者取消静音
+                mute_all: false,                                        //全体静音 
+                host_video: true,                                       //主持人视频
+                participant_video: false,                               //参会者视频
+                enable_record: false,                                   //开启录播
+                play_ivr_on_leave: false,                               //参会者离开时播放提示音
+                play_ivr_on_join: false,                                //有新的与会者加入时播放提示音
+                live_url: false                                         //开启直播
+            }
+        },
+    };
+
+    meeting_api.modify_meeting(params.meeting_id, params.modify_meeting_req)
+    .then((res) => {
+        console.log('create meeting ok, response:\n',  JSON.stringify(res, null, 4));
+    })
+    .catch((e) => {
+        console.log(e);
+    });
+
+    }else if(type==3){
+
+      var params = {
+        meeting_id: '14751167459700626889',  //有效的会议 ID。
+        userid: 'admin', //调用方用于标示用户的唯一 ID（例如企业用户可以为企业账户英文名、个人用户可以为手机号等）。
+        instanceid: 1,   //用户的终端设备类型。[1:PC, 2:Mac, 3:Android, 4:iOS, 5:Web, 6:iPad, 7:Android Pad, 8:小程序]
+        reason_code: 1, //原因代码，可为用户自定义。
+        reason_detail: '取消会议', //详细取消原因描述, 可为自定义。
+    };
+    meeting_api.cancel_meeting(params.meeting_id, params.userid, params.instanceid, params.reason_code, params.reason_detail)
+    .then((res) => {
+        console.log('cancel by id ok, meeting_id:\n',  JSON.stringify(res, null, 4));
+    })
+    .catch((e) => {
+        console.log(e);
+    });
+
+    }
+
   },
   async uploadPermMaterial33(req, res, next){ 
     
