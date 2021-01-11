@@ -75,148 +75,148 @@
        <!--增加Meeting页面-->
       <el-dialog :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogMeeting">
         <div style="height:60vh;">
-        <el-scrollbar style="height:100%;">
-          <el-form 
-          ref="AddMeetingForm"
-          :model="AddMeetingForm" 
-          :rules="addMeetingFormRules" 
-          label-position="left"          
-          >
-          <!-- :rules="formStatus!=0?addMeetingFormRules:null"  -->
-            <el-row>
-              <el-col :span="6" class="el-col_NewMettingLeft">
-                <p class="toptitle">基本信息</p>
-                <p class="h4title">请填写会议基本信息</p>
-              </el-col>
-              <el-col :span="14" class="el-col_NewMetting">
-                <el-form-item label="会议名称" prop="MeetingDesc">
-                  <el-input v-model="AddMeetingForm.MeetingDesc" :disabled="formStatus==1?false:true"></el-input>
-                </el-form-item>
-                <el-row>
-                  <p style="text-align:left">开始时间</p>
-                  <el-col :span="8">
-                    <el-form-item prop="StartDate">
-                      <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" class="startDate"></el-date-picker>
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span="8">  
-                    <el-form-item lable="开始时间" prop="StartTime">
-                      <el-time-select v-model="AddMeetingForm.StartTime" :picker-options="{start: '08:30',step: '00:15',end: '18:30'}" placeholder="选择时间" class="startTime"></el-time-select>
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-                <el-row>
-                  <p style="text-align:left">结束时间</p>
-                  <el-col :span="8">
-                    <el-form-item lable ="结束时间" prop="EndDate">
-                      <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.EndDate" type="date" placeholder="选择日期" class="startDate"></el-date-picker>
-                    </el-form-item>
-                  </el-col>
-                  <el-col :span="8">
-                    <el-form-item lable ="结束时间" prop="EndTime">
-                      <el-time-select v-model="AddMeetingForm.EndTime" :picker-options="{start: '08:30',step: '00:15',end: '18:30'}" placeholder="选择时间" class="startTime"></el-time-select> 
-                    </el-form-item>
-                  </el-col>
-                </el-row>
-                <el-form-item prop="IsRecurrent">
-                  <span slot="label">
-                   <el-checkbox v-model="AddMeetingForm.IsRecurrent">周期性会议</el-checkbox>
-                  </span>
-                </el-form-item>
-                <el-form-item prop="Room">
-                  <p style="text-align:left">会议地点(选填)</p>
-                  <el-input v-model="AddMeetingForm.Room" placeholder="请输入会议地点"></el-input>
-                </el-form-item>
-                <el-form-item prop="Status" style="text-align:left" >
-                  <p style="text-align:left">会议状态</p>
-                  <el-radio v-model="AddMeetingForm.Status" label="1">Open</el-radio>
-                  <el-radio v-model="AddMeetingForm.Status" label="0">Close</el-radio>
-                </el-form-item>
-                <el-form-item prop="Comments">
-                  <p style="text-align:left">备注</p>
-                  <el-input v-model="AddMeetingForm.Comments" placeholder="请填写备注"></el-input>
-                </el-form-item>
-              </el-col>
-            </el-row>
+          <el-scrollbar style="height:100%;">
+            <el-form 
+            ref="AddMeetingForm"
+            :model="AddMeetingForm" 
+            :rules="addMeetingFormRules" 
+            label-position="left"          
+            >
+            <!-- :rules="formStatus!=0?addMeetingFormRules:null"  -->
+              <el-row>
+                <el-col :span="6" class="el-col_NewMettingLeft">
+                  <p class="toptitle">基本信息</p>
+                  <p class="h4title">请填写会议基本信息</p>
+                </el-col>
+                <el-col :span="14" class="el-col_NewMetting">
+                  <el-form-item label="会议名称" prop="MeetingDesc">
+                    <el-input v-model="AddMeetingForm.MeetingDesc" :disabled="formStatus==1?false:true"></el-input>
+                  </el-form-item>
+                  <el-row>
+                    <p style="text-align:left">开始时间</p>
+                    <el-col :span="8">
+                      <el-form-item prop="StartDate">
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" class="startDate"></el-date-picker>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="8">  
+                      <el-form-item lable="开始时间" prop="StartTime">
+                        <el-time-select v-model="AddMeetingForm.StartTime" :picker-options="{start: '08:30',step: '00:15',end: '18:30'}" placeholder="选择时间" class="startTime"></el-time-select>
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <p style="text-align:left">结束时间</p>
+                    <el-col :span="8">
+                      <el-form-item lable ="结束时间" prop="EndDate">
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.EndDate" type="date" placeholder="选择日期" class="startDate"></el-date-picker>
+                      </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
+                      <el-form-item lable ="结束时间" prop="EndTime">
+                        <el-time-select v-model="AddMeetingForm.EndTime" :picker-options="{start: '08:30',step: '00:15',end: '18:30'}" placeholder="选择时间" class="startTime"></el-time-select> 
+                      </el-form-item>
+                    </el-col>
+                  </el-row>
+                  <el-form-item prop="IsRecurrent">
+                    <span slot="label">
+                    <el-checkbox v-model="AddMeetingForm.IsRecurrent">周期性会议</el-checkbox>
+                    </span>
+                  </el-form-item>
+                  <el-form-item prop="Room">
+                    <p style="text-align:left">会议地点(选填)</p>
+                    <el-input v-model="AddMeetingForm.Room" placeholder="请输入会议地点"></el-input>
+                  </el-form-item>
+                  <el-form-item prop="Status" style="text-align:left" >
+                    <p style="text-align:left">会议状态</p>
+                    <el-radio v-model="AddMeetingForm.Status" label="1">Open</el-radio>
+                    <el-radio v-model="AddMeetingForm.Status" label="0">Close</el-radio>
+                  </el-form-item>
+                  <el-form-item prop="Comments">
+                    <p style="text-align:left">备注</p>
+                    <el-input v-model="AddMeetingForm.Comments" placeholder="请填写备注"></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
 
-            <el-row>
-              <el-col :span="6" class="el-col_NewMettingLeft">
-                <p class="h2title">保密</p>
-                <p class="h4title">成员将需要密码入会</p>
-                <!-- <p class="h2title">会议人数上限</p> -->
-                <!-- <p class="h4title">同一场议会中允许参会的用户上限</p> -->
-                <p class="middletitle">邀请</p>
-                <p class="h4title">将改会议添加至被邀请成员的会议列表</p>
-                <p class="middletitle">指定主持人</p>
-                <p class="h4title">您不在会议时,该邀请成员优先成为主持人</p>
-                <p class="middletitle">设置</p>
-                <p class="h4title">请勾选相关的会议设置</p>
-              </el-col>
-              <el-col :span="14" class="el-col_NewMetting"> 
-                <el-form-item prop="Password" >
-                  <p style="text-align:left">入会密码(选填)</p>
-                  <el-input v-model="AddMeetingForm.Password" placeholder="请输入4~6位数字密码"></el-input> 
-                </el-form-item>
-                <!-- <el-form-item prop="LimitNumber">
-                  <el-input v-model="AddMeetingForm.LimitNumber" placeholder="1~2000人"></el-input>
-                </el-form-item> -->
-                <el-form-item prop="LimitNumber">
-                  <p style="text-align:left">邀请成员0/300(选填)</p>
-                  <el-input v-model="AddMeetingForm.LimitNumber" placeholder="请输入成员姓名搜索"></el-input>
-                </el-form-item>
-                <el-form-item prop="AssignedHost">
-                  <p style="text-align:left">指定主持人0/10(选填)</p>
-                  <el-input v-model="AddMeetingForm.AssignedHost" placeholder="请输入成员姓名搜索"></el-input>
-                </el-form-item>
-                <el-form-item prop="WaitingRoom" style="text-align:left">
-                    <el-checkbox v-model="AddMeetingForm.WaitingRoom">开启等候室</el-checkbox>
-                </el-form-item>
-                 <el-form-item prop="JoinBeforeHost" style="text-align:left">
-                    <el-checkbox v-model="AddMeetingForm.JoinBeforeHost">允许成员在主持人进会前加入会议</el-checkbox>
-                </el-form-item>
-                 <el-form-item prop="JoinMute" style="text-align:left">
-                    <el-checkbox v-model="AddMeetingForm.JoinMute">成员加入会议时自动静音</el-checkbox>
-                </el-form-item>
-                 <el-form-item prop="WaterPrint" style="text-align:left">
-                    <el-checkbox v-model="AddMeetingForm.WaterPrint">开启屏幕水印</el-checkbox>
-                </el-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="6" class="el-col_NewMettingLeft">
-                <!-- <p class="h2title">文档</p> -->
-                <!-- <p class="h4title">对本次会议相关的文档进行操作</p> -->
-                <!-- <p class="h2title">直播</p>
-                <p class="h4title">直播相关的设置项</p> -->
-                <p class="h2titlenumber">入会成员设置</p>
-                <p class="h4title">请设置允许入会的用户</p>
-                <p class="h2title">同声传译</p>
-                <p class="h4title">启动后,可配置同传译员</p>
-              </el-col>
-              <el-col :span="14" class="el-col_NewMetting">
-                <!-- <el-form-item prop="aa" >
-                  <span slot="label">
-                    <el-input v-model="AddSEForm.HospitalID" placeholder="ChooseFile"></el-input>
-                    <br><el-checkbox v-model="checked">允许成员上传文档</el-checkbox>
-                    <br><br><el-checkbox v-model="checked">开启直播</el-checkbox>
-                  </span>  
-                </el-form-item> -->
-                <el-form-item prop="InsideOrg" style="text-align:left" >
-                    <el-radio v-model="AddMeetingForm.InsideOrg" label="0">所有人可入会</el-radio>
-                    <el-radio v-model="AddMeetingForm.InsideOrg" label="1">仅企业内部人员可入会</el-radio>  
-                </el-form-item>
-                <el-form-item prop="Simultaneous" style="text-align:left;margin-top:15%">
-                  <el-checkbox v-model="AddMeetingForm.Simultaneous">启用同声传译</el-checkbox>
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click.native="createSubmit" type="primary">预定</el-button>
-            <el-button @click.native="handleClose()"  type="primary" class="returnButton">返回</el-button>
-            <!-- <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button> -->
-         </div>
-        </el-scrollbar>
+              <el-row>
+                <el-col :span="6" class="el-col_NewMettingLeft">
+                  <p class="h2title">保密</p>
+                  <p class="h4title">成员将需要密码入会</p>
+                  <!-- <p class="h2title">会议人数上限</p> -->
+                  <!-- <p class="h4title">同一场议会中允许参会的用户上限</p> -->
+                  <p class="middletitle">邀请</p>
+                  <p class="h4title">将改会议添加至被邀请成员的会议列表</p>
+                  <p class="middletitle">指定主持人</p>
+                  <p class="h4title">您不在会议时,该邀请成员优先成为主持人</p>
+                  <p class="middletitle">设置</p>
+                  <p class="h4title">请勾选相关的会议设置</p>
+                </el-col>
+                <el-col :span="14" class="el-col_NewMetting"> 
+                  <el-form-item prop="Password" >
+                    <p style="text-align:left">入会密码(选填)</p>
+                    <el-input v-model="AddMeetingForm.Password" placeholder="请输入4~6位数字密码"></el-input> 
+                  </el-form-item>
+                  <!-- <el-form-item prop="LimitNumber">
+                    <el-input v-model="AddMeetingForm.LimitNumber" placeholder="1~2000人"></el-input>
+                  </el-form-item> -->
+                  <el-form-item prop="LimitNumber">
+                    <p style="text-align:left">邀请成员0/300(选填)</p>
+                    <el-input v-model="AddMeetingForm.LimitNumber" placeholder="请输入成员姓名搜索"></el-input>
+                  </el-form-item>
+                  <el-form-item prop="AssignedHost">
+                    <p style="text-align:left">指定主持人0/10(选填)</p>
+                    <el-input v-model="AddMeetingForm.AssignedHost" placeholder="请输入成员姓名搜索"></el-input>
+                  </el-form-item>
+                  <el-form-item prop="WaitingRoom" style="text-align:left">
+                      <el-checkbox v-model="AddMeetingForm.WaitingRoom">开启等候室</el-checkbox>
+                  </el-form-item>
+                  <el-form-item prop="JoinBeforeHost" style="text-align:left">
+                      <el-checkbox v-model="AddMeetingForm.JoinBeforeHost">允许成员在主持人进会前加入会议</el-checkbox>
+                  </el-form-item>
+                  <el-form-item prop="JoinMute" style="text-align:left">
+                      <el-checkbox v-model="AddMeetingForm.JoinMute">成员加入会议时自动静音</el-checkbox>
+                  </el-form-item>
+                  <el-form-item prop="WaterPrint" style="text-align:left">
+                      <el-checkbox v-model="AddMeetingForm.WaterPrint">开启屏幕水印</el-checkbox>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="6" class="el-col_NewMettingLeft">
+                  <!-- <p class="h2title">文档</p> -->
+                  <!-- <p class="h4title">对本次会议相关的文档进行操作</p> -->
+                  <!-- <p class="h2title">直播</p>
+                  <p class="h4title">直播相关的设置项</p> -->
+                  <p class="h2titlenumber">入会成员设置</p>
+                  <p class="h4title">请设置允许入会的用户</p>
+                  <p class="h2title">同声传译</p>
+                  <p class="h4title">启动后,可配置同传译员</p>
+                </el-col>
+                <el-col :span="14" class="el-col_NewMetting">
+                  <!-- <el-form-item prop="aa" >
+                    <span slot="label">
+                      <el-input v-model="AddSEForm.HospitalID" placeholder="ChooseFile"></el-input>
+                      <br><el-checkbox v-model="checked">允许成员上传文档</el-checkbox>
+                      <br><br><el-checkbox v-model="checked">开启直播</el-checkbox>
+                    </span>  
+                  </el-form-item> -->
+                  <el-form-item prop="InsideOrg" style="text-align:left" >
+                      <el-radio v-model="AddMeetingForm.InsideOrg" label="0">所有人可入会</el-radio>
+                      <el-radio v-model="AddMeetingForm.InsideOrg" label="1">仅企业内部人员可入会</el-radio>  
+                  </el-form-item>
+                  <el-form-item prop="Simultaneous" style="text-align:left;margin-top:15%">
+                    <el-checkbox v-model="AddMeetingForm.Simultaneous">启用同声传译</el-checkbox>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-form>            
+          </el-scrollbar>
+        </div>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click.native="createSubmit" type="primary">预定</el-button>
+          <el-button @click.native="handleClose()"  type="primary" class="returnButton">返回</el-button>
+          <!-- <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button> -->
         </div>
       </el-dialog>
   </div>
@@ -800,6 +800,14 @@ body .el-table th.gutter{
     text-align:left;
     font-size:20px;
     margin-top:1px;
+  }
+  .el-scrollbar__wrap {
+    overflow-x: hidden;
+    height: 100%;
+  }
+  .el-scrollbar__thumb {
+    overflow-x: hidden;
+    height: 0%;
   }
 } 
 .block{

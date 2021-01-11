@@ -178,12 +178,12 @@
                   </el-form-item>
                 </el-col>
               </el-row>
-            </el-form>
-            <div style="margin-right:10px" slot="footer" class="dialog-footer">
-                <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
-                <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
-            </div>
+            </el-form>            
           </el-scrollbar>
+        </div>
+        <div style="margin-right:10px" slot="footer" class="dialog-footer">
+          <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
+          <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
         </div>
       </el-dialog>
   </div>
