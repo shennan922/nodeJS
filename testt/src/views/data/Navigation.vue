@@ -21,16 +21,19 @@
                   <el-menu-item index="MySE">
                     <span slot="title">MySE</span>
                   </el-menu-item>
-                  <el-menu-item index="3">
+                  <el-menu-item index="MyPush">
                     <span slot="title">My Push</span>
                   </el-menu-item>
-                  <el-menu-item index="4">
+                  <el-menu-item index="MyContent">
                     <span slot="title">My Content</span>
                   </el-menu-item>
-                  <el-menu-item index="5">
+                  <el-menu-item index="OnlineMeeting">
+                    <span slot="title">Online Meeting</span>
+                  </el-menu-item>
+                  <el-menu-item index="RequestList">
                     <span slot="title">Request List</span>
                   </el-menu-item>
-                  <el-menu-item index="6">
+                  <el-menu-item index="Analytics">
                     <span slot="title">Analytics</span>
                   </el-menu-item>
                   <el-menu-item index="Log">
@@ -121,21 +124,25 @@ export default {
         case "Navigation":
           this.$router.push("/data/Test");
           break;
-           case "3":
+           case "MyPush":
           this.$router.push("/data/MyPush");
           this.breadcrumbItems = "My Push";
           break;
-          case "4":
+          case "MyContent":
           this.$router.push("/data/MyContent");
           this.breadcrumbItems = "My Content";
           break;
-          case "5":
+          case "RequestList":
           this.$router.push("/data/RequestList");
           this.breadcrumbItems = "Request List";
           break;
-          case "6":
+          case "Analytics":
           this.$router.push("/data/Analytics");
           this.breadcrumbItems = "Analytics";
+          break;
+          case "OnlineMeeting":
+          this.$router.push("/data/OnlineMeeting");
+          this.breadcrumbItems = "OnlineMeeting";
           break;
       }
     },
@@ -146,7 +153,7 @@ export default {
       alert('123')
       var ii =WechatService.getQRCode('ceshile').then(url=>
       {
-         alert(url)
+         alert("url"+url)
       })
       console.log(ii);
             //清除token
