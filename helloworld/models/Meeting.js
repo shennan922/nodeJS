@@ -76,7 +76,7 @@ module.exports = (sequelize, DataTypes) => {
       field: 'JoinBeforeHost'
     },
     JoinMute: {
-      type: DataTypes.INTEGER,      
+      type: DataTypes.BOOLEAN,      
       field: 'JoinMute'
     },
     WaterPrint: {

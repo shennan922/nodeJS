@@ -71,7 +71,7 @@ module.exports = {
     meeting_api.create_meeting(create_params)
     .then((result) => {
       var newMeeting = {
-        MeetingID: result.meeting_info_list.meeting_id,	              //会议ID - 自动生成ID
+        MeetingID: result.meeting_info_list[0].meeting_id,	              //会议ID - 自动生成ID
         MeetingDesc: req.body.MeetingDesc,	          //会议名称
         Status: req.body.Status,	                    //状态 - 0关闭/1开放
         StartTime: req.body.StartTime,	              //开始时间
@@ -94,8 +94,8 @@ module.exports = {
         AttendFileUpload: req.body.AttendFileUpload	, //允许成员上传文档 - 0/1
         Simultaneous: req.body.Simultaneous,        	//同声传译 - 0/1
         LiveStream: req.body.LiveStream,            	//直播 - 0/1
-        MeetingLink: result.meeting_info_list.join_url,
-        MeetingCode: result.meeting_info_list.meeting_code,
+        MeetingLink: result.meeting_info_list[0].join_url,
+        MeetingCode: result.meeting_info_list[0].meeting_code,
         CreateDt: req.body.CreateDt.join_url,
         ModifyDt: null
       }
