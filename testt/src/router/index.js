@@ -93,6 +93,12 @@ const routes = [
         meta: { auth: true, title: 'Request List' },
         component: () => import('../views/data/RequestList.vue')
       },
+      {
+        path: '/data/OnlineMeeting',
+        name: 'OnlineMeeting',
+        meta: { auth: true, title: 'OnlineMeeting' },
+        component: () => import('../views/data/OnlineMeeting.vue')
+      },
     ]
   },
 
