@@ -80,8 +80,8 @@
       </el-row>
       <!--增加Content页面-->
       <el-dialog :title ="formStatus==1?'Create a New Paper':'Update a Paper'" :lock-scroll="true" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent" @close="handleFormClose" :close-on-click-modal="false" :modal-append-to-body="false">
-        <!--<div style="height:70vh;overflow:auto;" class="scrollbar">
-          <el-scrollbar style="height:100%; overflow-x:hidden;">-->
+        <div style="height:70vh;overflow:auto;" class="scrollbar">
+          <el-scrollbar style="height:100%">
             <el-form 
             ref="AddContentForm"
             :model="AddContentForm" 
@@ -183,8 +183,8 @@
                 <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
                 <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
             </div>
-          <!--</el-scrollbar>
-        </div>-->
+          </el-scrollbar>
+        </div>
       </el-dialog>
   </div>
 </template>
@@ -802,6 +802,7 @@ export default {
   align-items: center;
 }
 
+  
 .top{
   display: flex;
   justify-content: space-between;
@@ -886,7 +887,14 @@ export default {
     height: 178px;
     display: block;
   }
-  
+  .el-scrollbar__wrap {
+    overflow-x: hidden;
+    height: 100%;
+  }
+  .el-scrollbar__thumb {
+    overflow-x: hidden;
+    height: 0%;
+  }
 }
 .el-tag {
   margin-right: 10px;
@@ -894,6 +902,5 @@ export default {
 
   } 
 
-  
-  
+
 </style>

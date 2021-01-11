@@ -11,22 +11,23 @@
           
           <el-table 
           :model="MeetingForm" 
-          :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
+          :data="getMeetingList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
           :header-cell-style="tableHeaderColor" 
           @sort-change="changeTableSort" class="formSE"     
           ref="SeTable"
           >
-            <el-table-column min-width="10%" prop="MeetingID" label="Id" sortable="custom"></el-table-column>
+            <el-table-column min-width="8%" prop="MeetingID" label="Id" sortable="custom"></el-table-column>
             <el-table-column min-width="10%" prop="MeetingDesc" label="Title" ></el-table-column>
-            <el-table-column min-width="18%" prop="MeetingLink" label="AdminLink(请使用Chrome或Safiri打开)" sortable="custom">
+            <el-table-column min-width="15%" prop="MeetingLink" label="AdminLink(请使用Chrome或Safiri打开)" sortable="custom">
               <template scope="scope">
-                  <div>{{scope.row.MeetingLink}}
-                    <el-button  @click="copyText(scope.row.MeetingLink)" class="copyButton"><i class = "el-icon-document-copy"></i></el-button>
-                  </div>
+                <div>
+                  <a :href="scope.row.MeetingLink">召开会议</a>
+                  <el-button  @click="copyText(scope.row.MeetingLink)" class="copyButton"><i class = "el-icon-document-copy"></i></el-button>
+                </div>
               </template>
             </el-table-column>
-            <el-table-column min-width="10%" prop="Status" label="Status"></el-table-column>
-            <el-table-column min-width="15%" prop="MeetingLink" label="Attachedlink ">
+            <el-table-column min-width="10%" prop="Status" label="Status" :formatter="statusFormat"></el-table-column>
+            <el-table-column min-width="18%" prop="MeetingLink" label="AttachedLink ">
               <template scope="scope">
                   <div>{{scope.row.MeetingLink}}
                     <el-button  @click="copyText(scope.row.MeetingLink)" class="copyButton"><i class = "el-icon-document-copy"></i></el-button>
@@ -46,7 +47,7 @@
                     placement="right"
                     trigger="click">
                   <el-image :src="QRurl" date-qrid="245092"></el-image>
-                  <el-button size="mini" slot="reference" type="info" @click="generateQR(scope.row.SEID)"  plain class="buttonQRCode"><i class="el-icon-picture-outline"></i>Export</el-button>
+                  <el-button size="mini" slot="reference" type="info" @click="generateQR(scope.row.MeetingLink)" plain class="buttonQRCode"><i class="el-icon-picture-outline"></i>Export</el-button>
                 </el-popover>
                 </template>
             </el-table-column>
@@ -66,7 +67,7 @@
               :page-sizes="[1, 5, 10]"
               :page-size="pageSize"
               layout="total, sizes, prev, pager, next, jumper"
-              :total= "getSEList.length">
+              :total= "getMeetingList.length">
             </el-pagination>
           </div>
         </el-col>
@@ -124,10 +125,10 @@
                   <p style="text-align:left">会议地点(选填)</p>
                   <el-input v-model="AddMeetingForm.Room" placeholder="请输入会议地点"></el-input>
                 </el-form-item>
-                <el-form-item prop="Status" style="text-align:left">
+                <el-form-item prop="Status" style="text-align:left" >
                   <p style="text-align:left">会议状态</p>
-                  <el-radio v-model="AddMeetingForm.Status" label="0">Open</el-radio>
-                  <el-radio v-model="AddMeetingForm.Status" label="1">Close</el-radio>
+                  <el-radio v-model="AddMeetingForm.Status" label="1">Open</el-radio>
+                  <el-radio v-model="AddMeetingForm.Status" label="0">Close</el-radio>
                 </el-form-item>
                 <el-form-item prop="Comments">
                   <p style="text-align:left">备注</p>
@@ -368,7 +369,7 @@ export default {
   methods: {   
     HandleCancel(row){
       MeetingService.MeetingClose({
-        "UserID":"xxxx",
+        "UserID":"admin",
         "MeetingID": row.MeetingID,
         "ReasonCode":1,
         "ReasonDetail":"",
@@ -471,7 +472,7 @@ export default {
     },
     //设置表头行的样式
     tableHeaderColor({ row, column, rowIndex, columnIndex }) {
-      return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left";
+      return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left;white-space: pre-line;";
     },
     handleAdd() {
       this.formStatus = 1
@@ -538,6 +539,14 @@ export default {
       this.changeFlag = false
       this.dialogCreateVisible = false;
     },
+    statusFormat(row){
+      if (row.Status === 1) {
+        return "正常";
+      } 
+      else {
+        return "取消";
+      }
+    },
     getCurrentTime(){
       var myDate = new Date()
       var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
@@ -556,7 +565,7 @@ export default {
           this.$confirm('确认提交？', '提示', {}).then(async() => {   
             await MeetingService.MeetingCreate(
               {
-                  UserID:"xxxx",
+                  UserID:"admin",
                   MeetingID:"",
                   MeetingDesc:this.AddMeetingForm.MeetingDesc, 
                   Status:  this.AddMeetingForm.Status,
@@ -677,7 +686,7 @@ export default {
     },
   },
   computed: {
-      getSEList () {
+      getMeetingList () {
         const searchTableInfo = this.searchTableInfo
         if (searchTableInfo) {
           return this.getSearchInfo.filter(data => {
@@ -743,7 +752,6 @@ body .el-table th.gutter{
     table-layout: auto;
   } 
 }
-
 /deep/.dialogMeeting{
   // .el-dialog__header{
   // text-align: left;

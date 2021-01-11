@@ -150,11 +150,7 @@ export default {
       return variables;
     },
     logout() {
-      alert('123')
-      var ii =WechatService.getQRCode('ceshile').then(url=>
-      {
-         alert("url"+url)
-      })
+      var ii =WechatService.getQRCode('ceshile')
       console.log(ii);
             //清除token
       //window.sessionStorage.clear();
