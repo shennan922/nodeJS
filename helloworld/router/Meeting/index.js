@@ -11,6 +11,6 @@ router.use(function(req, res, next)
 router.get('/getList', Meeting.getList)
 router.post('/create', Meeting.create)
 router.post('/update', Meeting.update)
-router.get('/delete',Meeting.delete)
+router.post('/close',Meeting.close)
 
 module.exports = router;

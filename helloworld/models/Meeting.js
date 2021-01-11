@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
   
   Model.init({
     MeetingID: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING(400),
       primaryKey: true,
       field: 'MeetingID'
     },
