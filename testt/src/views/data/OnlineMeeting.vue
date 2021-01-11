@@ -42,7 +42,7 @@
                 </template>
             </el-table-column> -->
             <el-table-column min-width="8%" label="">
-              <template slot-scope="scope">
+              <template>
                 <el-popover
                     placement="right"
                     trigger="click">
@@ -74,6 +74,8 @@
       </el-row>
        <!--增加Meeting页面-->
       <el-dialog :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogMeeting">
+        <div style="height:60vh;">
+        <el-scrollbar style="height:100%;">
           <el-form 
           ref="AddMeetingForm"
           :model="AddMeetingForm" 
@@ -214,7 +216,8 @@
             <el-button @click.native="handleClose()"  type="primary" class="returnButton">返回</el-button>
             <!-- <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button> -->
          </div>
-
+        </el-scrollbar>
+        </div>
       </el-dialog>
   </div>
 </template>
