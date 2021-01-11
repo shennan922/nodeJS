@@ -11,29 +11,30 @@
           
           <el-table 
           :model="MeetingForm" 
-          :data="getSEList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
+          :data="getMeetingList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
           :header-cell-style="tableHeaderColor" 
           @sort-change="changeTableSort" class="formSE"     
           ref="SeTable"
           >
-            <el-table-column min-width="10%" prop="MeetingID" label="Id" sortable="custom"></el-table-column>
+            <el-table-column min-width="8%" prop="MeetingID" label="Id" sortable="custom"></el-table-column>
             <el-table-column min-width="10%" prop="MeetingDesc" label="Title" ></el-table-column>
-            <el-table-column min-width="18%" prop="MeetingLink" label="AdminLink(请使用Chrome或Safiri打开)" sortable="custom">
+            <el-table-column min-width="15%" prop="MeetingLink" label="AdminLink(请使用Chrome或Safiri打开)" sortable="custom">
+              <template scope="scope">
+                <div>
+                  <a :href="scope.row.MeetingLink">召开会议</a>
+                  <el-button  @click="copyText(scope.row.MeetingLink)" class="copyButton"><i class = "el-icon-document-copy"></i></el-button>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column min-width="10%" prop="Status" label="Status" :formatter="statusFormat"></el-table-column>
+            <el-table-column min-width="18%" prop="MeetingLink" label="Attachedlink ">
               <template scope="scope">
                   <div>{{scope.row.MeetingLink}}
                     <el-button  @click="copyText(scope.row.MeetingLink)" class="copyButton"><i class = "el-icon-document-copy"></i></el-button>
                   </div>
               </template>
             </el-table-column>
-            <el-table-column min-width="10%" prop="Status" label="Status"></el-table-column>
-            <el-table-column min-width="15%" prop="MeetingLink" label="Attachedlink ">
-              <template scope="scope">
-                  <div>{{scope.row.MeetingLink}}
-                    <el-button  @click="copyText(scope.row.MeetingLink)" class="copyButton"><i class = "el-icon-document-copy"></i></el-button>
-                  </div>
-              </template>
-            </el-table-column>
-            <el-table-column min-width="15%" prop="MLName" label="CreateDate"></el-table-column>
+            <el-table-column min-width="15%" prop="CreateDt" label="CreateDate"></el-table-column>
             <!-- <el-table-column min-width="15%" label="操作"  align="center">
                 <template scope="scope">
                     <el-tooltip class="item" effect="dark" :content="scope.row.url" placement="top">
@@ -46,12 +47,12 @@
                     placement="right"
                     trigger="click">
                   <el-image :src="QRurl" date-qrid="245092"></el-image>
-                  <el-button size="mini" slot="reference" type="info" @click="generateQR(scope.row.SEID)"  plain class="buttonQRCode"><i class="el-icon-picture-outline"></i>Export</el-button>
+                  <el-button size="mini" slot="reference" type="info" plain class="buttonQRCode"><i class="el-icon-picture-outline"></i>Export</el-button>
                 </el-popover>
                 </template>
             </el-table-column>
             <el-table-column min-width="16%" label="">
-              <template slot-scope="scope">
+              <template>
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" plain><i class="el-icon-edit"></i>Edit</el-button>
                 <el-button size="mini" type="info" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
               </template>
@@ -66,7 +67,7 @@
               :page-sizes="[1, 5, 10]"
               :page-size="pageSize"
               layout="total, sizes, prev, pager, next, jumper"
-              :total= "getSEList.length">
+              :total= "getMeetingList.length">
             </el-pagination>
           </div>
         </el-col>
@@ -124,10 +125,10 @@
                   <p style="text-align:left">会议地点(选填)</p>
                   <el-input v-model="AddMeetingForm.Room" placeholder="请输入会议地点"></el-input>
                 </el-form-item>
-                <el-form-item prop="Status" style="text-align:left">
+                <el-form-item prop="Status" style="text-align:left" >
                   <p style="text-align:left">会议状态</p>
-                  <el-radio v-model="AddMeetingForm.Status" label="0">Open</el-radio>
-                  <el-radio v-model="AddMeetingForm.Status" label="1">Close</el-radio>
+                  <el-radio v-model="AddMeetingForm.Status" label="1">Open</el-radio>
+                  <el-radio v-model="AddMeetingForm.Status" label="0">Close</el-radio>
                 </el-form-item>
                 <el-form-item prop="Comments">
                   <p style="text-align:left">备注</p>
@@ -519,6 +520,14 @@ export default {
       this.changeFlag = false
       this.dialogCreateVisible = false;
     },
+    statusFormat(row){
+      if (row.Status === 1) {
+        return "开启";
+      } 
+      else {
+        return "关闭";
+      }
+    },
     getCurrentTime(){
       var myDate = new Date()
       var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
@@ -658,7 +667,7 @@ export default {
     },
   },
   computed: {
-      getSEList () {
+      getMeetingList () {
         const searchTableInfo = this.searchTableInfo
         if (searchTableInfo) {
           return this.getSearchInfo.filter(data => {
