@@ -96,12 +96,12 @@
                     <p style="text-align:left">开始时间</p>
                     <el-col :span="8">
                       <el-form-item prop="StartDate">
-                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" class="startDate"></el-date-picker>
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate"></el-date-picker>
                       </el-form-item>
                     </el-col>
                     <el-col :span="8">  
                       <el-form-item lable="开始时间" prop="StartTime">
-                        <el-time-select v-model="AddMeetingForm.StartTime" :picker-options="{start: '08:30',step: '00:15',end: '18:30'}" placeholder="选择时间" class="startTime"></el-time-select>
+                        <el-time-select v-model="AddMeetingForm.StartTime" :picker-options="{start: '08:30',step: '00:15',end: '23:30'}" placeholder="选择时间" class="startTime"></el-time-select>
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -109,12 +109,12 @@
                     <p style="text-align:left">结束时间</p>
                     <el-col :span="8">
                       <el-form-item lable ="结束时间" prop="EndDate">
-                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.EndDate" type="date" placeholder="选择日期" class="startDate"></el-date-picker>
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.EndDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate"></el-date-picker>
                       </el-form-item>
                     </el-col>
                     <el-col :span="8">
                       <el-form-item lable ="结束时间" prop="EndTime">
-                        <el-time-select v-model="AddMeetingForm.EndTime" :picker-options="{start: '08:30',step: '00:15',end: '18:30'}" placeholder="选择时间" class="startTime"></el-time-select> 
+                        <el-time-select v-model="AddMeetingForm.EndTime" :picker-options="{start: '08:30',step: '00:15',end: '23:30'}" placeholder="选择时间" class="startTime"></el-time-select> 
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -127,11 +127,11 @@
                     <p style="text-align:left">会议地点(选填)</p>
                     <el-input v-model="AddMeetingForm.Room" placeholder="请输入会议地点"></el-input>
                   </el-form-item>
-                  <el-form-item prop="Status" style="text-align:left" >
+                  <!-- <el-form-item prop="Status" style="text-align:left" >
                     <p style="text-align:left">会议状态</p>
                     <el-radio v-model="AddMeetingForm.Status" label="1">Open</el-radio>
                     <el-radio v-model="AddMeetingForm.Status" label="0">Close</el-radio>
-                  </el-form-item>
+                  </el-form-item> -->
                   <el-form-item prop="Comments">
                     <p style="text-align:left">备注</p>
                     <el-input v-model="AddMeetingForm.Comments" placeholder="请填写备注"></el-input>
@@ -255,7 +255,8 @@ export default {
       Url2:'', 
       value1:'',
       value2:'', 
-      checked:'true', 
+      checked:true, 
+      joinMuteChecked:true,
       SEForm: {                   //table数据源
         SEID:"",
         SEName:"",
@@ -274,6 +275,11 @@ export default {
       //   MLID: "",
       //   TeamID: ""
       // },
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 24 * 60 * 60 * 1000
+        },
+      },
       MeetingForm: {                //详细页面数据源
         MeetingID:"",                 //会议ID - 自动生成ID
         MeetingDesc:"",             //会议名称
@@ -319,7 +325,7 @@ export default {
         Layout:"",                 //布局
         WaitingRoom:"",             //开启等候室 - 0/1
         JoinBeforeHost:"",         //允许在主持人进入会议前加入 - 0/1
-        JoinMute:"",                 //加入时自动静音 - 0/1
+        JoinMute:true,                 //加入时自动静音 - 0/1
         WaterPrint:"",             //开启水印 - 0/1
         InsideOrg:"",                 //入会成员设置 - 0/1
         AttendFileUpload:"",         //允许成员上传文档 - 0/1
@@ -336,6 +342,8 @@ export default {
       getTeam: [],                //Team接口返回数据
       getHospital:[],             //Hospital接口返回数据
       getGeoTree:[],              //GeoTree接口返回数据
+
+      
   
       addMeetingFormRules: {           //详细页面校验规则
         MeetingDesc: [
@@ -550,7 +558,22 @@ export default {
         return "取消";
       }
     },
-    getCurrentTime(){
+    // getCurrentTime(){
+    //   var myDate = new Date()
+    //   var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
+    //   var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
+    //   var dataToDate = myDate.getFullYear() + '-' + month + '-' + day
+    //   var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
+    //   var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
+    //   var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
+    //   var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
+    //   this.currentTime = createDate;
+    // },
+    async createSubmit() {
+      //this.getCurrentTime();
+      var totalStartDate= this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime;
+      var totalEndDate = this.AddMeetingForm.EndDate + "  " +this.AddMeetingForm.EndTime;
+      
       var myDate = new Date()
       var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
       var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
@@ -560,9 +583,46 @@ export default {
       var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
       var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
       this.currentTime = createDate;
-    },
-    async createSubmit() {
-      this.getCurrentTime();
+
+      var hhmm=hours1 + ':' + minutes1;
+
+      if(dataToDate == this.AddMeetingForm.StartDate){
+          if(this.AddMeetingForm.StartTime < hhmm){
+              this.$message({
+              type: 'info',
+              message: '请创建当前时间后的会议！'
+            });
+            return;
+          }
+      }
+      if(totalStartDate>=totalEndDate)
+      {
+        this.$message({
+              type: 'info',
+              message: '结束时间必须大于开始时间！'
+            });
+        return;
+      }
+      if(totalStartDate>=totalEndDate)
+      {
+        this.$message({
+              type: 'info',
+              message: '结束时间必须大于开始时间！'
+            });
+        return;
+      }
+      if(this.AddMeetingForm.StartDate==this.AddMeetingForm.EndDate)
+      {
+        if(this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime)
+        {
+          this.$message({
+                type: 'info',
+                message: '结束时间必须大于开始时间！'
+              });
+          return;
+        }
+      }
+      
       this.$refs.AddMeetingForm.validate((valid) => {
         if (valid) {
           this.$confirm('确认提交？', '提示', {}).then(async() => {   
@@ -571,7 +631,7 @@ export default {
                   UserID:"admin",
                   MeetingID:"",
                   MeetingDesc:this.AddMeetingForm.MeetingDesc, 
-                  Status:  this.AddMeetingForm.Status,
+                  Status:  "1",
                   StartTime: this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime,
                   EndTime:  this.AddMeetingForm.EndDate + "  " +this.AddMeetingForm.EndTime,
                   IsRecurrent: this.AddMeetingForm.IsRecurrent,
@@ -854,4 +914,7 @@ body .el-table th.gutter{
   background-color: #ffffff;
   border-color: rgb(238, 236, 236);
 }
+.el-scrollbar__wrap{
+    overflow-x: hidden!important;
+  }
 </style>
