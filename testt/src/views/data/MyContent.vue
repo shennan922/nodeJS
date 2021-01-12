@@ -130,7 +130,7 @@
                       <el-col :span="5">
                         <el-upload
                             class="avatar-uploader"
-                            action="http://localhost:3000/myContent/imageUpload"
+                            action="/api/myContent/imageUpload"
                             :show-file-list="false"
                             :on-change="handleChange"
                             :on-success="handleAvatarSuccess"
@@ -150,7 +150,7 @@
                       <el-col :span="5">
                         <el-upload
                           ref="upload"
-                          action="http://localhost:3000/myContent/uploadPdf"
+                          action="/api/myContent/uploadPdf"
                           :multiple="true"
                           :show-file-list="true"
                           :file-list="fileList"
@@ -159,17 +159,12 @@
                           :auto-upload="true"
                           :on-change="uploadOnChange"
                           :on-remove="uploadOnRemove"
-                    
+                          
                           >
                           <el-button slot="trigger">Choose file</el-button>
                         </el-upload>
                       </el-col>
-                      <!--<el-col :span="19">
-                        <el-input v-model="AddContentForm.UpdatePDFName"  :disabled="true"></el-input>
-                      </el-col>-->
                     </el-row>
-                    <el-button type="text" @click="downloadFile">下载test</el-button>
-                    <!--<a class='download' :href='api/myContent/downloadpdf' download=""  title="下载">下载</a>-->
                   </el-form-item>
                   <el-form-item label="Content" prop="ContentMessage">
                     <div>
@@ -332,42 +327,14 @@ export default {
       this.ContentID = Number(Math.random().toString().substr(3,6) );
     },
     uploadOnRemove(file){
-      console.log(val)
+      console.log(file)
+      ContentService.deleteFile({ContentID:this.ContentID,filePath:file.name})
     },
     uploadOnChange(file){    
-      //let fileID = this.UploadFiles.length+1
-      this.getCurrentTime()
-      console.log(this.fileList)
-      /*
-      let reader = new FileReader();
-      reader.readAsDataURL(file.raw);
-      let that = this
-      
-      reader.onload = function () {
-        that.UploadFiles.push({
-          ContentID:that.ContentID,
-          FileID:fileID,
-          FileName:file.name,
-          FileData:reader.result,
-          UploadTime: that.currentTime,
-        })
-      }    
-      */
-     this.uploadData.ContentID = this.ContentID
-     this.uploadData.UploadTime = this.currentTime
-    },
-    downloadFile(){
-      //ContentService.downloadFile({filePath:"./contents/3333.pdf"})
-      ContentService.downloadImg({filePath:"./images/test2.jpg"})
-      /*
-      let link = document.createElement('a');
-      link.style.display = 'none';
-      link.href = 'http://localhost:3000/myContent/downloadpdf?file=./contents/3333.pdf';
-      link.setAttribute('download', 'aaa.pdf');
-      document.body.appendChild(link);
-      link.click();
-      */
-    },
+      this.getCurrentTime()      
+      this.uploadData.ContentID = this.ContentID
+      this.uploadData.UploadTime = this.currentTime
+    },    
     onTagClose(tag){
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag),1)
       this.dynamicTagIDs.splice(this.dynamicTags.indexOf(tag),1)
@@ -407,6 +374,7 @@ export default {
       this.dynamicTagIDs = []
       this.UploadFiles = []
       this.fileList = []
+      this.imageUrl = ''
     },
 
     handleClose(tag) {
@@ -438,11 +406,9 @@ export default {
     getFileListData(data) {
       ContentService.getFileList(data)
         .then((res) => {
-          //this.UploadFiles = res.data;
-          console.log(res.data)
-          res.data.forEach(file => {
-            
-            this.fileList.push({"name":file.FileName})
+          res.data.forEach(file => {       
+            var content = ContentService.downloadFile({ContentID:data.ContentID,filePath:file.FileName})  
+            this.fileList.push({"name":file.FileName,"url":content})
           });
           console.log(this.fileList)
         })
@@ -564,11 +530,11 @@ export default {
     },
     handleAdd() {
       this.imageUrl = '';
-    this.getID();
-    this.dynamicTags =[];
-    this.dynamicTags = [];
-    this.formStatus = 1
-    this.dialogCreateVisible = true;
+      this.getID();
+      this.dynamicTags =[];
+      this.dynamicTags = [];
+      this.formStatus = 1
+      this.dialogCreateVisible = true;
       this.defaultMsg ="";
       this.AddContentForm = {
         SEID:"",

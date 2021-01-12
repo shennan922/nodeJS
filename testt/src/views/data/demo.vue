@@ -180,7 +180,7 @@ export default {
       /*在这里进行跨域请求*/
       axios
         .get(
-          "http://localhost:3002/students/list",
+          "api/students/list",
           {},
           { emulateJSON: true }
         )

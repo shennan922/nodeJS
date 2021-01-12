@@ -28,6 +28,9 @@ fs.readdirSync(__dirname)
     
   })
 
+db.convertLocalTime = ((time)=>{
+  return new Date(Date.parse(time) + 8*60*60*1000)
+})
 
 
 /*

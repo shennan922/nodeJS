@@ -12,7 +12,8 @@ module.exports = {
       define: {
         underscored: true,
         paranoid: true
-      }
+      },
+      //timezone: '+08:00'
     }
   },
   token: {

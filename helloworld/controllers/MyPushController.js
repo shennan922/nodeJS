@@ -61,7 +61,7 @@ module.exports = {
           RequestType: req.body.RequestType,
           ContentID: req.body.ContentID,
           MeetingID: req.body.MeetingID,
-          CreateDt: req.body.CreateDt,
+          CreateDt: db.convertLocalTime(req.body.CreateDt),
           ModifyDt: null
         }
         await MyPush.create(newPush)
@@ -110,7 +110,7 @@ module.exports = {
         ContentID: req.body.ContentID,
         MeetingID: req.body.MeetingID,
         CreateDt: null,
-        ModifyDt: req.body.ModifyDt
+        ModifyDt: db.convertLocalTime(req.body.ModifyDt)
       }
       await MyPush.update(newSE,{where:{PushID: req.body.PushID}})
       

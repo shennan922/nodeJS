@@ -5,6 +5,7 @@ var ueditor = require('ueditor');
 const Content = db.MyContent
 const ContentFile = db.MyContentFile
 const SEList = db.SEList
+const config = require('../config')
 
 // Content.belongsTo(SEList, {
 //   foreignKey: 'SEID',
@@ -72,7 +73,7 @@ module.exports = {
         FileID: fields.FileID,
         FileName: files.file.name,
         FilePath: pathNew,
-        FileURL: 'http://localhost:3000/myContent/downloadpdf?file='+pathFUll,
+        FileURL: config.host+'/myContent/downloadpdf?file='+pathFUll,
         CreateDt: fields.UploadTime
       }
       await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})

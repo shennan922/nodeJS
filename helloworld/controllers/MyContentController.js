@@ -156,7 +156,7 @@ module.exports = {
           ContentCategory: req.body.ContentCategory,
           ShortTitle: req.body.ShortTitle,
           ContentMessage: req.body.ContentMessage,
-          CreateDt: req.body.TimeStamp,
+          CreateDt: db.convertLocalTime(req.body.TimeStamp),
           PhotoName:req.body.PhotoName,
           PhotoPath:req.body.PhotoPath,
           ImgID:mid,
@@ -188,7 +188,7 @@ module.exports = {
         ContentCategory: req.body.ContentCategory,
         ShortTitle: req.body.ShortTitle,
         ContentMessage: req.body.ContentMessage,
-        ModifyDt: req.body.TimeStamp,
+        ModifyDt: db.convertLocalTime(req.body.TimeStamp),
         PhotoName:req.body.PhotoName,
         PhotoPath:req.body.PhotoPath,
       }
@@ -233,17 +233,24 @@ module.exports = {
         FileID: maxID.FileID==undefined?0:maxID.FileID+1,
         FileName: files.file.name,
         FilePath: pathNew,
-        FileURL: 'http://localhost:3000/myContent/downloadpdf?file='+pathFUll,
-        CreateDt: fields.UploadTime
+        FileURL: config.host+'/myContent/downloadpdf?file='+pathFUll,
+        CreateDt: db.convertLocalTime(fields.UploadTime)
       }
       await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
-    })
-    
-    res.status(200).send({
-      code: 200,
-      message: 'Content创建成功',
-      data: 'success upload'
-    })
+
+      res.status(200).send({
+        code: 200,
+        message: 'Content创建成功',
+        data: 'success upload'
+      })
+    })    
+    .catch((err)=>{
+      res.status(500).send({
+        code: 500,
+        error: '程序异常: ' + error
+      })
+      logger.logger.fatal("Create Content fail: "+req.body.SEIContentID+'/'+error)
+    })  
   },
   async createPdf(req, res) {
     try {
@@ -274,7 +281,7 @@ module.exports = {
           FileID: file.FileID,
           FileName: file.FileName,
           FilePath: path,
-          FileURL: 'http://localhost:3000/myContent/downloadpdf?file='+fullPath,
+          FileURL: config.host+'/myContent/downloadpdf?file='+fullPath,
           CreateDt: file.UploadTime
         }
         await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
@@ -301,7 +308,8 @@ module.exports = {
       "Content-Type":"application/octet-stream",//告诉浏览器这是一个二进制文件
       "Content-Disposition":"attachment; filename=xxx.pdf"//告诉浏览器这是一个需要下载的文件      
     });
-    fs.createReadStream(req.query.file).pipe(res);   
+    var path = './/contents//'+req.query.ContentID+'//'+req.query.file
+    fs.createReadStream(path).pipe(res);   
   },
   
   async downloadImg(req, res) {    
@@ -343,38 +351,72 @@ module.exports = {
     }
   },
 
+  async deleteFile (req, res) {
+    try {
+      var path = './/contents//'+req.query.ContentID+'//'+req.query.file
+      fs.unlink(path,(err)=>{
+        ContentFile.destroy({where: {ContentID: req.query.ContentID,FileName:req.query.file }})
+        if(err){logger.logger.fatal("Delete Content fail: "+err)}
+        res.status(200).send({
+          message: '删除文件成功'
+        })
+      logger.logger.info("Delete file: "+req.query.ContentID)
+      })      
+    } 
+    catch (error) {
+      res.status(500).send({
+        code: 500,
+        error: '数据删除失败: ' + error
+      })
+      logger.logger.fatal("Delete file fail: "+req.query.ContentID+'/'+error)
+    }
+  },
+
   async imageUpload(req, res) {
     try {
       let form = new formidable.IncomingForm()
       form.keepExtensions = true // 保留扩展名
-      form.parse(req, async (err, fields, files) => {
-        console.log(fields)
-        if(err) return next(err)        
+      form.parse(req,  (err, fields, files) => {
+        if(err) {
+          console.log(err); 
+          logger.logger.fatal(err)
+        }//return next(err)        
         var pathNew = './/contents//'+fields.ContentID
         var pathFUll = pathNew + '//'+files.file.name
-        fs.mkdir(pathNew,{recursive:true},(err)=>{
-          if(err){
-              throw err;
-          }else{
-              console.log('ok!');
-          }
-        });
-
-        let imgOld = await Content.findByPk(req.body.ContentID)
-        if(imgOld){
-          fs.unlink(pathNew+'//'+imgOld.PhotoName, function(err){
-            if(err){logger.logger.fatal(err+'-'+pathNew+'//'+imgOld.PhotoName);}
-            console.log('文件:'+pathNew+'//'+imgOld.PhotoName+'删除成功！');
+        
+        //var stat = fs.statSync(pathNew)
+        var stat = fs.existsSync(pathNew)
+        if(stat){
+          fs.readdirSync(pathNew).forEach(file => {
+            if(file.indexOf('.jpg')>0){
+              fs.unlink(pathNew+'//'+file, function(err){
+                if(err){logger.logger.fatal(err+'-'+pathNew+'//'+file)}
+              })
+            }
+          });
+        }else{
+          fs.mkdir(pathNew,{recursive:true},(err)=>{
+            if(err){
+                throw err;
+            }else{
+                console.log('ok!');
+            }
           })
         }
+        
+
+
+        
 
         fs.rename(files.file.path,pathFUll,(err)=>{if(err) return next(err)})
+
+        res.status(200).send({
+          code: 200,
+          message: '封面图片创建成功',
+          data: req.body.fileName
+        })
       })
-      res.status(200).send({
-        code: 200,
-        message: '封面图片创建成功',
-        data: req.body.fileName
-      })
+
     } catch (error) {
       res.status(500).send({
         code: 500,
@@ -409,7 +451,7 @@ module.exports = {
   },
   async testImg (req, res) {
     res.status(200).send({
-      imageUrl: "http://localhost:3000/myContent/photoUpload",
+      imageUrl: config.host+"/myContent/photoUpload",
       imagePath: "C:/Workspace/nodeJS_new_1222/helloworld/public/ueditor/images",
       imageFieldName: "upfile",
       imageMaxSize: 2048,

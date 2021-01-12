@@ -17,6 +17,7 @@ router.get('/delete',MyContentController.delete)
 router.post('/create', MyContentController.create)
 router.post('/update', MyContentController.update)
 router.post('/createPdf', MyContentController.createPdf)
+router.get('/deleteFile',MyContentController.deleteFile)
 //router.post('/deletePdf', MyContentController.deletePdf)
 router.post('/imageUpload', MyContentController.imageUpload)
 router.post('/photoUpload', ueditor(path.join(__dirname, '../../public'), function (req, res, next) {
@@ -142,8 +143,9 @@ router.get('/photoUpload',ueditor(path.join(__dirname, '../../public'), function
     }
 }))
 router.post('/uploadPdf', MyContentController.uploadPdf)
-// router.get('/downloadpdf', MyContentController.downloadPdf)
+router.get('/downloadpdf', MyContentController.downloadPdf)
 // router.get('/downloadImg/:ContentID', MyContentController.downloadImg)
 
 module.exports = router
+
 
