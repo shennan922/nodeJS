@@ -16,18 +16,18 @@
           @sort-change="changeTableSort" class="formSE"     
           ref="SeTable"
           >
-            <el-table-column min-width="8%" prop="MeetingID" label="Id" sortable="custom"></el-table-column>
-            <el-table-column min-width="10%" prop="MeetingDesc" label="Title" ></el-table-column>
-            <el-table-column min-width="15%" prop="MeetingLink" label="AdminLink(请使用Chrome或Safiri打开)" sortable="custom">
+            <el-table-column min-width="12%" prop="MeetingID" label="Id" sortable="custom"></el-table-column>
+            <el-table-column min-width="12%" prop="MeetingDesc" label="Title" ></el-table-column>
+            <!-- <el-table-column min-width="15%" prop="MeetingLink" label="AdminLink(请使用Chrome或Safiri打开)" sortable="custom">
               <template scope="scope">
                 <div>
                   <a :href="scope.row.MeetingLink">召开会议</a>
                   <el-button  @click="copyText(scope.row.MeetingLink)" class="copyButton"><i class = "el-icon-document-copy"></i></el-button>
                 </div>
               </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column min-width="10%" prop="Status" label="Status" :formatter="statusFormat"></el-table-column>
-            <el-table-column min-width="18%" prop="MeetingLink" label="AttachedLink ">
+            <el-table-column min-width="20%" prop="MeetingLink" label="AttachedLink ">
               <template scope="scope">
                   <div>{{scope.row.MeetingLink}}
                     <el-button  @click="copyText(scope.row.MeetingLink)" class="copyButton"><i class = "el-icon-document-copy"></i></el-button>
@@ -35,29 +35,19 @@
               </template>
             </el-table-column>
             <el-table-column min-width="15%" prop="CreateDt" label="CreateDate"></el-table-column>
-            <!-- <el-table-column min-width="15%" label="操作"  align="center">
-                <template scope="scope">
-                    <el-tooltip class="item" effect="dark" :content="scope.row.url" placement="top">
-                    <el-button type="text" @click="copyText(scope.row)">复制</el-button> 
-                </template>
-            </el-table-column> -->
-            <el-table-column min-width="8%" label="">
-              <template>
+            <el-table-column min-width="18%" label="Operation">
+              <template scope="scope">
                 <el-popover
                     placement="right"
                     trigger="click">
                   <el-image :src="QRurl" date-qrid="245092"></el-image>
                   <el-button size="mini" slot="reference" type="info" @click="generateQR(scope.row.MeetingLink)" plain class="buttonQRCode"><i class="el-icon-picture-outline"></i>Export</el-button>
                 </el-popover>
-                </template>
-            </el-table-column>
-            <el-table-column min-width="16%" label="">
-              <template slot-scope="scope">
-                <el-button size="mini" type="primary" @click="HandleEdit(scope.row)" right-padding="20px" class="buttonEdit" plain><i class="el-icon-edit"></i>Edit</el-button>
+                <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
                 <el-button size="mini" type="info" @click="HandleCancel(scope.row)" plain class="buttonDelete"><i class="el-icon-delete"></i>Cancel</el-button>
               </template>
             </el-table-column>
-            <el-table-column min-width="18%" prop="Comments" label="Comments"></el-table-column>
+            <!-- <el-table-column min-width="18%" prop="Comments" label="Comments"></el-table-column> -->
           </el-table>
           <div class="block">
             <el-pagination
@@ -74,7 +64,7 @@
       </el-row>
        <!--增加Meeting页面-->
       <el-dialog :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogMeeting">
-        <div style="height:60vh;">
+        <div style="height:60vh;min-width:20vh">
           <el-scrollbar style="height:100%;">
             <el-form 
             ref="AddMeetingForm"
@@ -90,7 +80,7 @@
                 </el-col>
                 <el-col :span="14" class="el-col_NewMetting">
                   <el-form-item label="会议名称" prop="MeetingDesc">
-                    <el-input v-model="AddMeetingForm.MeetingDesc" :disabled="formStatus==1?false:true"></el-input>
+                    <el-input v-model="AddMeetingForm.MeetingDesc"></el-input>
                   </el-form-item>
                   <el-row>
                     <p style="text-align:left">开始时间</p>
@@ -123,7 +113,7 @@
                     <el-checkbox v-model="AddMeetingForm.IsRecurrent">周期性会议</el-checkbox>
                     </span>
                   </el-form-item>
-                  <el-form-item prop="Room">
+                  <el-form-item lable="会议地点(选填)" prop="Room" >
                     <p style="text-align:left">会议地点(选填)</p>
                     <el-input v-model="AddMeetingForm.Room" placeholder="请输入会议地点"></el-input>
                   </el-form-item>
@@ -132,7 +122,7 @@
                     <el-radio v-model="AddMeetingForm.Status" label="1">Open</el-radio>
                     <el-radio v-model="AddMeetingForm.Status" label="0">Close</el-radio>
                   </el-form-item> -->
-                  <el-form-item prop="Comments">
+                  <el-form-item prop="Comments" lable="备注">
                     <p style="text-align:left">备注</p>
                     <el-input v-model="AddMeetingForm.Comments" placeholder="请填写备注"></el-input>
                   </el-form-item>
@@ -162,7 +152,7 @@
                   </el-form-item> -->
                   <el-form-item prop="LimitNumber">
                     <p style="text-align:left">邀请成员0/300(选填)</p>
-                    <el-input v-model="AddMeetingForm.LimitNumber" placeholder="请输入成员姓名搜索"></el-input>
+                    <el-input v-model="AddMeetingForm.SpecialGuestList" placeholder="请输入成员姓名搜索"></el-input>
                   </el-form-item>
                   <el-form-item prop="AssignedHost">
                     <p style="text-align:left">指定主持人0/10(选填)</p>
@@ -214,7 +204,8 @@
           </el-scrollbar>
         </div>
         <div slot="footer" class="dialog-footer">
-          <el-button @click.native="createSubmit" type="primary">预定</el-button>
+          <el-button @click.native="createSubmit" v-if="formStatus==1" type="primary">预定</el-button>
+          <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">更新</el-button>
           <el-button @click.native="handleClose()"  type="primary" class="returnButton">返回</el-button>
           <!-- <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button> -->
         </div>
@@ -226,18 +217,13 @@
 <script src="Content/vue/dist/vue.js"></script>
 
 <script>
-import SEService from "../../services/SEService";
-import MLService from "../../services/MLService";
-import GeneralService from "../../services/GeneralService";
 import WechatService from "../../services/WechatService";
 import MeetingService from "../../services/OnlineMeetingService";
 
 export default {
-  inject:['reload'],
-  name: "MySE",
+  name: "OnlineMeeting",
   mounted() {
     this.getDetailList();
-    this.getMLListData();
   },  
   
   data() {
@@ -245,8 +231,6 @@ export default {
       dialogCreateVisible:false,  //详细页面显示/隐藏
       formStatus:0,               //详细页面状态: 0-隐藏/1-新增/2-编辑
       changeFlag:false,           //编辑页面回显/手动选择
-      getHosData:[],              //根据city筛选hospital
-      getDepData:[],              //根据hospital筛选department
       searchTableInfo:"",         //模糊搜索框
       getSearchInfo:[],           //模糊搜索结果
       pageNum:1,                  //table第几页
@@ -266,15 +250,6 @@ export default {
         MLName: "",
         TeamName: ""
       },
-      // AddSEForm: {                //详细页面数据源
-      //   SEID:"",
-      //   SEName:"",
-      //   CityID: "",
-      //   HospitalID: "",
-      //   DepID: "",
-      //   MLID: "",
-      //   TeamID: ""
-      // },
       pickerOptions: {
         disabledDate(time) {
           return time.getTime() < Date.now() - 24 * 60 * 60 * 1000
@@ -338,13 +313,10 @@ export default {
       },
       currentTime:"",
       rows: [],                   //SE接口返回数据
-      getMLList: [],              //ML接口返回数据
-      getTeam: [],                //Team接口返回数据
-      getHospital:[],             //Hospital接口返回数据
-      getGeoTree:[],              //GeoTree接口返回数据
-
-      
-  
+      sDate:'',
+      eDate:'',
+      sTime:'',
+      eTime:'',
       addMeetingFormRules: {           //详细页面校验规则
         MeetingDesc: [
           { required: true, message: '请填写会议名称', trigger: 'change'}
@@ -363,18 +335,6 @@ export default {
         ],  
       },
     };
-  },
-
-  watch: {
-    'AddSEForm.CityID'(city) {
-      if(this.changeFlag){
-        city = city[2]
-      }
-      this.filterHospital(city)
-    },
-    'AddSEForm.HospitalID'(hospital) {
-      this.filterDeparement(hospital)
-    }
   },
 
   methods: {   
@@ -400,7 +360,6 @@ export default {
     copyText(row) {
       console.log(row);  //每一行的数据
       this.Url2 = row;  //每一行的某个值，如选中的当前行的url
-      //alert("this.Url2:" + this.Url2);
       var oInput = document.createElement('input');     //创建一个隐藏input（重要！）
       oInput.value = this.Url2;    //赋值
       console.log(oInput.value);
@@ -411,23 +370,6 @@ export default {
       oInput.style.display='none';
       alert('复制成功');
     }, 
-    handleChange(flag){
-      if(flag=='city'){
-        this.AddSEForm.HospitalID = ''
-        this.AddSEForm.DepID = ''
-      }
-      if(flag=='hos'){
-        this.AddSEForm.DepID = ''
-      }
-    },
-
-    //select回调，判断当前下拉框是否展示
-    handleChangeFlag(val) {
-      if(val){
-        this.changeFlag = true
-      }  
-    },
-
     async generateQR(SEID){
       var ii = WechatService.getQRCode(SEID).then(url=>
       {
@@ -487,19 +429,79 @@ export default {
     },
     handleAdd() {
       this.formStatus = 1
-      this.dialogCreateVisible = true;   
-    },
-    handleEdit(row) {
-      this.formStatus = 2
       this.dialogCreateVisible = true;
-      this.AddSEForm = {
-        SEID:row.SEID,
-        SEName:row.SEName,
-        CityID: row.CityID,
-        HospitalID: row.HospitalID,
-        DepID: row.DepartmentID,
-        MLID: row.MLID ,
-        TeamID: row.TeamID
+      this.AddMeetingForm.JoinMute= true;   
+    },
+    dateFormat(time) {
+      var date=new Date(time);
+      var year=date.getFullYear();
+      /* 在日期格式中，月份是从0开始的，因此要加0
+        * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+        * */
+      var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+      var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+      var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours();
+      var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+      var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+      // 拼接
+      return year+"-"+month+"-"+day+" "+hours+":"+minutes;
+      //return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
+  },
+    handleEdit(row) {
+
+      this.AddMeetingForm.JoinMute = row.JoinMute
+      if(row.JoinMute != "1")
+      {
+        var showJoinMute=false;
+      }
+      else{
+        row.JoinMute = true;
+      }
+
+      this.formStatus = 2
+      var startTime = this.dateFormat(row.StartTime);
+      //获取开始日期
+      this.sDate = startTime.substring(0,10);
+      //获取开始时间
+      //var timearr = startTime.replace(" ", ":").replace(/\:/g, "-").split("-");
+      //this.sTime = ""+timearr[3]+ " ：" + timearr[4]+" ";
+      this.sTime = startTime.substring(11,16);
+
+      var endTime = this.dateFormat(row.EndTime);
+      //获取结束日期
+      this.eDate = endTime.substring(0,10);
+      //获取结束时间
+      this.eTime = endTime.substring(11,16);
+
+      this.dialogCreateVisible = true;
+      this.AddMeetingForm = {
+        MeetingID:row.MeetingID, 
+        MeetingDesc:row.MeetingDesc, 
+        Status:row.Status,                 //状态 - 0关闭/1开放
+        StartTime:this.sTime,                //开始时间
+        EndTime:this.eTime,                 //结束时间
+        IsRecurrent:row.IsRecurrent,             //周期性会议 - 0/1
+        Room:row.Room,                     //会议地点
+        Comments:row.Comments,                
+        Password:row.Password,               //保密
+        AttendNum:row.AttendNum,                 //会议人数上限
+        AttendInvite:row.AttendInvite,             //邀请
+        SpecialGuest:row.SpecialGuest,             //嘉宾 - 0/1
+        SpecialGuestList:row.SpecialGuestList,         //嘉宾名单, 打钩之后出现
+        AssignedHost:row.AssignedHost,            //指定主持人
+        Layout:row.Layout,                 //布局
+        WaitingRoom:row.WaitingRoom,             //开启等候室 - 0/1
+        JoinBeforeHost:row.JoinBeforeHost,        //允许在主持人进入会议前加入 - 0/1
+        JoinMute:row.JoinMute,                 //加入时自动静音 - 0/1
+        WaterPrint:row.WaterPrint,             //开启水印 - 0/1
+        InsideOrg:row.InsideOrg,                 //入会成员设置 - 0/1
+        AttendFileUpload:row.AttendFileUpload,         //允许成员上传文档 - 0/1
+        Simultaneous:row.Simultaneous,             //同声传译 - 0/1
+        LiveStream:row.LiveStream,             //直播 - 0/1
+        CreateDt:row.CreateDt,
+        ModifyDt:row.ModifyDt,
+        StartDate:this.sDate,                 //开始时间
+        EndDate:this.eDate,   
       };
     },
     handleDelete(SEID){
@@ -517,8 +519,7 @@ export default {
       })
     },
     handleClose(){            
-      //resetFields将form重置到mounted之后的状态, 对于编辑页面不适用
-      //this.$refs.AddSEForm.resetFields()   
+      //resetFields将form重置到mounted之后的状态, 对于编辑页面不适用  
       this.AddMeetingForm={                //详细页面数据源
         MeetingID:"",                 //会议ID - 自动生成ID
         MeetingDesc:"",             //会议名称
@@ -558,19 +559,19 @@ export default {
         return "取消";
       }
     },
-    // getCurrentTime(){
-    //   var myDate = new Date()
-    //   var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
-    //   var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
-    //   var dataToDate = myDate.getFullYear() + '-' + month + '-' + day
-    //   var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
-    //   var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
-    //   var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
-    //   var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
-    //   this.currentTime = createDate;
-    // },
+    getCurrentTime(){
+      var myDate = new Date()
+      var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
+      var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
+      var dataToDate = myDate.getFullYear() + '-' + month + '-' + day
+      var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
+      var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
+      var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
+      var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
+      this.currentTime = createDate;
+    },
     async createSubmit() {
-      //this.getCurrentTime();
+      //await this.getCurrentTime();
       var totalStartDate= this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime;
       var totalEndDate = this.AddMeetingForm.EndDate + "  " +this.AddMeetingForm.EndTime;
       
@@ -611,17 +612,17 @@ export default {
             });
         return;
       }
-      if(this.AddMeetingForm.StartDate==this.AddMeetingForm.EndDate)
-      {
-        if(this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime)
-        {
-          this.$message({
-                type: 'info',
-                message: '结束时间必须大于开始时间！'
-              });
-          return;
-        }
-      }
+      // if(this.AddMeetingForm.StartDate==this.AddMeetingForm.EndDate)
+      // {
+      //   if(this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime)
+      //   {
+      //     this.$message({
+      //           type: 'info',
+      //           message: '结束时间必须大于开始时间！'
+      //         });
+      //     return;
+      //   }
+      // }
       
       this.$refs.AddMeetingForm.validate((valid) => {
         if (valid) {
@@ -684,17 +685,76 @@ export default {
     },
 
     async updateSubmit(formStatus) {
-      this.$refs.AddSEForm.validate((valid) => {
+      var totalStartDate= this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime;
+      var totalEndDate = this.AddMeetingForm.EndDate + "  " +this.AddMeetingForm.EndTime;
+      
+      var myDate = new Date()
+      var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
+      var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
+      var dataToDate = myDate.getFullYear() + '-' + month + '-' + day
+      var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
+      var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
+      var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
+      var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
+      this.currentTime = createDate;
+
+      var hhmm=hours1 + ':' + minutes1;
+
+      if(dataToDate > this.AddMeetingForm.StartDate){
+          this.$message({
+            type: 'info',
+            message: '会议的开始日期不能小于今天！'
+          });
+            return;
+      }
+      if(dataToDate == this.AddMeetingForm.StartDate){
+          if(this.AddMeetingForm.StartTime < hhmm){
+              this.$message({
+              type: 'info',
+              message: '只能更新当前时间后的会议！'
+            });
+            return;
+          }
+      }
+      if(totalStartDate>=totalEndDate)
+      {
+        this.$message({
+              type: 'info',
+              message: '结束时间必须大于开始时间！'
+            });
+        return;
+      }
+      this.$refs.AddMeetingForm.validate((valid) => {
         if (valid) {
           this.$confirm('确认提交？', '提示', {}).then(async() => { 
-            await SEService.SEUpdate(
+            await MeetingService.MeetingUpdate(
               {
-                SEID: this.AddSEForm.SEID,
-                SEName: this.AddSEForm.SEName,
-                City: this.AddSEForm.CityID,
-                Department: this.AddSEForm.DepID,
-                MLName: this.AddSEForm.MLID,
-                Team:this.AddSEForm.TeamID
+                UserID:"admin",
+                  MeetingID:this.AddMeetingForm.MeetingID,
+                  MeetingDesc:this.AddMeetingForm.MeetingDesc, 
+                  Status: "1",
+                  StartTime: this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime,
+                  EndTime:  this.AddMeetingForm.EndDate + "  " +this.AddMeetingForm.EndTime,
+                  IsRecurrent: this.AddMeetingForm.IsRecurrent,
+                  Room: this.AddMeetingForm.Room,
+                  Comments: this.AddMeetingForm.Comments,               
+                  Password:  this.AddMeetingForm.Password,
+                  AttendNum: this.AddMeetingForm.AttendNum,
+                  AttendInvite:this.AddMeetingForm.AttendInvite,
+                  SpecialGuest:this.AddMeetingForm.SpecialGuest,
+                  SpecialGuestList:this.AddMeetingForm.SpecialGuestList,
+                  AssignedHost: this.AddMeetingForm.AssignedHost,
+                  Layout:  this.AddMeetingForm.Layout,
+                  WaitingRoom: this.AddMeetingForm.WaitingRoom,
+                  JoinBeforeHost:this.AddMeetingForm.JoinBeforeHost,
+                  JoinMute:this.AddMeetingForm.JoinMute,
+                  WaterPrint: this.AddMeetingForm.WaterPrint, 
+                  InsideOrg: this.AddMeetingForm.InsideOrg,
+                  AttendFileUpload:this.AddMeetingForm.AttendFileUpload,
+                  Simultaneous: this.AddMeetingForm.Simultaneous,
+                  LiveStream: this.AddMeetingForm.LiveStream,
+                  CreateDt: "",
+                  ModifyDt: this.currentTime  
               }
             ).then((res) => {
               if (res.code == 400){
@@ -734,19 +794,6 @@ export default {
           console.log("err"+err);
         });
     },
-
-    //getMLList
-    getMLListData() {
-      MLService.getMLList()
-        .then((res) => {
-          this.getMLList = res;
-          
-        })
-        .catch(function (err) {
-          console.log(err);
-        });
-       
-    },
   },
   computed: {
       getMeetingList () {
@@ -784,6 +831,7 @@ export default {
     margin-top: -10px;
     margin-right:1%;
     font-weight:bold;
+    border-color:#639eda;
 }
 .copyButton{
   padding-left: 5px;
@@ -793,7 +841,8 @@ export default {
 }
 .buttonEdit{
   margin-right:3%;
-  width:75px
+  width:75px;
+  margin-top:3px;
 }
 .buttonQRCode{
   margin-right:3%;
@@ -802,9 +851,11 @@ export default {
   padding-left:3%
 }
 .buttonDelete{
-  margin-right:3%;
+  //margin-right:3%;
   width:75px;
   margin-top:3px;
+  padding-left:3%;
+  margin-left:0px;
 }
 body .el-table th.gutter{
   display: table-cell!important;
@@ -816,6 +867,7 @@ body .el-table th.gutter{
   } 
 }
 /deep/.dialogMeeting{
+
   // .el-dialog__header{
   // text-align: left;
   // padding-left:7%;
@@ -825,6 +877,9 @@ body .el-table th.gutter{
     line-height: 5px;
     position: relative;
     font-size: 14px;
+    .el-input--suffix .el-input__inner{
+      padding-right: 0px!important;
+    }
   }
   .el-dialog__title{
     color:#fff;
@@ -866,8 +921,9 @@ body .el-table th.gutter{
     height: 100%;
   }
   .el-scrollbar__thumb {
-    overflow-x: hidden;
+    //overflow-x: hidden;
     height: 0%;
+    width:60%;
   }
 } 
 .block{
@@ -888,16 +944,24 @@ body .el-table th.gutter{
 }
  
 .searchBox{
-  width: 15%;
+  width: 20%;
   float: right;
   padding: 5px;
+  
+  /deep/.el-input--prefix .el-input__inner {
+    padding-left: 10px; 
+  }
 }
 
 .startDate{
   width:99%;
   text-align:left;
   float:left;
+  .el-input--suffix .el-input__inner {
+    padding-right: 0px!important;
+  }
 }
+
 .startTime{
   width:99%;
   margin-left:10%;

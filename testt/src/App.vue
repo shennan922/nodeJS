@@ -40,6 +40,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  min-width: 800px;
 }
 #edui_fixedlayer {
   z-index: 99999!important;
@@ -66,5 +67,12 @@ export default {
 }
 body {
   margin: 0;
+  overflow: auto;
 }
+  .el-dialog__body{
+    padding-left:20px!important;
+  }
+  // .el-input--prefix .el-input__inner {
+  //   padding-left: 5px!important; 
+  // }
 </style>
