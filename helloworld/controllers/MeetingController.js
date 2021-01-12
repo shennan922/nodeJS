@@ -14,7 +14,7 @@ module.exports = {
       if (data) {
         //data = JSON.parse(JSON.stringify(data).replace(/NodeDesc/g, 'Hospital').replace(/NodeID/g, 'HospitalID').replace(/Department.Dep/g, 'Department').replace(/Geo.City/g, 'City'))
         res.status(200).send({
-          value:'MyPushList',
+          value:'MyMeetingList',
           data:data
         })        
         logger.logger.info('Query Meeting: '+data.length+' records returned')
@@ -184,7 +184,7 @@ module.exports = {
       
       res.status(200).send({
         code: 200,
-        message: 'MyPush更新成功'
+        message: 'Meeting更新成功'
       })
       logger.logger.info("Update Meeting: "+req.body.MeetingID)
       console.log('update meeting ok, response:\n',  JSON.stringify(result, null, 4));

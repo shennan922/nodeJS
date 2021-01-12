@@ -545,6 +545,7 @@ export default {
     margin-top: -10px;
     margin-right:1%;
     font-weight:bold;
+    border-color:#639eda;
 }
 .buttonEdit{
   margin-right:3%;
@@ -619,5 +620,8 @@ body .el-table th.gutter{
   width: 19%;
   float: right;
   padding: 5px;
+  /deep/.el-input--prefix .el-input__inner {
+    padding-left: 10px; 
+  }
 }
 </style>

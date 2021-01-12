@@ -8,9 +8,9 @@
             Lilly Wechat - My Content
             </h3>
           </div>
-          <div class='Button'>
-            <el-button type="primary" icon="el-icon-plus" @click="handleAdd">Create a New Paper</el-button>
-            <el-button type="primary" icon="el-icon-plus">Upload Content</el-button>
+          <div>
+            <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">Create a New Paper</el-button>
+            <el-button  class="NewButton" type="primary" icon="el-icon-plus">Upload Content</el-button>
           </div>
         </div>
         <div class='content'>
@@ -59,7 +59,7 @@
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
                 <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
-                <el-button size="mini" type="info" @click="handleID(scope.row.SEID)" plain >Test</el-button>
+                <!-- <el-button size="mini" type="info" @click="handleID(scope.row.SEID)" plain >Test</el-button> -->
               </template>
             </el-table-column>
           </el-table> 
@@ -208,7 +208,7 @@ export default {
     return {
       ContentID:"",
       pageNum:1,//table第几页
-      pageSize:10,  
+      pageSize:5,  
       defaultMsg:"",
       currentTime:"",
       config: {
@@ -763,7 +763,7 @@ export default {
 .content{
   display: flex;
   justify-content: space-between;
-  height: 80px;
+  //height: 80px;
   width: 100%;
   align-items: center;
 }
@@ -792,9 +792,12 @@ export default {
     font-weight:bold;
 }
 .searchBox{
-  width: 19%;
+  width: 15%;
   float: right;
   padding: 5px;
+  /deep/.el-input--prefix .el-input__inner {
+    padding-left: 10px; 
+  }
 }
 
 /deep/.dialogContent{
@@ -867,6 +870,26 @@ export default {
   width: 120px;
 
   } 
-
-
+.buttonEdit{
+  margin-right:3%;
+  width:75px;
+  margin-top:3px;
+}
+.buttonDelete{
+  //margin-right:3%;
+  width:75px;
+  margin-top:3px;
+  padding-left:3%;
+  margin-left:0px;
+}
+.NewButton{
+    background-color:#639eda;
+    //text-align: right;
+    //color: white;
+    //float: right;
+    //margin-top: -10px;
+    //margin-right:1%;
+    font-weight:bold;
+    border-color:#639eda ;
+}
 </style>

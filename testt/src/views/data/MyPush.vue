@@ -747,10 +747,12 @@ export default {
     margin-top: -10px;
     margin-right:1%;
     font-weight:bold;
+    border-color:#639eda;
 }
 .buttonEdit{
   margin-right:3%;
-  width:75px
+  width:75px;
+  margin-top:3px;
 }
 .buttonQRCode{
   margin-right:3%;
@@ -759,9 +761,10 @@ export default {
   padding-left:3%
 }
 .buttonDelete{
-  margin-right:3%;
   width:75px;
   margin-top:3px;
+  padding-left:3%;
+  margin-left:0px;
 }
 body .el-table th.gutter{
   display: table-cell!important;
@@ -848,5 +851,8 @@ body .el-table th.gutter{
   width: 14%;
   float: right;
   padding: 5px;
+  /deep/.el-input--prefix .el-input__inner {
+    padding-left: 10px; 
+  }
 }
 </style>
