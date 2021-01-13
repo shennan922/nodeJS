@@ -26,10 +26,12 @@
                 </div>
               </template>
             </el-table-column> -->
-            <el-table-column min-width="10%" prop="Status" label="Status" :formatter="statusFormat"></el-table-column>
+            <el-table-column min-width="10%" prop="Status" label="Status" :formatter="statusFormat" sortable="custom"></el-table-column>
             <el-table-column min-width="20%" prop="MeetingLink" label="AttachedLink ">
               <template scope="scope">
-                  <div>{{scope.row.MeetingLink}}
+                  <div>
+                    <!-- {{scope.row.MeetingLink}} -->
+                    <a :href="scope.row.MeetingLink">{{scope.row.MeetingLink}}</a>
                     <el-button  @click="copyText(scope.row.MeetingLink)" class="copyButton"><i class = "el-icon-document-copy"></i></el-button>
                   </div>
               </template>
@@ -63,8 +65,8 @@
         </el-col>
       </el-row>
        <!--增加Meeting页面-->
-      <el-dialog :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogMeeting">
-        <div style="height:60vh;min-width:20vh">
+      <el-dialog :title ="formStatus==1?'Create a Meeting':'Update a Meeting'":visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogMeeting">
+        <div style="height:50vh;">
           <el-scrollbar style="height:100%;">
             <el-form 
             ref="AddMeetingForm"
@@ -452,7 +454,7 @@ export default {
       this.AddMeetingForm.JoinMute = row.JoinMute
       if(row.JoinMute != "1")
       {
-        var showJoinMute=false;
+        row.JoinMute=false;
       }
       else{
         row.JoinMute = true;
@@ -611,19 +613,7 @@ export default {
               message: '结束时间必须大于开始时间！'
             });
         return;
-      }
-      // if(this.AddMeetingForm.StartDate==this.AddMeetingForm.EndDate)
-      // {
-      //   if(this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime)
-      //   {
-      //     this.$message({
-      //           type: 'info',
-      //           message: '结束时间必须大于开始时间！'
-      //         });
-      //     return;
-      //   }
-      // }
-      
+      }  
       this.$refs.AddMeetingForm.validate((valid) => {
         if (valid) {
           this.$confirm('确认提交？', '提示', {}).then(async() => {   
@@ -685,6 +675,9 @@ export default {
     },
 
     async updateSubmit(formStatus) {
+      if(this.AddMeetingForm.Password ==""){
+          this.AddMeetingForm.Password = null
+      }
       var totalStartDate= this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime;
       var totalEndDate = this.AddMeetingForm.EndDate + "  " +this.AddMeetingForm.EndTime;
       
@@ -838,6 +831,7 @@ export default {
   padding-top: 5px;
   padding-right: 5px;
   height: 25px;
+  float:right;
 }
 .buttonEdit{
   margin-right:3%;
@@ -868,11 +862,12 @@ body .el-table th.gutter{
 }
 /deep/.dialogMeeting{
 
-  // .el-dialog__header{
-  // text-align: left;
-  // padding-left:7%;
-  // background-color: #498CDF,
-  // };
+  .el-dialog__header{
+    text-align: left;
+    padding-left:7%;
+    background-color: #498CDF;
+    //padding: 40px 20px 10px;
+  };
   .el-form-item__content{
     line-height: 5px;
     position: relative;
@@ -884,6 +879,12 @@ body .el-table th.gutter{
   .el-dialog__title{
     color:#fff;
   };
+  .el-dialog__body {
+    padding: 30px 30px;
+    color: #606266;
+    font-size: 14px;
+    word-break: break-all;
+}
   .el-dialog__close{
     color:#fff;
   }
@@ -921,9 +922,8 @@ body .el-table th.gutter{
     height: 100%;
   }
   .el-scrollbar__thumb {
-    //overflow-x: hidden;
+    overflow-x: hidden;
     height: 0%;
-    width:60%;
   }
 } 
 .block{
@@ -931,6 +931,7 @@ body .el-table th.gutter{
 }
 .el-col_NewMetting{
   margin-left:5%;
+  padding-right:5px;
   .el-select{
     width:100%
   }
@@ -971,7 +972,7 @@ body .el-table th.gutter{
   width:180%
 }
 .dialog-footer{
-  margin-right:10%;
+  margin-right:5%;
 }
 .returnButton{
   color:#0d0d0d;

@@ -80,7 +80,7 @@
       </el-row>
       <!--增加Content页面-->
       <el-dialog :title ="formStatus==1?'Create a New Paper':'Update a Paper'" :lock-scroll="true" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" class="dialogContent" @close="handleFormClose" :close-on-click-modal="false" :modal-append-to-body="false">
-        <div style="height:70vh;overflow:auto;" class="scrollbar">
+        <div style="height:50vh;">
           <el-scrollbar style="height:100%">
             <el-form 
             ref="AddContentForm"
@@ -90,7 +90,7 @@
             >
             <!-- :rules="addContentFormRules" -->
               <el-row>
-                <el-col class="el-col_Content">
+                <el-col :span="24" class="el-col_Content">
                   <el-form-item label="SE" prop="SEID">
                     <el-select v-model="AddContentForm.SEID" clearable placeholder="请选择" style="width:100%;padding-left:0px">
                       <el-option
@@ -100,7 +100,7 @@
                   </el-form-item>
                 <el-form-item label="Content Category" prop="ContentCategory">
                     <div>
-                    <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:90%;padding-left:0px" ref="categorySelect">
+                    <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:87%;padding-left:0px" ref="categorySelect">
                       <el-option
                         v-for="item in getCategoryList" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
                       </el-option> 
@@ -176,7 +176,7 @@
             </el-form>            
           </el-scrollbar>
         </div>
-        <div style="margin-right:10px" slot="footer" class="dialog-footer">
+        <div style="margin-right:5%" slot="footer" class="dialog-footer">
           <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
           <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
         </div>
@@ -823,15 +823,16 @@ export default {
   }
  .button-new-tag{
   width:10%;
-  padding-left:20px;
+  padding-left:15px;
   background-color:#639eda;
-  color:#fff
+  color:#fff;
+  margin-left:10px;
   }
   .el-dialog__footer{
     padding-top:0px;
   }
   .el-dialog__body{
-    padding: 3% 5% 0px 5%;
+    padding: 3% 3% 0px 5%;
   }  
    .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
@@ -891,5 +892,9 @@ export default {
     //margin-right:1%;
     font-weight:bold;
     border-color:#639eda ;
+}
+.el-col_Content{
+  //margin-right:10px;
+  padding-right:2%;
 }
 </style>
