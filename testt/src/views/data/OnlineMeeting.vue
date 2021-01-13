@@ -13,7 +13,7 @@
           :model="MeetingForm" 
           :data="getMeetingList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border 
           :header-cell-style="tableHeaderColor" 
-          @sort-change="changeTableSort" class="formSE"     
+          @sort-change="changeTableSort" class="formMeeting"     
           ref="SeTable"
           >
             <el-table-column min-width="12%" prop="MeetingID" label="Id" sortable="custom"></el-table-column>
@@ -27,16 +27,19 @@
               </template>
             </el-table-column> -->
             <el-table-column min-width="10%" prop="Status" label="Status" :formatter="statusFormat" sortable="custom"></el-table-column>
-            <el-table-column min-width="20%" prop="MeetingLink" label="AttachedLink ">
+            <el-table-column min-width="22%" prop="MeetingLink" label="MeetingLink ">
               <template scope="scope">
                   <div>
-                    <!-- {{scope.row.MeetingLink}} -->
-                    <a :href="scope.row.MeetingLink">{{scope.row.MeetingLink}}</a>
+                    <a :href="scope.row.MeetingLink" target="_blank">{{scope.row.MeetingLink}}</a>
                     <el-button  @click="copyText(scope.row.MeetingLink)" class="copyButton"><i class = "el-icon-document-copy"></i></el-button>
                   </div>
               </template>
             </el-table-column>
-            <el-table-column min-width="15%" prop="CreateDt" label="CreateDate"></el-table-column>
+            <el-table-column min-width="13%" prop="CreateDt" label="CreateDate">
+              <template scope="scope">
+                {{dateFormat(scope.row.CreateDt)}}
+              </template>
+            </el-table-column>
             <el-table-column min-width="18%" label="Operation">
               <template scope="scope">
                 <el-popover
@@ -65,7 +68,7 @@
         </el-col>
       </el-row>
        <!--增加Meeting页面-->
-      <el-dialog :title ="formStatus==1?'Create a Meeting':'Update a Meeting'":visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogMeeting">
+      <el-dialog :title ="formStatus==1?'Create a Meeting':'Update a Meeting'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleClose" :close-on-click-modal="false" class="dialogMeeting">
         <div style="height:50vh;">
           <el-scrollbar style="height:100%;">
             <el-form 
@@ -85,7 +88,7 @@
                     <el-input v-model="AddMeetingForm.MeetingDesc"></el-input>
                   </el-form-item>
                   <el-row>
-                    <p style="text-align:left">开始时间</p>
+                    <p style="text-align:left"><span style="color:#F78875">*</span> 开始时间</p>
                     <el-col :span="8">
                       <el-form-item prop="StartDate">
                         <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate"></el-date-picker>
@@ -98,7 +101,7 @@
                     </el-col>
                   </el-row>
                   <el-row>
-                    <p style="text-align:left">结束时间</p>
+                    <p style="text-align:left"><span style="color:#F78875">*</span> 结束时间</p>
                     <el-col :span="8">
                       <el-form-item lable ="结束时间" prop="EndDate">
                         <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.EndDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate"></el-date-picker>
@@ -106,7 +109,7 @@
                     </el-col>
                     <el-col :span="8">
                       <el-form-item lable ="结束时间" prop="EndTime">
-                        <el-time-select v-model="AddMeetingForm.EndTime" :picker-options="{start: '08:30',step: '00:15',end: '23:30'}" placeholder="选择时间" class="startTime"></el-time-select> 
+                        <el-time-select v-model="AddMeetingForm.EndTime" :picker-options="{start: '08:30',step: '00:15',end: '23:30',minTime:AddMeetingForm.StartTime}" placeholder="选择时间" class="startTime"></el-time-select> 
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -194,8 +197,8 @@
                     </span>  
                   </el-form-item> -->
                   <el-form-item prop="InsideOrg" style="text-align:left" >
-                      <el-radio v-model="AddMeetingForm.InsideOrg" label="0">所有人可入会</el-radio>
-                      <el-radio v-model="AddMeetingForm.InsideOrg" label="1">仅企业内部人员可入会</el-radio>  
+                      <el-radio v-model="AddMeetingForm.InsideOrg" :label="0">所有人可入会</el-radio>
+                      <el-radio v-model="AddMeetingForm.InsideOrg" :label="1">仅企业内部人员可入会</el-radio>  
                   </el-form-item>
                   <el-form-item prop="Simultaneous" style="text-align:left;margin-top:15%">
                     <el-checkbox v-model="AddMeetingForm.Simultaneous">启用同声传译</el-checkbox>
@@ -304,7 +307,7 @@ export default {
         JoinBeforeHost:"",         //允许在主持人进入会议前加入 - 0/1
         JoinMute:true,                 //加入时自动静音 - 0/1
         WaterPrint:"",             //开启水印 - 0/1
-        InsideOrg:"",                 //入会成员设置 - 0/1
+        InsideOrg:"0",                 //入会成员设置 - 0/1
         AttendFileUpload:"",         //允许成员上传文档 - 0/1
         Simultaneous:"",             //同声传译 - 0/1
         LiveStream:"",             //直播 - 0/1
@@ -341,6 +344,15 @@ export default {
 
   methods: {   
     HandleCancel(row){
+      if(row.Status =="0")
+      {
+         this.$message({
+          type: 'info',
+          message: '会议已经是取消状态！'
+        });
+        return;
+      }
+
       MeetingService.MeetingClose({
         "UserID":"admin",
         "MeetingID": row.MeetingID,
@@ -388,7 +400,7 @@ export default {
       var sortingType = column.order;
 
       //如果字段名称为“创建时间”，将“创建时间”转换为时间戳，才能进行大小比较
-      if(fieldName=="createTime"){
+      if(fieldName=="CreateDt"){
         this.getSearchInfo.map(item => {
           item.createTime = this.$moment(item.createTime).valueOf();
         });
@@ -408,7 +420,7 @@ export default {
       }
 
       //如果字段名称为“创建时间”，将时间戳格式的“创建时间”再转换为时间格式
-      if(fieldName=="createTime"){
+      if(fieldName=="CreateDt"){
         this.getSearchInfo.map(item => {
           item.createTime = this.$moment(item.createTime).format(
             "YYYY-MM-DD HH:mm:ss"
@@ -430,9 +442,11 @@ export default {
       return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left;white-space: pre-line;";
     },
     handleAdd() {
+      
       this.formStatus = 1
       this.dialogCreateVisible = true;
-      this.AddMeetingForm.JoinMute= true;   
+      this.AddMeetingForm.JoinMute= true; 
+      this.AddMeetingForm.InsideOrg = 0;
     },
     dateFormat(time) {
       var date=new Date(time);
@@ -446,8 +460,8 @@ export default {
       var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
       var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
       // 拼接
-      return year+"-"+month+"-"+day+" "+hours+":"+minutes;
-      //return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
+      //return year+"-"+month+"-"+day+" "+hours+":"+minutes;
+      return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
   },
     handleEdit(row) {
 
@@ -461,7 +475,8 @@ export default {
       }
 
       this.formStatus = 2
-      var startTime = this.dateFormat(row.StartTime);
+
+      var startTime = this.dateFormat(row.StartTime.substring(0,23));
       //获取开始日期
       this.sDate = startTime.substring(0,10);
       //获取开始时间
@@ -469,7 +484,7 @@ export default {
       //this.sTime = ""+timearr[3]+ " ：" + timearr[4]+" ";
       this.sTime = startTime.substring(11,16);
 
-      var endTime = this.dateFormat(row.EndTime);
+      var endTime = this.dateFormat(row.EndTime.substring(0,23));
       //获取结束日期
       this.eDate = endTime.substring(0,10);
       //获取结束时间
@@ -854,7 +869,7 @@ export default {
 body .el-table th.gutter{
   display: table-cell!important;
 }
-/deep/.formSE{
+/deep/.formMeeting{
   width: 100%;
   .el-table__body{
     table-layout: auto;
@@ -972,7 +987,7 @@ body .el-table th.gutter{
   width:180%
 }
 .dialog-footer{
-  margin-right:5%;
+  margin-right:3.7%;
 }
 .returnButton{
   color:#0d0d0d;

@@ -73,7 +73,7 @@
                     <el-input v-model="AddMyPushForm.Greeting"></el-input>
                   </el-form-item>
                 </el-col>
-                <el-col :span="10" class="el-col_MyPush">
+                <el-col :span="10" class="el-col_MyPushRight">
                   <h2 class="h2title">Settings</h2>
                   <el-form-item label="Categorized" prop="Categorized">
                     <el-radio v-model="AddMyPushForm.Categorized" label="1" style="margin-top:15px">Type1</el-radio>
@@ -119,7 +119,7 @@
               </el-row>
               <!-- select content button -->
               <el-row>
-                <el-button @click.native="selectContent" type="primary" style="float:left;padding-buttom:15px">Select Content</el-button>
+                <el-button @click.native="selectContent" type="primary" style="float:left;padding-buttom:15px;margin-left:3%">Select Content</el-button>
               </el-row>
               <!-- show table -->
               <el-table 
@@ -128,7 +128,7 @@
                 :header-cell-style="contentTableHeaderColor"
                 class="formMyPush" 
                 ref="SeTable"
-                style="margin-top:10px;width:98%"
+                style="margin-top:10px;width:95%;margin-left:3%;"
               >
                 <el-table-column min-width="10%" prop="SEID" label="SE"></el-table-column>
                 <el-table-column min-width="15%" prop="ContentCategory" label="Category" ></el-table-column>
@@ -148,7 +148,7 @@
             </el-form>
           </el-scrollbar>
         </div> 
-          <div style="margin-right:10px" slot="footer" class="dialog-footer">
+          <div slot="footer" class="dialog-footer">
             <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
             <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
          </div>
@@ -179,7 +179,7 @@
               </el-col>
             </el-row>
           </el-form>
-          <div style="margin-right:10px" slot="footer" class="dialog-footer">
+          <div style="margin-right:9.5%" slot="footer" >
             <el-button @click.native="contentConfirm" type="primary">Confirm</el-button>
          </div>
 
@@ -822,7 +822,8 @@ body .el-table th.gutter{
 
 .el-col_MyPush{
   margin-left:5%;
-  padding-right:2%;
+  //padding-right:2%;
+  margin-right:3%;
   .el-select{
     width:100%
   }
@@ -839,11 +840,27 @@ body .el-table th.gutter{
     margin-left: -8% !important;
   }
 }
-// class.el-form-item__label:before{
-//       content: '*';
-//         color: red;
-//         margin-left: -8%;
-// }
+.el-col_MyPushRight{
+  margin-left:6%;
+  //padding-right:2%;
+  //margin-right:3%;
+  .el-select{
+    width:100%
+  }
+  .el-cascader{
+    width:100%
+  }
+  .el-radio{
+    float:left
+  }
+  .el-checkbox{
+     float:left
+  }
+  .el-form-item__lable::before{
+    margin-left: -8% !important;
+  }
+}
+
 
 .myPushCheckBox{
   width:40%;
@@ -854,8 +871,7 @@ body .el-table th.gutter{
     } 
   }
   
-}
- 
+} 
 .searchBox{
   width: 14%;
   float: right;
@@ -863,5 +879,8 @@ body .el-table th.gutter{
   /deep/.el-input--prefix .el-input__inner {
     padding-left: 10px; 
   }
+}
+.dialog-footer{
+  margin-right:2.1%;
 }
 </style>

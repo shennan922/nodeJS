@@ -176,7 +176,7 @@
             </el-form>            
           </el-scrollbar>
         </div>
-        <div style="margin-right:5%" slot="footer" class="dialog-footer">
+        <div slot="footer" class="dialog-footer">
           <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
           <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
         </div>
@@ -896,5 +896,8 @@ export default {
 .el-col_Content{
   //margin-right:10px;
   padding-right:2%;
+}
+.dialog-footer{
+  margin-right:2.3%;
 }
 </style>
