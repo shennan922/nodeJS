@@ -136,7 +136,7 @@
                             :on-success="handleAvatarSuccess"
                             :before-upload="beforeAvatarUpload"
                             :data="{ContentID}"
-                            ref="upload"
+                            ref="uploadImg"
                             >
                             <img v-if="imageUrl" :src="imageUrl" class="avatar">
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -159,7 +159,7 @@
                           :auto-upload="true"
                           :on-change="uploadOnChange"
                           :on-remove="uploadOnRemove"
-                          
+                          :on-preview="uploadOnPreview"
                           >
                           <el-button slot="trigger">Choose file</el-button>
                         </el-upload>
@@ -330,10 +330,19 @@ export default {
       console.log(file)
       ContentService.deleteFile({ContentID:this.ContentID,filePath:file.name})
     },
-    uploadOnChange(file){    
+    uploadOnPreview(file){
+      let link = document.createElement('a');
+      link.style.display = 'none';
+      link.href = file.url;
+      link.setAttribute('download', name);
+      document.body.appendChild(link);
+      link.click();
+    },    
+    uploadOnChange(file){   
       this.getCurrentTime()      
       this.uploadData.ContentID = this.ContentID
       this.uploadData.UploadTime = this.currentTime
+      this.fileList.push({"name":file.name,"url":'/api/myContent/downloadpdf?ContentID='+this.ContentID+'&file='+file.name})
     },    
     onTagClose(tag){
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag),1)
@@ -407,8 +416,8 @@ export default {
       ContentService.getFileList(data)
         .then((res) => {
           res.data.forEach(file => {       
-            var content = ContentService.downloadFile({ContentID:data.ContentID,filePath:file.FileName})  
-            this.fileList.push({"name":file.FileName,"url":content})
+            //var content = ContentService.downloadFile({ContentID:data.ContentID,filePath:file.FileName})  
+            this.fileList.push({"name":file.FileName,"url":'/api/myContent/downloadpdf?ContentID='+data.ContentID+'&file='+file.FileName})
           });
           console.log(this.fileList)
         })
@@ -570,7 +579,7 @@ export default {
     handleAvatarSuccess(res,file) {
       this.imageUrl = URL.createObjectURL(file.raw);
       //上传成功之后清除历史记录  
-      this.$refs.upload.clearFiles();  
+      this.$refs.uploadImg.clearFiles();  
       //this.AddContentForm.UpdatePhotoPath = this.imageUrl;
     },
     beforeAvatarUpload(UpdatePhoto) {

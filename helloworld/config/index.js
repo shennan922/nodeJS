@@ -37,8 +37,8 @@ module.exports = {
     url:'https://api.meeting.qq.com/v1/meetings'
   },
   appInfo:{
-    appID: "wx43ce1ba96c04fd5c", 
-    secret: "59d51309664e12b4dc7b69f37c60b945", 
+    appID: "wx43ce1ba96c04fd5c", //wx43ce1ba96c04fd5c
+    secret: "59d51309664e12b4dc7b69f37c60b945", //59d51309664e12b4dc7b69f37c60b945
     wxapi:"https://api.weixin.qq.com/cgi-bin",
     QRurl:'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=',
     snsurl:'https://api.weixin.qq.com/sns/oauth2',
@@ -49,6 +49,11 @@ module.exports = {
     sendMessageurl:'https://api.weixin.qq.com/cgi-bin/message/mass/sendall?',
     expire_seconds:604800
   },
-  host:'http://localhost:3000'
+  host:'http://localhost:3000',
+  openID:'oJVgv6a8CT5JWPbaS-21t2cp_NNk'
+  //bochao - oJVgv6ZH9l1Jq0BEO3K0QpYZD98I
+  //shennan - oJVgv6a8CT5JWPbaS-21t2cp_NNk
+  //david - oJVgv6e0Ob6vBRU7UdlwdeUG0HYM
+  //xintong - oJVgv6VS8300wzNDG0oCM8M6JNCo
   
 }

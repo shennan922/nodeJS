@@ -14,28 +14,7 @@ Content.belongsTo(SEList, {
   targetKey: 'SEID',
   as: 'SE'
 });
-async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTitle,ContentMessage){
-  var files = await ContentFile.findAll({where:{ContentID:ContentID},raw:true})
-  let text = []
-  
-  files.forEach(file => {
-    text.push({"name":file.FileName,"url":file.FileURL})
-  });
-  let str = '<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>'
-      str += '<title>'+ShortTitle+'</title></head>'
-      str += '<body><div style="text-align:left"><h3>'+ShortTitle+'</h3><table border="0">'
-      str += '<tr><td style="width: 30%;">SE</td><td style="width: 65%;">'+SEID+'</td></tr>'
-      str += '<tr><td>Content Category</td><td>'+ContentCategory+'</td></tr>'
-      str += '<tr><td>Search Term</td><td>'+SearchTerm+'</td></tr>'
-      if(text.length > 0){
-        text.forEach(text => {
-          str += '<tr><td>Attachmnet</td><td><a class=\'download\' href=\''+text.url+'\'>'+text.name+'</a></br></td></tr>'
-        });        
-      }
-      str += '<tr><td>Content</td><td><div style="width:80%; border:1px solid #000"><p>'+ContentMessage+'</p></div></td></tr>'
-      str += '</table></div></body></html>'
-  return str
-}
+
 
 module.exports = {
   async getList (req, res) {
@@ -122,62 +101,37 @@ module.exports = {
       logger.logger.fatal('Query MyContentFile fail: '+error)
     }
   },
-  async create (req, res) {
-    try {   
-      //let maxID = await Content.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('ContentID')),'maxID']]})
-      let token =await weChat.updateAccessToken(config.appInfo.appID,config.appInfo.secret)//await weChat.getAccessToken(Date.now(),config.appInfo.appID)
-      let content = await generateContent(req.body.ContentID,
-        req.body.SEID,
-        req.body.SearchTerm,
-        req.body.ContentCategory,
-        req.body.ShortTitle,
-        req.body.ContentMessage)
-        console.log(content)
-      let mediaID = await weChat.uploadImage(token,'.//contents//'+req.body.ContentID+'//'+req.body.PhotoName).then(async mid =>{
-        let material = {
-          "articles": [{
-            "title": req.body.ShortTitle,
-            "thumb_media_id": mid,
-            "author": 'sean',
-            "digest": 'zhaiyao',
-            "show_cover_pic": 1,
-            "content":  content,
-            "content_source_url": '',
-            "need_open_comment":1,
-            "only_fans_can_comment":1
-          },]
-        }
-        let textID = await weChat.uploadImageText(token,material,1)
+  async create (req, res) { 
+    let token =await weChat.updateAccessToken(config.appInfo.appID,config.appInfo.secret)//await weChat.getAccessToken(Date.now(),config.appInfo.appID)
+    await weChat.uploadImage(token,'.//contents//'+req.body.ContentID+'//'+req.body.PhotoName).then(async mid =>{     
+      let newContent = {
+        ContentID: req.body.ContentID,
+        SEID: req.body.SEID,
+        SearchTerm: req.body.SearchTerm,
+        ContentCategory: req.body.ContentCategory,
+        ShortTitle: req.body.ShortTitle,
+        ContentMessage: req.body.ContentMessage,
+        CreateDt: db.convertLocalTime(req.body.TimeStamp),
+        PhotoName:req.body.PhotoName,
+        PhotoPath:req.body.PhotoPath,
+        ImgID:mid,
+        TextID:null
+      }  
+      await Content.create(newContent)
 
-        let newContent = {
-          ContentID: req.body.ContentID,//maxID.dataValues.maxID+1,
-          SEID: req.body.SEID,
-          SearchTerm: req.body.SearchTerm,
-          ContentCategory: req.body.ContentCategory,
-          ShortTitle: req.body.ShortTitle,
-          ContentMessage: req.body.ContentMessage,
-          CreateDt: db.convertLocalTime(req.body.TimeStamp),
-          PhotoName:req.body.PhotoName,
-          PhotoPath:req.body.PhotoPath,
-          ImgID:mid,
-          TextID:textID
-        }
-  
-        await Content.create(newContent)   
-  
-        res.status(200).send({
-          code: 200,
-          message: 'Content创建成功'
-        })
-        logger.logger.info("Create Content: "+newContent.ContentID)        
+      res.status(200).send({
+        code: 200,
+        message: 'Content创建成功'
       })
-    } catch (error) {
+      logger.logger.info("Create Content: "+newContent.ContentID)        
+    })
+    .catch((error)=>{
       res.status(500).send({
         code: 500,
         error: '程序异常: ' + error
       })
       logger.logger.fatal("Create Content fail: "+req.body.SEIContentID+'/'+error)
-    }
+    })
   },
   
   async update (req, res) {
@@ -213,8 +167,14 @@ module.exports = {
     let form = new formidable.IncomingForm()
     form.encoding = 'utf-8' // 编码
     form.keepExtensions = true // 保留扩展名
-    form.parse(req, async (err, fields, files) => {
-      if(err) return next(err)
+    form.parse(req, async (error, fields, files) => {
+      if(error) {
+        res.status(500).send({
+          code: 500,
+          error: '程序异常: ' + error
+        })
+        logger.logger.fatal("Create Content fail: "+fields.ContentID+'/'+error)
+      }
       
       var pathNew = './/contents//'+fields.ContentID
       var pathFUll = pathNew + '//'+files.file.name
@@ -225,7 +185,7 @@ module.exports = {
             console.log('ok!');
         }
       });
-      fs.rename(files.file.path,pathFUll,(err)=>{if(err) return next(err)})
+      fs.rename(files.file.path,pathFUll,(err)=>{if(err) {logger.logger.fatal("Create Content fail: "+fields.ContentID+'/'+error)}})
       let maxID = await ContentFile.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('FileID')),'maxID']],where:{ContentID:fields.ContentID}})
 
       var newContentFile = {
@@ -233,7 +193,7 @@ module.exports = {
         FileID: maxID.FileID==undefined?0:maxID.FileID+1,
         FileName: files.file.name,
         FilePath: pathNew,
-        FileURL: config.host+'/myContent/downloadpdf?file='+pathFUll,
+        FileURL: config.host+'/myContent/downloadpdf?file='+files.file.FileName+'&ContentID='+fields.ContentID,
         CreateDt: db.convertLocalTime(fields.UploadTime)
       }
       await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
@@ -243,13 +203,6 @@ module.exports = {
         message: 'Content创建成功',
         data: 'success upload'
       })
-    })    
-    .catch((err)=>{
-      res.status(500).send({
-        code: 500,
-        error: '程序异常: ' + error
-      })
-      logger.logger.fatal("Create Content fail: "+req.body.SEIContentID+'/'+error)
     })  
   },
   async createPdf(req, res) {
@@ -281,7 +234,7 @@ module.exports = {
           FileID: file.FileID,
           FileName: file.FileName,
           FilePath: path,
-          FileURL: config.host+'/myContent/downloadpdf?file='+fullPath,
+          FileURL: config.host+'/myContent/downloadpdf?file='+file.FileName+'&ContentID='+file.ContentID,
           CreateDt: file.UploadTime
         }
         await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
@@ -373,56 +326,44 @@ module.exports = {
   },
 
   async imageUpload(req, res) {
-    try {
-      let form = new formidable.IncomingForm()
-      form.keepExtensions = true // 保留扩展名
-      form.parse(req,  (err, fields, files) => {
-        if(err) {
-          console.log(err); 
-          logger.logger.fatal(err)
-        }//return next(err)        
-        var pathNew = './/contents//'+fields.ContentID
-        var pathFUll = pathNew + '//'+files.file.name
-        
-        //var stat = fs.statSync(pathNew)
-        var stat = fs.existsSync(pathNew)
-        if(stat){
-          fs.readdirSync(pathNew).forEach(file => {
-            if(file.indexOf('.jpg')>0){
-              fs.unlink(pathNew+'//'+file, function(err){
-                if(err){logger.logger.fatal(err+'-'+pathNew+'//'+file)}
-              })
-            }
-          });
-        }else{
-          fs.mkdir(pathNew,{recursive:true},(err)=>{
-            if(err){
-                throw err;
-            }else{
-                console.log('ok!');
-            }
-          })
-        }
-        
-
-
-        
-
-        fs.rename(files.file.path,pathFUll,(err)=>{if(err) return next(err)})
-
-        res.status(200).send({
-          code: 200,
-          message: '封面图片创建成功',
-          data: req.body.fileName
+    let form = new formidable.IncomingForm()
+    form.keepExtensions = true // 保留扩展名
+    form.parse(req,  (err, fields, files) => {
+      if(err) {
+        console.log(err); 
+        logger.logger.fatal(err)
+      }//return next(err)        
+      var pathNew = './/contents//'+fields.ContentID
+      var pathFUll = pathNew + '//'+files.file.name
+      
+      //var stat = fs.statSync(pathNew)
+      var stat = fs.existsSync(pathNew)
+      if(stat){
+        fs.readdirSync(pathNew).forEach(file => {
+          if(file.indexOf('.jpg')>0){
+            fs.unlink(pathNew+'//'+file, function(err){
+              if(err){logger.logger.fatal(err+'-'+pathNew+'//'+file)}
+            })
+          }
+        });
+      }else{
+        fs.mkdir(pathNew,{recursive:true},(err)=>{
+          if(err){
+              throw err;
+          }else{
+              console.log('ok!');
+          }
         })
-      })
+      }
 
-    } catch (error) {
-      res.status(500).send({
-        code: 500,
-        error: '程序异常: ' + error
+      fs.rename(files.file.path,pathFUll,(err)=>{if(err){logger.logger.fatal(err)}})
+
+      res.status(200).send({
+        code: 200,
+        message: '封面图片创建成功',
+        data: req.body.fileName
       })
-    }
+    })
   },
 
   async photoUpload(req, res) {

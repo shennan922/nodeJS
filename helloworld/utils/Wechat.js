@@ -202,6 +202,48 @@ module.exports = {
     }
   },
   
+  async pushTexts(token, material,openId,refresh=1){ 
+    var data = {}
+    try{
+      /*
+      material = {
+        "articles": [{
+          "title": 'seantest',
+          "thumb_media_id": 'rg-P4AQ-1Njrj6-brqd5dEQTLot2ogyhX2HwbYEyrPU',
+          "author": 'sean',
+          "digest": 'zhaiyao',
+          "show_cover_pic": 1,
+          "content": 'zheshiceshiwenzhang',
+          "content_source_url": 'www.baidu.com',
+          "need_open_comment":1,
+          "only_fans_can_comment":1
+        },]
+      }
+      */
+      uploadUrl = config.appInfo.uploadPermNews;
+      data = material
+      var ticket =await axios.post(`${config.appInfo.uploadPermNews}access_token=${token}`, data, function (error, response, body) {
+        if(error!==null){
+          logger.logger.error("upload image_text error: "+error.message)
+          reject(error.message);
+        }
+        resolve(JSON.parse(body));
+      }); 
+      if(ticket.data.errcode==42001&&refresh==1){
+        token = await updateAccessToken(config.appInfo.appID,config.appInfo.secret)
+        return await this.uploadImageText(token, material,0)
+      }
+      else{
+        await pushContentPreview(token,ticket.data.media_id,openId)
+        return ticket.data.media_id  
+      }                
+    }catch (error)
+    {
+      logger.logger.error("upload image_text error: "+error.message)
+      return ''
+    }
+  },
+
   async uploadImageText(token, material,refresh=1){ 
     var data = {}
     try{
