@@ -37,7 +37,7 @@
             </el-table-column>
             <el-table-column min-width="13%" prop="CreateDt" label="CreateDate">
               <template scope="scope">
-                {{dateFormat(scope.row.CreateDt)}}
+                {{dateFormatCreateDT(scope.row.CreateDt)}}
               </template>
             </el-table-column>
             <el-table-column min-width="18%" label="Operation">
@@ -91,35 +91,43 @@
                     <p style="text-align:left"><span style="color:#F78875">*</span> 开始时间</p>
                     <el-col :span="8">
                       <el-form-item prop="StartDate">
-                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate"></el-date-picker>
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate" @change="changeStartTime()"></el-date-picker>
                       </el-form-item>
                     </el-col>
                     <el-col :span="8">  
                       <el-form-item lable="开始时间" prop="StartTime">
-                        <el-time-select v-model="AddMeetingForm.StartTime" :picker-options="{start: '08:30',step: '00:15',end: '23:30'}" placeholder="选择时间" class="startTime"></el-time-select>
+                        <el-time-select v-model="AddMeetingForm.StartTime" :picker-options="{start: '08:30',step: '00:15',end: '24:00'}" placeholder="选择时间" class="startTime" @change="changeStartTime()" ></el-time-select>
                       </el-form-item>
                     </el-col>
                   </el-row>
+                  <el-row style="float:left">
+                    <p v-if="startTimeVisible" :visible.sync="startTimeVisible" class ="startP">开始时间不能早于当前时间</p>  
+                  </el-row>    
                   <el-row>
                     <p style="text-align:left"><span style="color:#F78875">*</span> 结束时间</p>
                     <el-col :span="8">
                       <el-form-item lable ="结束时间" prop="EndDate">
-                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.EndDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate"></el-date-picker>
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.EndDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate" @change="changeEndTime()" ></el-date-picker>
                       </el-form-item>
                     </el-col>
                     <el-col :span="8">
+                      <!-- ,minTime:AddMeetingForm.StartTime -->
                       <el-form-item lable ="结束时间" prop="EndTime">
-                        <el-time-select v-model="AddMeetingForm.EndTime" :picker-options="{start: '08:30',step: '00:15',end: '23:30',minTime:AddMeetingForm.StartTime}" placeholder="选择时间" class="startTime"></el-time-select> 
+                        <el-time-select v-model="AddMeetingForm.EndTime" :picker-options="{start: '08:30',step: '00:15',end: '24:00'}" placeholder="选择时间" class="startTime" @change="changeEndTime()"></el-time-select> 
                       </el-form-item>
                     </el-col>
                   </el-row>
-                  <el-form-item prop="IsRecurrent">
-                    <span slot="label">
-                    <el-checkbox v-model="AddMeetingForm.IsRecurrent">周期性会议</el-checkbox>
-                    </span>
-                  </el-form-item>
+                  <el-row style="float:left">
+                    <p v-if="endTimeVisible" :visible.sync="endTimeVisible" class ="startP">会议结束时间应该晚于开始时间</p>  
+                    <p v-if="endTimeVisible1" :visible.sync="endTimeVisible1" class ="startP">会议结束时间不能早于当前时间</p> 
+                  </el-row>
+                  <el-row style="float:left;width:100%"> 
+                    <el-form-item prop="IsRecurrent" style="text-align:left">
+                      <el-checkbox v-model="AddMeetingForm.IsRecurrent">周期性会议</el-checkbox>
+                    </el-form-item>
+                  </el-row>
                   <el-form-item lable="会议地点(选填)" prop="Room" >
-                    <p style="text-align:left">会议地点(选填)</p>
+                    <p style="text-align:left;float:left">会议地点(选填)</p>
                     <el-input v-model="AddMeetingForm.Room" placeholder="请输入会议地点"></el-input>
                   </el-form-item>
                   <!-- <el-form-item prop="Status" style="text-align:left" >
@@ -246,6 +254,9 @@ export default {
       value2:'', 
       checked:true, 
       joinMuteChecked:true,
+      startTimeVisible:false,
+      endTimeVisible:false,
+      endTimeVisible1:false,
       SEForm: {                   //table数据源
         SEID:"",
         SEName:"",
@@ -344,11 +355,11 @@ export default {
 
   methods: {   
     HandleCancel(row){
-      if(row.Status =="0")
+      if(row.Status != "1")
       {
          this.$message({
           type: 'info',
-          message: '会议已经是取消状态！'
+          message: '状态是取消,已开始,已结束的会议不能取消！'
         });
         return;
       }
@@ -463,7 +474,30 @@ export default {
       //return year+"-"+month+"-"+day+" "+hours+":"+minutes;
       return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
   },
+    dateFormatCreateDT(time){
+      var date=new Date(time);
+      var year=date.getFullYear();
+      /* 在日期格式中，月份是从0开始的，因此要加0
+        * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+        * */
+      var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+      var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+      var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours()-8;
+      var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+      var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+      // 拼接
+      //return year+"-"+month+"-"+day+" "+hours+":"+minutes;
+      return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
+    },
     handleEdit(row) {
+      if(row.Status !="1")
+      {
+         this.$message({
+          type: 'info',
+          message: '状态是取消,已开始,已结束的会议不能修改！'
+        });
+        return;
+      }
 
       this.AddMeetingForm.JoinMute = row.JoinMute
       if(row.JoinMute != "1")
@@ -567,6 +601,94 @@ export default {
       this.formStatus = 0 
       this.changeFlag = false
       this.dialogCreateVisible = false;
+      this.startTimeVisible = false;
+      this.endTimeVisible = false;
+      this.endTimeVisible1 = false;
+    },
+    changeStartTime(){
+     
+      this.getCurrentTime();
+      var currentDay = this.currentTime.substring(0,10);
+      var currentHS = this.currentTime.substring(11,16);
+      var inputDay = this.AddMeetingForm.StartDate;
+      var inputHS = this.AddMeetingForm.StartTime;
+    
+      if(this.AddMeetingForm.StartTime!="" && currentDay == this.AddMeetingForm.StartDate && (this.AddMeetingForm.StartTime < currentHS))
+      {
+           //alert(1);
+           this.startTimeVisible = true;
+           this.AddMeetingForm.EndTime == "";
+      }
+      else if(this.AddMeetingForm.EndDate!="" && this.AddMeetingForm.StartDate > this.AddMeetingForm.EndDate)
+      {
+        //alert(2);
+          this.endTimeVisible = true;
+          this.AddMeetingForm.EndTime == "";
+      }
+      else if(this.AddMeetingForm.EndDate!="" && this.AddMeetingForm.StartDate!="" && this.AddMeetingForm.EndDate == this.AddMeetingForm.StartDate && this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime)
+      {
+        //alert(3);
+          this.endTimeVisible = true;
+          this.AddMeetingForm.EndTime == "";
+      }
+      else{
+        //alert(4);
+          this.startTimeVisible = false;
+          this.endTimeVisible = false;
+
+          if(this.AddMeetingForm.StartTime != "")
+          {
+              var inputH = this.AddMeetingForm.StartTime.substring(0,2);
+              var inputS = this.AddMeetingForm.StartTime.substring(3,5);
+
+              if(inputH == "23"){
+
+              }
+              else{
+                inputH = parseInt(inputH) + 1;
+              }
+              if(inputH < 10)
+              {
+                var inputEndHS = '0'+ inputH+':'+inputS
+              }
+              else{
+                var inputEndHS =  inputH+':'+inputS
+              }
+                this.AddMeetingForm.EndTime = inputEndHS;
+              }
+          }
+     
+    },
+    changeEndTime(){
+      this.getCurrentTime();
+      var currentDay = this.currentTime.substring(0,10);
+      var currentHS = this.currentTime.substring(11,16);
+      // alert("this.AddMeetingForm.StartDate:" + this.AddMeetingForm.StartDate);
+      // alert("this.AddMeetingForm.StartTime:" + this.AddMeetingForm.StartTime);
+      // alert("this.AddMeetingForm.EndTime:" + this.AddMeetingForm.EndTime);
+      // alert("this.AddMeetingForm.EndDate:" + this.AddMeetingForm.EndDate);
+      // alert("currentDay:" + currentDay);
+      // alert("currentHS:" + currentHS);
+      if(this.AddMeetingForm.EndDate != "" && this.AddMeetingForm.StartDate > this.AddMeetingForm.EndDate)
+      {
+        //alert(5);
+          this.endTimeVisible = true;
+      }
+      else if(this.AddMeetingForm.EndDate == this.AddMeetingForm.StartDate && this.AddMeetingForm.EndTime!="" &&this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime)
+      {
+        //alert(6);
+          this.endTimeVisible = true;
+      }
+      else if(this.AddMeetingForm.StartDate =="" && this.AddMeetingForm.StartTime =="" && this.AddMeetingForm.EndTime !="" && this.AddMeetingForm.EndDate == currentDay && this.AddMeetingForm.EndTime < currentHS)
+      {
+        //alert(8);
+          this.endTimeVisible1 = true;
+      }
+      else{
+        //alert(7);
+        this.endTimeVisible = false;
+        this.endTimeVisible1 = false;
+      }
     },
     statusFormat(row){
       if (row.Status === 1) {
@@ -588,47 +710,50 @@ export default {
       this.currentTime = createDate;
     },
     async createSubmit() {
-      //await this.getCurrentTime();
-      var totalStartDate= this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime;
-      var totalEndDate = this.AddMeetingForm.EndDate + "  " +this.AddMeetingForm.EndTime;
+      this.getCurrentTime();
+      if(this.startTimeVisible == true || this.endTimeVisible == true){
+        return;
+      }
+      // var totalStartDate= this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime;
+      // var totalEndDate = this.AddMeetingForm.EndDate + "  " +this.AddMeetingForm.EndTime;
       
-      var myDate = new Date()
-      var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
-      var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
-      var dataToDate = myDate.getFullYear() + '-' + month + '-' + day
-      var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
-      var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
-      var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
-      var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
-      this.currentTime = createDate;
+      // var myDate = new Date()
+      // var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
+      // var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
+      // var dataToDate = myDate.getFullYear() + '-' + month + '-' + day
+      // var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
+      // var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
+      // var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
+      // var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
+      // this.currentTime = createDate;
 
-      var hhmm=hours1 + ':' + minutes1;
+      // var hhmm=hours1 + ':' + minutes1;
 
-      if(dataToDate == this.AddMeetingForm.StartDate){
-          if(this.AddMeetingForm.StartTime < hhmm){
-              this.$message({
-              type: 'info',
-              message: '请创建当前时间后的会议！'
-            });
-            return;
-          }
-      }
-      if(totalStartDate>=totalEndDate)
-      {
-        this.$message({
-              type: 'info',
-              message: '结束时间必须大于开始时间！'
-            });
-        return;
-      }
-      if(totalStartDate>=totalEndDate)
-      {
-        this.$message({
-              type: 'info',
-              message: '结束时间必须大于开始时间！'
-            });
-        return;
-      }  
+      // if(dataToDate == this.AddMeetingForm.StartDate){
+      //     if(this.AddMeetingForm.StartTime < hhmm){
+      //         this.$message({
+      //         type: 'info',
+      //         message: '请创建当前时间后的会议！'
+      //       });
+      //       return;
+      //     }
+      // }
+      // if(totalStartDate>=totalEndDate)
+      // {
+      //   this.$message({
+      //         type: 'info',
+      //         message: '结束时间必须大于开始时间！'
+      //       });
+      //   return;
+      // }
+      // if(totalStartDate>=totalEndDate)
+      // {
+      //   this.$message({
+      //         type: 'info',
+      //         message: '结束时间必须大于开始时间！'
+      //       });
+      //   return;
+      // }  
       this.$refs.AddMeetingForm.validate((valid) => {
         if (valid) {
           this.$confirm('确认提交？', '提示', {}).then(async() => {   
@@ -693,45 +818,49 @@ export default {
       if(this.AddMeetingForm.Password ==""){
           this.AddMeetingForm.Password = null
       }
-      var totalStartDate= this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime;
-      var totalEndDate = this.AddMeetingForm.EndDate + "  " +this.AddMeetingForm.EndTime;
-      
-      var myDate = new Date()
-      var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
-      var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
-      var dataToDate = myDate.getFullYear() + '-' + month + '-' + day
-      var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
-      var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
-      var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
-      var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
-      this.currentTime = createDate;
-
-      var hhmm=hours1 + ':' + minutes1;
-
-      if(dataToDate > this.AddMeetingForm.StartDate){
-          this.$message({
-            type: 'info',
-            message: '会议的开始日期不能小于今天！'
-          });
-            return;
-      }
-      if(dataToDate == this.AddMeetingForm.StartDate){
-          if(this.AddMeetingForm.StartTime < hhmm){
-              this.$message({
-              type: 'info',
-              message: '只能更新当前时间后的会议！'
-            });
-            return;
-          }
-      }
-      if(totalStartDate>=totalEndDate)
-      {
-        this.$message({
-              type: 'info',
-              message: '结束时间必须大于开始时间！'
-            });
+      this.getCurrentTime();
+      if(this.startTimeVisible == true || this.endTimeVisible == true){
         return;
       }
+      // var totalStartDate= this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime;
+      // var totalEndDate = this.AddMeetingForm.EndDate + "  " +this.AddMeetingForm.EndTime;
+      
+      // var myDate = new Date()
+      // var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
+      // var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
+      // var dataToDate = myDate.getFullYear() + '-' + month + '-' + day
+      // var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
+      // var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
+      // var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
+      // var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
+      // this.currentTime = createDate;
+
+      // var hhmm=hours1 + ':' + minutes1;
+
+      // if(dataToDate > this.AddMeetingForm.StartDate){
+      //     this.$message({
+      //       type: 'info',
+      //       message: '会议的开始日期不能小于今天！'
+      //     });
+      //       return;
+      // }
+      // if(dataToDate == this.AddMeetingForm.StartDate){
+      //     if(this.AddMeetingForm.StartTime < hhmm){
+      //         this.$message({
+      //         type: 'info',
+      //         message: '只能更新当前时间后的会议！'
+      //       });
+      //       return;
+      //     }
+      // }
+      // if(totalStartDate>=totalEndDate)
+      // {
+      //   this.$message({
+      //         type: 'info',
+      //         message: '结束时间必须大于开始时间！'
+      //       });
+      //   return;
+      // }
       this.$refs.AddMeetingForm.validate((valid) => {
         if (valid) {
           this.$confirm('确认提交？', '提示', {}).then(async() => { 
@@ -829,6 +958,7 @@ export default {
     border:  #2daaf3;
     padding-top: 20px;
     margin:0px;
+    padding-left:5px;
 }
 
 .NewButton{
@@ -953,6 +1083,12 @@ body .el-table th.gutter{
   .el-cascader{
     width:100%
   }
+  .startP{
+    font-size:12px;
+    text-align:left;
+    margin-top:-13%;
+    color:#F56C6C;
+  }
 }
 .el-col_NewMettingLeft{
   margin-left:5%;
@@ -997,4 +1133,5 @@ body .el-table th.gutter{
 .el-scrollbar__wrap{
     overflow-x: hidden!important;
   }
+
 </style>
