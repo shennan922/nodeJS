@@ -569,12 +569,21 @@ export default {
       this.dialogCreateVisible = false;
     },
     statusFormat(row){
-      if (row.Status === 1) {
-        return "正常";
-      } 
-      else {
-        return "取消";
+      switch(row.Status){
+        case 0:
+          return '取消'
+          break
+        case 1:
+          return '正常'
+          break
+        case 2:
+          return '已开始'
+          break
+        case 3:
+          return '已结束'
+          break
       }
+
     },
     getCurrentTime(){
       var myDate = new Date()

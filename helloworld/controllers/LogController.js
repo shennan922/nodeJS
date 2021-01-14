@@ -3,6 +3,39 @@ var fs=require('fs');
 var readline = require('readline');
 
 module.exports = {
+    async getLogList(req, res){
+        fs.readdir('.//logs','utf-8',(err,data)=>{
+            let list = []
+            data.reverse().forEach(file=>{
+                list.push({'fileList':file})
+            })
+            res.status(200).send({
+                code: 200,
+                data: list
+            })
+        })        
+    },
+
+    async getLog(req, res){
+        var logPath = './/logs//'+req.query.fileName
+
+        var log = []
+        var fRead = fs.createReadStream(logPath);
+        var objReadline = readline.createInterface({input: fRead});
+        //按行读取日志
+        objReadline.on('line', (line)=>{
+            var itemStr = line.trim();
+            log.push({log:itemStr})
+        })
+  
+        objReadline.on('close', ()=>{
+            res.status(200).send({
+                code: 200,
+                log: log
+            })
+        });
+    },
+
     async readLog(req, res){
     //函数接受3个参数，日期、精度(天时分秒)和操作（查找、刷新或者默认）
     //date,type,operation,logReadFlag
@@ -32,7 +65,6 @@ module.exports = {
         //拼接日志文件名称
         var logStr = '';
         fs.stat(logPath, function (err, stats) {
-            console.log('111')
             //获取对应的日志文件状态
             if(err){
             //日志不存在或者异常处理信息
@@ -40,7 +72,6 @@ module.exports = {
                 var info = '无日志信息可供查看: '+err
                 console.log(info)
             }else{
-                console.log('333')
                 var log = []        
                 var lineCount = 0;                
                 var fReadName = logPath;

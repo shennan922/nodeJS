@@ -9,7 +9,11 @@ const Meeting = db.Meeting
 module.exports = {
   async getList (req, res) {
     try {
-      var data = await Meeting.findAll({raw: true})
+      var data = await Meeting.findAll({
+        order: [
+          ['CreateDt', 'DESC']
+        ],
+        raw: true})
 
       if (data) {
         //data = JSON.parse(JSON.stringify(data).replace(/NodeDesc/g, 'Hospital').replace(/NodeID/g, 'HospitalID').replace(/Department.Dep/g, 'Department').replace(/Geo.City/g, 'City'))

@@ -143,6 +143,7 @@ export default {
   
   data() {
     return {
+      currentTime:"",
       dialogCreateVisible:false,  //详细页面显示/隐藏
       formStatus:0,               //详细页面状态: 0-隐藏/1-新增/2-编辑
       changeFlag:false,           //编辑页面回显/手动选择
@@ -221,7 +222,19 @@ export default {
     }
   },
 
-  methods: {    
+  methods: { 
+    getCurrentTime(){
+      var myDate = new Date()
+      var month = myDate.getMonth() <= 9 ? '0' + (myDate.getMonth() + 1) : myDate.getMonth() + 1
+      var day = myDate.getDate() <= 9 ? '0' + (myDate.getDate()) : myDate.getDate()
+      var dataToDate = myDate.getFullYear() + '-' + month + '-' + day
+      var hours1 = myDate.getHours() <= 9 ? '0' + (myDate.getHours()) : myDate.getHours() // 获取系统时，
+      var minutes1 = myDate.getMinutes() <= 9 ? '0' + (myDate.getMinutes()) : myDate.getMinutes() // 分
+      var seconds1 = myDate.getSeconds() <= 9 ? '0' + (myDate.getSeconds()) : myDate.getSeconds() // 秒
+      var createDate = myDate.getFullYear() + '-' + month + '-' + day + ' ' + hours1 + ':' + minutes1 + ':' + seconds1
+      this.currentTime = createDate;
+    },
+
     handleChange(flag){
       if(flag=='city'){
         this.AddSEForm.HospitalID = ''
@@ -343,6 +356,7 @@ export default {
       this.changeFlag = false
     },
     async createSubmit(formStatus) {
+      this.getCurrentTime();
       this.$refs.AddSEForm.validate((valid) => {
         if (valid) {
           this.$confirm('确认提交？', '提示', {}).then(async() => {    
@@ -354,7 +368,8 @@ export default {
                 Hospital: this.AddSEForm.HospitalID,
                 Department: this.AddSEForm.DepID,
                 MLName: this.AddSEForm.MLID,
-                Team:this.AddSEForm.TeamID
+                Team:this.AddSEForm.TeamID,
+                CreateDt: this.currentTime
               }
             ).then((res) => {
               if (res.code == 400){
@@ -395,7 +410,8 @@ export default {
                 City: this.AddSEForm.CityID,
                 Department: this.AddSEForm.DepID,
                 MLName: this.AddSEForm.MLID,
-                Team:this.AddSEForm.TeamID
+                Team:this.AddSEForm.TeamID,
+                ModifyDt: this.currentTime
               }
             ).then((res) => {
               if (res.code == 400){

@@ -69,6 +69,9 @@ module.exports = {
           }
         ],
         where:{SEName :{[Op.like]:'%'+req.query.Name+'%'}},
+        order: [
+          ['CreateDt', 'DESC']
+        ],
         raw: true
         
       })
@@ -112,7 +115,8 @@ module.exports = {
           TeamID: req.body.Team,
           MLID: req.body.MLName,
           CityID: req.body.City,
-          DepID: req.body.Department
+          DepID: req.body.Department,
+          CreateDt:req.body.CreateDt
         }
         await SEList.create(newSE)
       }
@@ -121,13 +125,13 @@ module.exports = {
         code: 200,
         message: 'SE创建成功'
       })
-      logger.logger.info("Create SE: "+newSE.SEID)
+      logger.logger.info("Create SE: "+req.body.SEID)
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '程序异常: ' + error
       })
-      logger.logger.fatal("Create SE fail: "+newSE.SEID+'/'+error)
+      logger.logger.fatal("Create SE fail: "+req.body.SEID+'/'+error)
     }
   },
   async update (req, res) {
@@ -138,7 +142,8 @@ module.exports = {
         TeamID: req.body.Team,
         MLID: req.body.MLName,
         CityID: req.body.City,
-        DepID: req.body.Department
+        DepID: req.body.Department,
+        ModifyDt:req.body.ModifyDt
       }
       await SEList.update(newSE,{where:{SEID: req.body.SEID}})
       

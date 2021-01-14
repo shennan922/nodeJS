@@ -44,7 +44,15 @@ module.exports = (sequelize, DataTypes) => {
     OpenID: {
       type: DataTypes.STRING,
       field: 'OpenID'
-    }
+    },
+    CreateDt: {
+      type: DataTypes.DATE,      
+      field: 'CreateDt'
+    },
+    ModifyDt: {
+      type: DataTypes.DATE,      
+      field: 'ModifyDt'
+    },
   },
   {
     sequelize,

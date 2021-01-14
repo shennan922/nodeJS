@@ -19,7 +19,7 @@ async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTi
   let text = []
   
   files.forEach(file => {
-    text.push({"name":file.FileName,"url":file.FileURL})
+    //text.push({"name":file.FileName,"url":file.FileURL})
   });
   let str = '<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>'
       str += '<title>'+ShortTitle+'</title></head>'
@@ -29,18 +29,25 @@ async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTi
       str += '<tr><td>Search Term</td><td>'+SearchTerm+'</td></tr>'
       if(text.length > 0){
         text.forEach(text => {
-          str += '<tr><td>Attachmnet</td><td><a class=\'download\' href=\''+text.url+'\'>'+text.name+'</a></br></td></tr>'
+          //str += '<tr><td>Attachmnet</td><td><a class="download" href="'+text.url+'">'+text.name+'</a></br></td></tr>'
+          str += '<tr><td>Attachmnet</td><td><a class="download" href="http://localhost:3000/myContent/downloadpdf?file=undefined&ContentID=892118">4444.pdf</a></br></td></tr>'
         });        
       }
-      str += '<tr><td>Content</td><td><div style="width:80%; border:1px solid #000"><p>'+ContentMessage+'</p></div></td></tr>'
-      str += '</table></div></body></html>'
+      //str += '<tr><td>Content</td><td><div style="width:80%; border:1px solid #000"><p>'+ContentMessage+'</p></div></td></tr>'
+      str += '<tr><td>Content</td><td><div style="width:80%; border:1px solid #000"><p><img src="http://mmbiz.qpic.cn/mmbiz_jpg/QBmZfnm0uBfAcjSnnpDodSa9CwsgQrJ94juCMyVsfNNlVxVwmFzXL7DUZvDHTSuI1ibUzfUd4dITVItYCN9wWNg/0"></p></div></td></tr>'
+      str += '</table>'
+      str += '</div></body></html>'
   return str
 }
 
 module.exports = {
   async getList (req, res) {
     try {
-      var data = await MyPush.findAll({raw: true})
+      var data = await MyPush.findAll({
+        order: [
+          ['CreateDt', 'DESC']
+        ],
+        raw: true})
 
       if (data) {
         //data = JSON.parse(JSON.stringify(data).replace(/NodeDesc/g, 'Hospital').replace(/NodeID/g, 'HospitalID').replace(/Department.Dep/g, 'Department').replace(/Geo.City/g, 'City'))
@@ -93,7 +100,7 @@ module.exports = {
           content.ContentCategory,
           content.ShortTitle,
           content.ContentMessage)
-        
+        console.log(material)
         let showCover = 0
         if(i==0){
           //showCover = 1
@@ -139,8 +146,8 @@ module.exports = {
       })
       logger.logger.info("Create MyPushList: "+req.body.PushID)
     } catch (error) {
-      res.status(500).send({
-        code: 500,
+      res.status(200).send({
+        code: 400,
         error: '程序异常: ' + error
       })
       logger.logger.fatal("Create MyPushList fail: "+req.body.PushID+'/'+error)
@@ -200,3 +207,4 @@ module.exports = {
     }
   }
 }
+

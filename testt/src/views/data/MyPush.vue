@@ -25,10 +25,10 @@
             <el-table-column min-width="15%" prop="Priority" label="Priority" sortable :formatter="priorityFormat"></el-table-column>
             <el-table-column min-width="15%" prop="RequestType" label="Request Type" :formatter="requestTypeFormat"></el-table-column>
             <el-table-column min-width="18%" label="Operation">
-              <template>
+              <template slot-scope="scope">
                 <!-- @click="handlePushEdit(scope.row)" -->
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" plain><i class="el-icon-edit"></i>Edit</el-button>
-                <el-button size="mini" type="info" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
+                <el-button size="mini" type="info" plain class="buttonDelete" @click="onPushDelete(scope.row.PushID)"><i class="el-icon-delete"></i>Delete</el-button>
                 <!-- @click="handlePushDelete(scope.row)" -->
               </template>
             </el-table-column>
@@ -56,8 +56,7 @@
             :model="AddMyPushForm" 
             :rules="formStatus!=0?addMyPushFormRules:null"  
             label-width="105px"
-            label-position="left"
-                      
+            label-position="left"                      
             >
               <el-row>
                 <el-col :span="10" class="el-col_MyPush">
@@ -338,6 +337,20 @@ export default {
   },
 
   methods: {  
+    onPushDelete(pushID){
+      MyPushService.myPushDelete(pushID).then((res) => {
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        });
+        this.getDetailList();
+      }).catch((error) => {
+        this.$message({
+          type: 'info',
+          message: '删除失败'+error
+        });
+      })
+    },
     getSEList() {
       SEService.getSEList("")
         .then((res) => {

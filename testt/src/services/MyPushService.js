@@ -8,6 +8,10 @@ export default {
   async myPushCreate (data) {
     const response = await req.request.post('/myPush/create',data)
     return response.data
+  },
+  async myPushDelete (data) {
+    const response = await req.request.get('/myPush/delete?PushID='+data)
+    return response.data
   }
 
 }

@@ -91,23 +91,28 @@ module.exports = {
     })
   },
   async downloadImg(req, res) {    
-    res.set({
-      "Content-Type":"application/jpeg",//告诉浏览器这是一个二进制文件
-      "Content-Disposition":"attachment; filename=xxx.jpg"//告诉浏览器这是一个需要下载的文件      
-    });
-    // fs.createReadStream('helloworld/public/images/'+req.params.ContentID).pipe(res); 
-    fs.createReadStream('public/images/'+req.params.ContentID).pipe(res); 
-    /*
-    Content.findByPk(req.params.ContentID).then((img)=>{
-      fs.createReadStream('.//contents//'+req.params.ContentID+'//'+img.PhotoName).pipe(res);   
-    }).catch((err)=>{
-      res.status(400).send({
-        code: 400,
-        data:null,
-        message:'fail: '+err
+    try{
+      res.set({
+        "Content-Type":"application/jpeg",//告诉浏览器这是一个二进制文件
+        "Content-Disposition":"attachment; filename=xxx.jpg"//告诉浏览器这是一个需要下载的文件      
+      });
+      // fs.createReadStream('helloworld/public/images/'+req.params.ContentID).pipe(res); 
+      fs.createReadStream('public/images/'+req.params.ContentID).pipe(res); 
+      /*
+      Content.findByPk(req.params.ContentID).then((img)=>{
+        fs.createReadStream('.//contents//'+req.params.ContentID+'//'+img.PhotoName).pipe(res);   
+      }).catch((err)=>{
+        res.status(400).send({
+          code: 400,
+          data:null,
+          message:'fail: '+err
+        })
       })
-    })
-    */
+      */
+    }
+    catch(err){
+      logger.logger.fatal("download UE img fail: " + req.params.ContentID + '/' + err)
+    }
 
 
   },

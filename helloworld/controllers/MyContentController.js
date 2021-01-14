@@ -28,6 +28,9 @@ module.exports = {
             as: 'SE'
           }
         ],
+        order: [
+          ['CreateDt', 'DESC']
+        ],
         raw: true
       })
       
@@ -103,7 +106,18 @@ module.exports = {
   },
   async create (req, res) { 
     let token =await weChat.updateAccessToken(config.appInfo.appID,config.appInfo.secret)//await weChat.getAccessToken(Date.now(),config.appInfo.appID)
-    await weChat.uploadImage(token,'.//contents//'+req.body.ContentID+'//'+req.body.PhotoName).then(async mid =>{     
+    var pathNew = './/contents//'+req.body.ContentID+'//'+req.body.PhotoName
+    var stat = fs.existsSync(pathNew)
+    if(!stat){
+      res.status(200).send({
+        code: 400,
+        message: '图片不存在: '+ req.body.ContentID+'//'+req.body.PhotoName
+      })
+      logger.logger.error("图片不存在 : "+req.body.ContentID+'//'+req.body.PhotoName) 
+      return
+    }
+
+    await weChat.uploadImage(token,pathNew).then(async mid =>{     
       let newContent = {
         ContentID: req.body.ContentID,
         SEID: req.body.SEID,
@@ -123,14 +137,14 @@ module.exports = {
         code: 200,
         message: 'Content创建成功'
       })
-      logger.logger.info("Create Content: "+newContent.ContentID)        
+      logger.logger.info("Create Content: "+req.body.ContentID)        
     })
     .catch((error)=>{
       res.status(500).send({
         code: 500,
         error: '程序异常: ' + error
       })
-      logger.logger.fatal("Create Content fail: "+req.body.SEIContentID+'/'+error)
+      logger.logger.fatal("Create Content fail: "+req.body.ContentID+'/'+error)
     })
   },
   
@@ -174,15 +188,15 @@ module.exports = {
           error: '程序异常: ' + error
         })
         logger.logger.fatal("Create Content fail: "+fields.ContentID+'/'+error)
+        return
       }
       
       var pathNew = './/contents//'+fields.ContentID
       var pathFUll = pathNew + '//'+files.file.name
       fs.mkdir(pathNew,{recursive:true},(err)=>{
         if(err){
-            throw err;
-        }else{
-            console.log('ok!');
+          logger.logger.fatal(err)
+          return
         }
       });
       fs.rename(files.file.path,pathFUll,(err)=>{if(err) {logger.logger.fatal("Create Content fail: "+fields.ContentID+'/'+error)}})
@@ -193,7 +207,7 @@ module.exports = {
         FileID: maxID.FileID==undefined?0:maxID.FileID+1,
         FileName: files.file.name,
         FilePath: pathNew,
-        FileURL: config.host+'/myContent/downloadpdf?file='+files.file.FileName+'&ContentID='+fields.ContentID,
+        FileURL: config.host+'/myContent/downloadpdf?file='+files.file.name+'&ContentID='+fields.ContentID,
         CreateDt: db.convertLocalTime(fields.UploadTime)
       }
       await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
@@ -211,9 +225,8 @@ module.exports = {
       var path = './/contents//'+req.body.file[0].ContentID
       fs.mkdir(path,{recursive:true},(err)=>{
         if(err){
-            throw err;
-        }else{
-            console.log('ok!');
+          logger.logger.fatal(err)
+          return
         }
       });
 
@@ -266,30 +279,33 @@ module.exports = {
   },
   
   async downloadImg(req, res) {    
-    res.set({
-      "Content-Type":"application/jpeg",//告诉浏览器这是一个二进制文件
-      "Content-Disposition":"attachment; filename=xxx.jpg"//告诉浏览器这是一个需要下载的文件      
-    });
-    // fs.createReadStream('helloworld/public/images/'+req.params.ContentID).pipe(res); 
-    fs.createReadStream('public/images/'+req.params.ContentID).pipe(res); 
-    /*
-    Content.findByPk(req.params.ContentID).then((img)=>{
-      fs.createReadStream('.//contents//'+req.params.ContentID+'//'+img.PhotoName).pipe(res);   
-    }).catch((err)=>{
-      res.status(400).send({
-        code: 400,
-        data:null,
-        message:'fail: '+err
+    try{
+      res.set({
+        "Content-Type":"application/jpeg",//告诉浏览器这是一个二进制文件
+        "Content-Disposition":"attachment; filename="+req.params.ContentID+"\""//告诉浏览器这是一个需要下载的文件      
+      });
+      fs.createReadStream('public/images/'+req.params.ContentID).pipe(res); 
+      /*
+      Content.findByPk(req.params.ContentID).then((img)=>{
+        fs.createReadStream('.//contents//'+req.params.ContentID+'//'+img.PhotoName).pipe(res);   
+      }).catch((err)=>{
+        res.status(400).send({
+          code: 400,
+          data:null,
+          message:'fail: '+err
+        })
       })
-    })
-    */
-
-
+      */
+    }
+    catch(err){
+      logger.logger.fatal("download UE img fail: " + req.params.ContentID + '/' + err)
+    }
   },
 
   async delete (req, res) {
     try {
       await Content.destroy({where: {ContentID: req.query.ContentID}})
+      await ContentFile.destroy({where: {ContentID: req.query.ContentID}})
       res.status(200).send({
         message: '数据删除成功'
       })
@@ -342,21 +358,27 @@ module.exports = {
         fs.readdirSync(pathNew).forEach(file => {
           if(file.indexOf('.jpg')>0){
             fs.unlink(pathNew+'//'+file, function(err){
-              if(err){logger.logger.fatal(err+'-'+pathNew+'//'+file)}
+              if(err){
+                logger.logger.fatal(err+'-'+pathNew+'//'+file)
+              }
             })
           }
         });
       }else{
         fs.mkdir(pathNew,{recursive:true},(err)=>{
           if(err){
-              throw err;
-          }else{
-              console.log('ok!');
+            logger.logger.fatal(err)
+            return
           }
         })
       }
 
-      fs.rename(files.file.path,pathFUll,(err)=>{if(err){logger.logger.fatal(err)}})
+      fs.rename(files.file.path,pathFUll,(err)=>{
+        if(err){
+          logger.logger.fatal(err)
+          return
+        }
+      })
 
       res.status(200).send({
         code: 200,

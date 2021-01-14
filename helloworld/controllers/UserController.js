@@ -10,7 +10,7 @@ function tokenSign ({ id, email }) {
   try {
     return Jwt.sign({ id, email }, config.token.secretOrPrivateKey, config.token.options)
   } catch (error) {
-    throw (error)
+    logger.logger.fatal("Authentication fail: " + email + '/' + error)
   }
 }
 

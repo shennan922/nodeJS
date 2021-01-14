@@ -4,9 +4,12 @@
     </h3>
     <el-container >
         <el-aside style="width: 15%">
-          <el-table  :data="fileName" border style="width: 100%" class="table"
-            :row-style="tableRowStyle" :header-cell-style="tableHeaderColor" height="580px">
-            <el-table-column label="File Name" prop="fileName"></el-table-column>
+          <el-table  :data="fileList" border style="width: 100%" class="table"
+            :row-style="tableRowStyle" :header-cell-style="tableHeaderColor" height="580px"
+            highlight-current-row
+            @current-change="onCellClick"
+          >
+            <el-table-column label="File Name" prop="fileList" sortable="true"></el-table-column>
           </el-table>
         </el-aside>
         <el-container >
@@ -36,28 +39,23 @@ import LogService from "../../services/LogService";
 export default {
   name: "Log",
   mounted() {
-    this.getLog();
+    this.getList();
   },
 
   
   data() {
     return {
-    fileName:[{fileName:"server-.2020-12-10.log"},
-              {fileName:"server-.2020-12-11.log"},
-              {fileName:"server-.2020-12-12.log"},
-              {fileName:"server-.2020-12-13.log"},
-              {fileName:"server-.2020-12-14.log"},
-              {fileName:"server-.2020-12-15.log"},
-              {fileName:"server-.2020-12-16.log"}],
-    tableLabel: [
-        { prop: "log", label: "Content" }
-      ],
+    fileList:[],
     row: [],
     raw: []
     };
   },
 
   methods: {
+    onCellClick(row){
+      console.log(row.fileList)
+      this.getLog(row.fileList)
+    },
     tableRowStyle({ row, rowIndex }) {
       return "background-color:;font-size:15px;";
     },
@@ -75,15 +73,29 @@ export default {
       this.row = result
     },
 
-
+    async getList(){
+      await LogService.getFileList()
+      .then((res) => {
+        this.fileList = res.data;
+      })
+      .catch(function (err) {
+        console.log(err);
+      });
+    },
     
-    async getLog() {
+    async getLog(file) {
+      /*
       await LogService.getLog({
         date: '2020-12-10',
         type: '',
         operation: 'search',
         logReadFlag: '0'
-      }).then((res) => {
+      })
+      */
+      await LogService.getLog({
+        fileName:file
+      })
+      .then((res) => {
         this.row = res.log;
         this.raw = res.log;
       })

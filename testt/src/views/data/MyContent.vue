@@ -58,7 +58,7 @@
             <el-table-column min-width="15%" label="Operation">
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
-                <el-button size="mini" type="info" @click="handleDelete(scope.row.SEID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
+                <el-button size="mini" type="info" @click="handleDelete(scope.row.ContentID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
                 <!-- <el-button size="mini" type="info" @click="handleID(scope.row.SEID)" plain >Test</el-button> -->
               </template>
             </el-table-column>
@@ -676,7 +676,13 @@ export default {
                   this.dialogCreateVisible = false;
                   this.getDetailList()
                   this.handleFormClose()
-                }              
+                }    
+                if (res.code == 400){
+                  this.$message({
+                    type: 'info',
+                    message: res.message
+                  });
+                }            
               })
             }).catch((err) => {
               this.$message({
