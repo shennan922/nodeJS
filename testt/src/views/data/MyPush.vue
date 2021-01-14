@@ -16,15 +16,15 @@
             @sort-change="changeTableSort" class="formMyPush"
             ref="SeTable"
           >
-            <el-table-column min-width="10%" prop="PushID" label="PushID" sortable></el-table-column>
+            <el-table-column min-width="13%" prop="PushID" label="PushID" sortable></el-table-column>
             <el-table-column min-width="10%" prop="SEID" label="SEID"></el-table-column>
             <el-table-column min-width="15%" prop="Greeting" label="Greetings" ></el-table-column>
             <el-table-column min-width="15%" prop="Categorized" label="Categorized" :formatter="categorizedFormat"></el-table-column>
-            <el-table-column min-width="15%" prop="ScheduleDate" label="Schedule Date"></el-table-column>
-            <el-table-column min-width="15%" prop="ScheduleTime" label="Schedule Time"></el-table-column>
+            <el-table-column min-width="17%" prop="ScheduleDate" label="ScheduleDate"></el-table-column>
+            <el-table-column min-width="17%" prop="ScheduleTime" label="ScheduleTime"></el-table-column>
             <el-table-column min-width="15%" prop="Priority" label="Priority" sortable :formatter="priorityFormat"></el-table-column>
-            <el-table-column min-width="15%" prop="RequestType" label="Request Type" :formatter="requestTypeFormat"></el-table-column>
-            <el-table-column min-width="18%" label="Operation">
+            <el-table-column min-width="16%" prop="RequestType" label="RequestType" :formatter="requestTypeFormat"></el-table-column>
+            <el-table-column min-width="17%" label="Operation">
               <template slot-scope="scope">
                 <!-- @click="handlePushEdit(scope.row)" -->
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" plain><i class="el-icon-edit"></i>Edit</el-button>
@@ -135,7 +135,11 @@
                 <!-- <el-table-column min-width="20%" prop="ShortTitle" label="Content Title"></el-table-column> -->
                 <el-table-column min-width="16%" prop="SearchTerm" label="Search Term"></el-table-column>
                 <!-- <el-table-column min-width="19%" prop="MLName" label="12EQueryName"></el-table-column> -->
-                <el-table-column min-width="15%" prop="CreateDt" label="Create Date"></el-table-column>
+                <el-table-column min-width="15%" prop="CreateDt" label="Create Date">
+                  <template scope="scope">
+                    {{dateFormat(scope.row.CreateDt)}}
+                  </template>
+                </el-table-column>
                 <el-table-column min-width="20%" label="Operation">
                   <template slot-scope="scope">
                     <el-button size="mini" type="info" style="width:12px;margin-left:5px" @click="handleMoveUp(scope.$index,scope.row)" :disabled="scope.$index===0" plain ><i class="el-icon-top" style="margin-left:-6px"></i></el-button>
@@ -728,6 +732,21 @@ export default {
         }
       }  
     },
+    dateFormat(time) {
+      var date=new Date(time);
+      var year=date.getFullYear();
+      /* 在日期格式中，月份是从0开始的，因此要加0
+        * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+        * */
+      var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+      var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+      var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours()-8;
+      var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+      var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+      // 拼接
+      //return year+"-"+month+"-"+day+" "+hours+":"+minutes;
+      return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
+  },
   },
   computed: {
       getMyPushList () {
@@ -755,6 +774,7 @@ export default {
     border:  #2daaf3;
     padding-top: 20px;
     margin:0px;
+    padding-left:5px;
 }
 
 .NewButton{
@@ -781,7 +801,7 @@ export default {
 .buttonDelete{
   width:75px;
   margin-top:3px;
-  padding-left:3%;
+  //padding-left:3%;
   margin-left:0px;
 }
 body .el-table th.gutter{
@@ -886,7 +906,7 @@ body .el-table th.gutter{
   
 } 
 .searchBox{
-  width: 14%;
+  width: 12%;
   float: right;
   padding: 5px;
   /deep/.el-input--prefix .el-input__inner {

@@ -77,8 +77,8 @@ module.exports = {
         MeetingID: result.meeting_info_list[0].meeting_id,	              //会议ID - 自动生成ID
         MeetingDesc: req.body.MeetingDesc,	          //会议名称
         Status: req.body.Status,	                    //状态 - 0关闭/1开放
-        StartTime: req.body.StartTime,	              //开始时间
-        EndTime: req.body.EndTime,                	  //结束时间
+        StartTime: db.convertLocalTime(req.body.StartTime),	              //开始时间
+        EndTime: db.convertLocalTime(req.body.EndTime),                	  //结束时间
         IsRecurrent: req.body.IsRecurrent,	          //周期性会议 - 0/1
         Room: req.body.Room,	                        //会议地点
         Comments: req.body.Comments,	

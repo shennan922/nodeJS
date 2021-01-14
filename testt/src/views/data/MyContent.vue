@@ -36,25 +36,34 @@
             @sort-change="changeTableSort" class="formSE"
             ref="ContenTable"
             >
-            <el-table-column min-width="8%" prop="ContentID" label="ContentID" sortable></el-table-column>
-            <el-table-column min-width="8%" prop="SearchTerm" label="Search Term" ></el-table-column>
-            <el-table-column min-width="20%" prop="ContentCategory" label="Category">
+            <el-table-column min-width="12%" prop="ContentID" label="ContentID" sortable></el-table-column>
+            <el-table-column min-width="12%" prop="SearchTerm" label="SearchTerm" ></el-table-column>
+            <el-table-column min-width="18%" prop="ContentCategory" label="Category">
               <template slot-scope="scope" >
                 <el-tag
                   :key="tag"
                   v-for="tag in getCategoryDesc(scope.row.ContentCategory)"
                   :closable="false"
                   effect="light"
+                  style="width:100px"
                   >
                   {{tag}}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column min-width="10%" prop="ShortTitle" label="Short Title"></el-table-column>
+            <el-table-column min-width="10%" prop="ShortTitle" label="ShortTitle"></el-table-column>
             <!-- <el-table-column min-width="5%" prop="ContentMessage" label="ContentMessage"></el-table-column> -->
             <el-table-column min-width="10%" prop="SEID" label="SEID" sortable></el-table-column>
-            <el-table-column min-width="15%" prop="CreateDt" label="Create Date"></el-table-column>
-            <el-table-column min-width="15%" prop="ModifyDt" label="Modify Date"></el-table-column>
+            <el-table-column min-width="15%" prop="CreateDt" label="CreateDate">
+              <template scope="scope">
+                {{dateFormat(scope.row.CreateDt)}}
+              </template>
+            </el-table-column>
+            <el-table-column min-width="15%" prop="ModifyDt" label="ModifyDate">
+              <template scope="scope">
+                {{dateFormat(scope.row.ModifyDt)}}
+              </template>
+            </el-table-column>
             <el-table-column min-width="15%" label="Operation">
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
@@ -745,6 +754,21 @@ export default {
         }
       })
     },
+    dateFormat(time) {
+      var date=new Date(time);
+      var year=date.getFullYear();
+      /* 在日期格式中，月份是从0开始的，因此要加0
+        * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+        * */
+      var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+      var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+      var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours()-8;
+      var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+      var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+      // 拼接
+      //return year+"-"+month+"-"+day+" "+hours+":"+minutes;
+      return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
+  },
 
   },
   computed: {
@@ -796,6 +820,7 @@ export default {
 .title{
   width: 15%;
   color: white;
+  padding-left:5px;
   }
 
 .Button{
@@ -807,7 +832,7 @@ export default {
     font-weight:bold;
 }
 .searchBox{
-  width: 15%;
+  width: 13.8%;
   float: right;
   padding: 5px;
   /deep/.el-input--prefix .el-input__inner {
@@ -895,7 +920,7 @@ export default {
   //margin-right:3%;
   width:75px;
   margin-top:3px;
-  padding-left:3%;
+  //padding-left:3%;
   margin-left:0px;
 }
 .NewButton{

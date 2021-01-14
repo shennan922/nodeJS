@@ -40,7 +40,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  min-width: 1000px;
+  min-width: 1024px;
 }
 #edui_fixedlayer {
   z-index: 99999!important;
@@ -74,5 +74,8 @@ body {
   }
   // .el-input--prefix .el-input__inner {
   //   padding-left: 5px!important; 
+  // }
+  //   .el-table th.gutter{
+  //   display: table-cell!important;
   // }
 </style>
