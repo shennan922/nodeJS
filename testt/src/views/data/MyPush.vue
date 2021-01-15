@@ -740,7 +740,7 @@ export default {
         * */
       var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
       var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
-      var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours()-8;
+      var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours();
       var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
       var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
       // 拼接
@@ -774,7 +774,7 @@ export default {
     border:  #2daaf3;
     padding-top: 20px;
     margin:0px;
-    padding-left:5px;
+    //padding-left:5px;
 }
 
 .NewButton{

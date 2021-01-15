@@ -551,7 +551,7 @@ export default {
     border:  #2daaf3;
     padding-top: 20px;
     margin:0px;
-    padding-left:5px;
+    //padding-left:5px;
 }
 
 .NewButton{
