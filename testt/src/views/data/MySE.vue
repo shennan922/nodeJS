@@ -143,6 +143,7 @@ export default {
   
   data() {
     return {
+      //LoadingImg: require("@/assets/Loading.png"),
       currentTime:"",
       dialogCreateVisible:false,  //详细页面显示/隐藏
       formStatus:0,               //详细页面状态: 0-隐藏/1-新增/2-编辑
@@ -153,7 +154,7 @@ export default {
       getSearchInfo:[],           //模糊搜索结果
       pageNum:1,                  //table第几页
       pageSize:5,                 //table每页几条数据
-      QRurl:'',                   //动态生成二维码链接     
+      QRurl:require("@/assets/Loading.png"),      //动态生成二维码链接     
       SEForm: {                   //table数据源
         SEID:"",
         SEName:"",
@@ -185,7 +186,7 @@ export default {
 
       addSEFormRules: {           //详细页面校验规则
         SEID: [
-          { required: true, message: 'SEID', trigger: 'change'},
+          { required: true, message: '请输入SEID', trigger: 'change'},
           { min: 6, max: 8, message: "长度在 6 到 8 个字符", trigger: "blur" }
         ],
         SEName: [
@@ -257,6 +258,7 @@ export default {
       {
          this.QRurl = url;
          console.log("this.QRurl:" + this.QRurl);
+         
       })
       console.log(ii);      
       //this.QRurl = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQHB7zwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyWl91b2dTQm9jTEYxVGpEQjF2Y24AAgRTLdxfAwSAOgkA'
@@ -633,7 +635,7 @@ body .el-table th.gutter{
     padding-top:3%;
     text-align:left;
     font-size:17px;
-    padding-bottom: 2%;
+    padding-bottom: 4%;
   }
   .h2title{
     text-align:left;
@@ -673,7 +675,7 @@ body .el-table th.gutter{
 }
 .dialog-footer{
   margin-right:6.5%;
-  margin-top:-20%;
+  margin-top:-15%;
 }
 
 .el-form-item {

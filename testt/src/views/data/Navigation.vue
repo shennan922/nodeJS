@@ -36,10 +36,9 @@
                   <el-menu-item index="Analytics">
                     <span slot="title">Analytics</span>
                   </el-menu-item>
-                  <el-menu-item index="Log">
-                    <!-- <i class="el-icon-menu"></i> -->
+                  <!-- <el-menu-item index="Log">
                     <span slot="title">Log</span>
-                  </el-menu-item>
+                  </el-menu-item> -->
             </el-menu>
         </el-col>
         <el-col :span="2">

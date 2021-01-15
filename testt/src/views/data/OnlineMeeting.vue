@@ -101,7 +101,7 @@
                     </el-col>
                   </el-row>
                   <el-row style="float:left">
-                    <p v-if="startTimeVisible" :visible.sync="startTimeVisible" class ="startP">开始时间不能早于当前时间</p>  
+                    <p v-if="startTimeVisible" :visible.sync="startTimeVisible" class ="startP">会议开始时间不能早于当前时间</p>  
                   </el-row>    
                   <el-row>
                     <p style="text-align:left;margin-top:2%"><span style="color:#F78875">*</span> 结束时间</p>
@@ -120,8 +120,9 @@
                   <el-row style="float:left">
                     <p v-if="endTimeVisible" :visible.sync="endTimeVisible" class ="startP">会议结束时间应该晚于开始时间</p>  
                     <p v-if="endTimeVisible1" :visible.sync="endTimeVisible1" class ="startP">会议结束时间不能早于当前时间</p> 
+                    <p v-if="endTimeVisible2" :visible.sync="endTimeVisible2" class ="startP" style="padding-top:2px">会议开始时间和结束时间不能完全相同</p>
                   </el-row>
-                  <el-row style="float:left;width:100%;margin-top:2%"> 
+                  <el-row style="float:left;width:100%;margin-top:3%"> 
                     <el-form-item prop="IsRecurrent" style="text-align:left">
                       <el-checkbox v-model="AddMeetingForm.IsRecurrent">周期性会议</el-checkbox>
                     </el-form-item>
@@ -257,6 +258,7 @@ export default {
       startTimeVisible:false,
       endTimeVisible:false,
       endTimeVisible1:false,
+      endTimeVisible2:false,
       SEForm: {                   //table数据源
         SEID:"",
         SEName:"",
@@ -347,7 +349,7 @@ export default {
           { required: true, message: '请输入结束日期', trigger: 'blur'}
         ], 
         EndTime: [
-          { required: true, message: '\xa0\xa0\xa0请输入结束时间', trigger: 'change'}
+          { required: true, message: '\xa0\xa0\xa0请输入结束时间', trigger: 'blur'}
         ],  
       },
     };
@@ -606,6 +608,7 @@ export default {
       this.startTimeVisible = false;
       this.endTimeVisible = false;
       this.endTimeVisible1 = false;
+      this.endTimeVisible2 = false;
     },
     changeStartTime(){
      
@@ -614,41 +617,67 @@ export default {
       var currentHS = this.currentTime.substring(11,16);
       var inputDay = this.AddMeetingForm.StartDate;
       var inputHS = this.AddMeetingForm.StartTime;
-    
+      
       if(this.AddMeetingForm.StartTime!="" && currentDay == this.AddMeetingForm.StartDate && (this.AddMeetingForm.StartTime < currentHS))
       {
            //alert(1);
+           this.endTimeVisible2 = false;
            this.startTimeVisible = true;
-           this.AddMeetingForm.EndTime == "";
+           //this.AddMeetingForm.EndTime = "";
       }
       else if(this.AddMeetingForm.EndDate!="" && this.AddMeetingForm.StartDate > this.AddMeetingForm.EndDate)
       {
         //alert(2);
-          this.endTimeVisible = true;
-          this.AddMeetingForm.EndTime == "";
+        this.startTimeVisible = false;
+        this.endTimeVisible2 = false;
+        this.endTimeVisible1 = false;
+          if(this.endTimeVisible1 == true)
+          {
+
+          }
+          else{
+            this.endTimeVisible = true;
+          }
       }
-      else if(this.AddMeetingForm.EndDate!="" && this.AddMeetingForm.StartDate!="" && this.AddMeetingForm.EndDate == this.AddMeetingForm.StartDate && this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime)
+      else if(this.AddMeetingForm.EndDate!="" && this.AddMeetingForm.StartDate!="" && this.AddMeetingForm.EndDate == this.AddMeetingForm.StartDate && this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime
+      &&this.AddMeetingForm.StartDate!=null && this.AddMeetingForm.EndDate!=null)
       {
         //alert(3);
+        if(this.AddMeetingForm.StartTime > currentHS){
+          this.startTimeVisible = false;
+        }
+          this.endTimeVisible2 = false;
+          //this.endTimeVisible = true;
           this.endTimeVisible = true;
-          this.AddMeetingForm.EndTime == "";
+          //add
+          this.endTimeVisible1 = false;
+          //add end
       }
-      // else if(this.AddMeetingForm.EndDate=="" && this.AddMeetingForm.StartDate =="" && this.AddMeetingForm.EndTime=="" && this.AddMeetingForm.StartTime < currentHS)
-      // {
+      else if(this.AddMeetingForm.StartDate != "" && this.AddMeetingForm.StartDate != null && this.AddMeetingForm.EndDate != "" && this.AddMeetingForm.StartDate != null &&
+      this.AddMeetingForm.StartTime != "" && this.AddMeetingForm.StartTime != null && this.AddMeetingForm.EndTime != "" && this.AddMeetingForm.EndTime != null &&
+      this.AddMeetingForm.StartDate == this.AddMeetingForm.EndDate && this.AddMeetingForm.StartTime == this.AddMeetingForm.EndTime)
+      {
+        //alert("11");
 
-      // }
+          this.endTimeVisible = false;
+          this.endTimeVisible1 = false;
+          this.endTimeVisible2 = true;
+      }
       else{
         //alert(4);
           this.startTimeVisible = false;
           this.endTimeVisible = false;
-
-          if(this.AddMeetingForm.StartTime != "" && this.AddMeetingForm.EndTime == "" && this.AddMeetingForm.StartTime > currentHS)
+          this.endTimeVisible2 = false;
+          //if(this.AddMeetingForm.StartTime != "" && this.AddMeetingForm.EndTime == "" && this.AddMeetingForm.StartTime > currentHS )
+          if(((this.AddMeetingForm.StartDate == "" || this.AddMeetingForm.StartDate == null ) && (this.AddMeetingForm.EndTime == "" || this.AddMeetingForm.EndTime == null))||
+            (this.AddMeetingForm.StartDate == currentDay && this.AddMeetingForm.StartTime > currentHS && (this.AddMeetingForm.EndTime == "" || this.AddMeetingForm.EndTime == null))||
+            (this.AddMeetingForm.StartDate > currentDay) && this.AddMeetingForm.StartTime != "" && (this.AddMeetingForm.EndTime == ""|| this.AddMeetingForm.EndTime == null))
           {
               var inputH = this.AddMeetingForm.StartTime.substring(0,2);
               var inputS = this.AddMeetingForm.StartTime.substring(3,5);
 
-              if(inputH == "23"){
-
+              if(inputH == 24){
+           
               }
               else{
                 inputH = parseInt(inputH) + 1;
@@ -656,6 +685,10 @@ export default {
               if(inputH < 10)
               {
                 var inputEndHS = '0'+ inputH+':'+inputS
+              }
+              else if(inputH == 23 || inputH == 24)
+              {
+                var inputEndHS ="24:00";
               }
               else{
                 var inputEndHS =  inputH+':'+inputS
@@ -673,22 +706,47 @@ export default {
       if(this.AddMeetingForm.EndDate != "" && this.AddMeetingForm.StartDate > this.AddMeetingForm.EndDate)
       {
         //alert(5);
+          this.endTimeVisible2 = false;
           this.endTimeVisible = true;
       }
-      else if(this.AddMeetingForm.EndDate == this.AddMeetingForm.StartDate && this.AddMeetingForm.EndTime!="" &&this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime)
+      else if(this.AddMeetingForm.EndDate == this.AddMeetingForm.StartDate && this.AddMeetingForm.EndTime!="" &&this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime
+      &&this.AddMeetingForm.EndDate !=null && this.AddMeetingForm.StartDate !=null &&this.AddMeetingForm.EndDate !="" && this.AddMeetingForm.StartDate !="")
       {
         //alert(6);
+        this.endTimeVisible2 = false;
+        if(this.endTimeVisible1 == true){
+
+        }else{
+
           this.endTimeVisible = true;
+        }
       }
-      else if(this.AddMeetingForm.StartDate =="" && this.AddMeetingForm.StartTime =="" && this.AddMeetingForm.EndTime !="" && this.AddMeetingForm.EndDate == currentDay && this.AddMeetingForm.EndTime < currentHS)
+      else if((this.AddMeetingForm.StartDate ==""|| this.AddMeetingForm.StartDate ==null) && (this.AddMeetingForm.StartTime =="" || this.AddMeetingForm.StartTime == null) && this.AddMeetingForm.EndTime !="" && this.AddMeetingForm.EndDate == currentDay && this.AddMeetingForm.EndTime < currentHS)
       {
         //alert(8);
-          this.endTimeVisible1 = true;
+        this.endTimeVisible2 = false;
+        this.endTimeVisible1 = true;
       }
-      else{
-        //alert(7);
+      else if(this.AddMeetingForm.EndDate == currentDay && this.AddMeetingForm.EndTime < currentHS && this.AddMeetingForm.EndTime!= "" && this.AddMeetingForm.EndTime !=null
+      && this.AddMeetingForm.StartDate!="" && this.AddMeetingForm.StartDate!= null && this.AddMeetingForm.StartTime!= "" && this.AddMeetingForm.StartTime!= null){
+        //alert(9);
+        this.endTimeVisible2 = false;
+        this.endTimeVisible1 = true;
+      }
+       else if(this.AddMeetingForm.StartDate != "" && this.AddMeetingForm.StartDate != null && this.AddMeetingForm.EndDate != "" && this.AddMeetingForm.StartDate != null &&
+      this.AddMeetingForm.StartTime != "" && this.AddMeetingForm.StartTime != null && this.AddMeetingForm.EndTime != "" && this.AddMeetingForm.EndTime != null &&
+      this.AddMeetingForm.StartDate == this.AddMeetingForm.EndDate && this.AddMeetingForm.StartTime == this.AddMeetingForm.EndTime)
+      {
+        //alert("10");
         this.endTimeVisible = false;
         this.endTimeVisible1 = false;
+          this.endTimeVisible2 = true;
+      }
+      else{
+          //alert(7);
+        this.endTimeVisible = false;
+        this.endTimeVisible1 = false;
+        this.endTimeVisible2 = false;
       }
     },
     statusFormat(row){
@@ -721,7 +779,7 @@ export default {
     },
     async createSubmit() {
       this.getCurrentTime();
-      if(this.startTimeVisible == true || this.endTimeVisible == true){
+      if(this.startTimeVisible == true || this.endTimeVisible == true || this.endTimeVisible1 == true || this.endTimeVisible2 == true){
         return;
       }
       // var totalStartDate= this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime;
@@ -1095,7 +1153,7 @@ body .el-table th.gutter{
   .startP{
     font-size:12px;
     text-align:left;
-    margin-top:-8%;
+    margin-top:-7%;
     color:#F56C6C;
     margin-bottom: 1%;
   }

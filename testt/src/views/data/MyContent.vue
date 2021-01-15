@@ -335,8 +335,18 @@ export default {
     getID(){
       this.ContentID = Number(Math.random().toString().substr(3,6) );
     },
+    // uploadOnRemove(file){
+    //   console.log(file)
+    //   ContentService.deleteFile({ContentID:this.ContentID,filePath:file.name})
+    // },
     uploadOnRemove(file){
-      console.log(file)
+      var temp = this.fileList
+      this.fileList = []
+      for(var i=0;i<temp.length;i++){
+        if(temp[i].name != file.name){
+          this.fileList.push(temp[i])
+        }
+      }
       ContentService.deleteFile({ContentID:this.ContentID,filePath:file.name})
     },
     uploadOnPreview(file){

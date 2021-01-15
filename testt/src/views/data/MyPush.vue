@@ -3,7 +3,7 @@
       <el-row>
         <el-col :span="24">
           <h3 class="title" >Lilly Wechat - My Push
-              <el-button class="NewButton" type="primary" @click="handleAdd">New My Push</el-button>
+              <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">New My Push</el-button>
           </h3>
           <div class="searchBox">
             <el-input prefix-icon="iconfont icon-sousuo" v-model="searchTableInfo" placeholder="请输入搜索内容"></el-input>
