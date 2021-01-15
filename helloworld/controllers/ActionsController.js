@@ -152,7 +152,19 @@ module.exports = {
       //3. 开发者获得加密后的字符串可与signature对比，标识该请求来源于微信
       if(code===signature){
         var b = new Buffer.from(data, 'base64')
-        var s = b.toString();      
+        var str = JSON.parse(b.toString())
+        var status =99
+        if(str.event=="meeting.started")  {
+            status = 2
+        }  else if (str.event=="meeting.end") {
+            status = 3
+        }  
+        if (status<99){
+          var newMeeting = {          
+            Status: status
+          }
+           db.Meeting.update(newMeeting,{where:{MeetingID: str.payload[0].meeting_info.meeting_id}})
+        }      
       }
     }
     catch (error) {
