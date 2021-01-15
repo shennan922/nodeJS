@@ -2,7 +2,7 @@
   <div>
       <el-row>
         <el-col :span="24">
-          <h3 class="title" >Lilly Wechat - SE List
+          <h3 class="title">Lilly Wechat - SE List
               <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">New SE</el-button>
           </h3>
           <div class="searchBox">
@@ -70,7 +70,7 @@
                 <el-form-item label="SEID" prop="SEID">
                   <el-input v-model="AddSEForm.SEID" :disabled="formStatus==1?false:true"></el-input>
                 </el-form-item>
-                <el-form-item label="New SE" prop="SEName" >
+                <el-form-item label="New SE" prop="SEName">
                   <el-input v-model="AddSEForm.SEName"></el-input>
                 </el-form-item>
                 <el-form-item label="ML" prop="MLID">
@@ -96,14 +96,14 @@
                   </el-form-item>
                 <h2 class="h2">Hospital</h2>
                 <el-form-item label="Hospital" prop="HospitalID">
-                  <el-select v-model="AddSEForm.HospitalID" placeholder="请选择"  @change="handleChange('hos')">
+                  <el-select v-model="AddSEForm.HospitalID" placeholder="请选择"  @change="handleChange('hos')" @click.native="validCity()">
                     <el-option
                        v-for="item in getHosData" :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
                     </el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="Department" prop="DepID">
-                   <el-select v-model="AddSEForm.DepID" placeholder="请选择" >
+                   <el-select v-model="AddSEForm.DepID" placeholder="请选择" @click.native="validHos()">
                     <el-option
                        v-for="item in getDepData" :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
                     </el-option>
@@ -112,7 +112,7 @@
               </el-col>
             </el-row>
           </el-form>
-          <div style="margin-right:10px" slot="footer" class="dialog-footer">
+          <div slot="footer" class="dialog-footer">
             <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
             <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
          </div>
@@ -241,7 +241,7 @@ export default {
         this.AddSEForm.DepID = ''
       }
       if(flag=='hos'){
-        this.AddSEForm.DepID = ''
+        this.AddSEForm.DepID = '';
       }
     },
 
@@ -524,6 +524,24 @@ export default {
         }
       }
     },
+    validCity(){
+      if(this.AddSEForm.CityID =="")
+      {
+       this.$message({
+          type: 'info',
+          message: '请先选择City！'
+        });
+      }
+    },
+     validHos(){
+       if(this.AddSEForm.HospitalID =="")
+       {
+        this.$message({
+            type: 'info',
+            message: '请先选择Hospital！'
+          });
+       }
+    },
   },
   computed: {
       getSEList () {
@@ -592,15 +610,13 @@ body .el-table th.gutter{
   .el-table__body{
     table-layout: auto;
   } 
-    
   
-  // .table__header{
-  //   table-layout: auto;
-  // }
 }
 
 
 /deep/.dialogSE{
+  width:120%;
+  margin-left:-10%;
   .el-dialog__header{
   text-align: left;
   padding-left:7%;
@@ -608,16 +624,31 @@ body .el-table th.gutter{
   };
   .el-dialog__title{
     color:#fff;
+    margin-left:-5%;
   };
   .el-dialog__close{
     color:#fff;
   }
   .h2{
-    padding-top:9%;
+    padding-top:3%;
     text-align:left;
+    font-size:17px;
+    padding-bottom: 2%;
   }
   .h2title{
-    text-align:left
+    text-align:left;
+    font-size:17px;
+  }
+  .el-dialog__body {
+    padding: 10px 20px;
+    color: #606266;
+    font-size: 14px;
+    word-break: break-all;
+  }
+  .el-dialog__footer {
+    padding: 0px 20px 20px;
+    text-align: right;
+    box-sizing: border-box;
   }
 } 
 .block{
@@ -632,7 +663,6 @@ body .el-table th.gutter{
     width:100%
   }
 }
- 
 .searchBox{
   width: 19%;
   float: right;
@@ -640,5 +670,13 @@ body .el-table th.gutter{
   /deep/.el-input--prefix .el-input__inner {
     padding-left: 10px; 
   }
+}
+.dialog-footer{
+  margin-right:6.5%;
+  margin-top:-20%;
+}
+
+.el-form-item {
+    margin-bottom: 17px;
 }
 </style>

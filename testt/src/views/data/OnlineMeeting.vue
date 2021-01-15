@@ -85,10 +85,10 @@
                 </el-col>
                 <el-col :span="14" class="el-col_NewMetting">
                   <el-form-item label="会议名称" prop="MeetingDesc">
-                    <el-input v-model="AddMeetingForm.MeetingDesc"></el-input>
+                    <el-input v-model="AddMeetingForm.MeetingDesc" style="margin-top:-1%"></el-input>
                   </el-form-item>
                   <el-row>
-                    <p style="text-align:left"><span style="color:#F78875">*</span> 开始时间</p>
+                    <p style="text-align:left;margin-top:2%"><span style="color:#F78875">*</span> 开始时间</p>
                     <el-col :span="8">
                       <el-form-item prop="StartDate">
                         <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate" @change="changeStartTime()"></el-date-picker>
@@ -104,7 +104,7 @@
                     <p v-if="startTimeVisible" :visible.sync="startTimeVisible" class ="startP">开始时间不能早于当前时间</p>  
                   </el-row>    
                   <el-row>
-                    <p style="text-align:left"><span style="color:#F78875">*</span> 结束时间</p>
+                    <p style="text-align:left;margin-top:2%"><span style="color:#F78875">*</span> 结束时间</p>
                     <el-col :span="8">
                       <el-form-item lable ="结束时间" prop="EndDate">
                         <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.EndDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate" @change="changeEndTime()" ></el-date-picker>
@@ -121,7 +121,7 @@
                     <p v-if="endTimeVisible" :visible.sync="endTimeVisible" class ="startP">会议结束时间应该晚于开始时间</p>  
                     <p v-if="endTimeVisible1" :visible.sync="endTimeVisible1" class ="startP">会议结束时间不能早于当前时间</p> 
                   </el-row>
-                  <el-row style="float:left;width:100%"> 
+                  <el-row style="float:left;width:100%;margin-top:2%"> 
                     <el-form-item prop="IsRecurrent" style="text-align:left">
                       <el-checkbox v-model="AddMeetingForm.IsRecurrent">周期性会议</el-checkbox>
                     </el-form-item>
@@ -144,7 +144,7 @@
 
               <el-row>
                 <el-col :span="6" class="el-col_NewMettingLeft">
-                  <p class="h2title">保密</p>
+                  <p class="toptitle">保密</p>
                   <p class="h4title">成员将需要密码入会</p>
                   <!-- <p class="h2title">会议人数上限</p> -->
                   <!-- <p class="h4title">同一场议会中允许参会的用户上限</p> -->
@@ -171,7 +171,7 @@
                     <p style="text-align:left">指定主持人0/10(选填)</p>
                     <el-input v-model="AddMeetingForm.AssignedHost" placeholder="请输入成员姓名搜索"></el-input>
                   </el-form-item>
-                  <el-form-item prop="WaitingRoom" style="text-align:left">
+                  <el-form-item prop="WaitingRoom" style="text-align:left;margin-top:5%">
                       <el-checkbox v-model="AddMeetingForm.WaitingRoom">开启等候室</el-checkbox>
                   </el-form-item>
                   <el-form-item prop="JoinBeforeHost" style="text-align:left">
@@ -633,12 +633,16 @@ export default {
           this.endTimeVisible = true;
           this.AddMeetingForm.EndTime == "";
       }
+      // else if(this.AddMeetingForm.EndDate=="" && this.AddMeetingForm.StartDate =="" && this.AddMeetingForm.EndTime=="" && this.AddMeetingForm.StartTime < currentHS)
+      // {
+
+      // }
       else{
         //alert(4);
           this.startTimeVisible = false;
           this.endTimeVisible = false;
 
-          if(this.AddMeetingForm.StartTime != "")
+          if(this.AddMeetingForm.StartTime != "" && this.AddMeetingForm.EndTime == "" && this.AddMeetingForm.StartTime > currentHS)
           {
               var inputH = this.AddMeetingForm.StartTime.substring(0,2);
               var inputS = this.AddMeetingForm.StartTime.substring(3,5);
@@ -665,12 +669,7 @@ export default {
       this.getCurrentTime();
       var currentDay = this.currentTime.substring(0,10);
       var currentHS = this.currentTime.substring(11,16);
-      // alert("this.AddMeetingForm.StartDate:" + this.AddMeetingForm.StartDate);
-      // alert("this.AddMeetingForm.StartTime:" + this.AddMeetingForm.StartTime);
-      // alert("this.AddMeetingForm.EndTime:" + this.AddMeetingForm.EndTime);
-      // alert("this.AddMeetingForm.EndDate:" + this.AddMeetingForm.EndDate);
-      // alert("currentDay:" + currentDay);
-      // alert("currentHS:" + currentHS);
+
       if(this.AddMeetingForm.EndDate != "" && this.AddMeetingForm.StartDate > this.AddMeetingForm.EndDate)
       {
         //alert(5);
@@ -1017,7 +1016,8 @@ body .el-table th.gutter{
   } 
 }
 /deep/.dialogMeeting{
-
+  width:120%;
+  margin-left:-10%;
   .el-dialog__header{
     text-align: left;
     padding-left:7%;
@@ -1034,9 +1034,10 @@ body .el-table th.gutter{
   }
   .el-dialog__title{
     color:#fff;
+    margin-left:-5%;
   };
   .el-dialog__body {
-    padding: 30px 30px;
+    padding: 10px 30px;
     color: #606266;
     font-size: 14px;
     word-break: break-all;
@@ -1091,14 +1092,12 @@ body .el-table th.gutter{
   .el-select{
     width:100%
   }
-  .el-cascader{
-    width:100%
-  }
   .startP{
     font-size:12px;
     text-align:left;
-    margin-top:-13%;
+    margin-top:-8%;
     color:#F56C6C;
+    margin-bottom: 1%;
   }
 }
 .el-col_NewMettingLeft{
@@ -1123,12 +1122,14 @@ body .el-table th.gutter{
   .el-input--suffix .el-input__inner {
     padding-right: 0px!important;
   }
+  margin-top:-5%;
 }
 
 .startTime{
   width:99%;
   margin-left:10%;
   float:left;
+  margin-top:-5%;
 }
 .lableAddMeeting{
   width:180%
@@ -1144,5 +1145,8 @@ body .el-table th.gutter{
 .el-scrollbar__wrap{
     overflow-x: hidden!important;
   }
+.el-form-item{
+  margin-bottom:12px;
+}
 
 </style>

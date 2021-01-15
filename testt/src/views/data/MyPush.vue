@@ -47,7 +47,7 @@
         </el-col>
       </el-row>
        <!--增加My Push页面-->
-      <el-dialog :title ="formStatus==1?'New My Push':'Update My Push'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleMyPushClose" :close-on-click-modal="false" class="dialogMyPush">
+      <el-dialog :title ="formStatus==1?'New My Push':'Update My Push'" :visible.sync="dialogCreateVisible" v-if="dialogCreateVisible" @close="handleMyPushClose" :close-on-click-modal="false" class="dialogMyPush" style="width:120%;margin-left:-10%">
         <!-- style="width:125%;margin-left:-200px" -->
         <div style="height:50vh;">
           <el-scrollbar style="height:100%;">
@@ -61,6 +61,7 @@
               <el-row>
                 <el-col :span="10" class="el-col_MyPush">
                   <h2 class="h2title">Greeting</h2>
+                  <!-- <p class="toptitle">Greeting</p> -->
                   <el-form-item label="Select SE" prop="SEID">
                     <el-select v-model="AddMyPushForm.SEID" clearable placeholder="请选择" style="width:100%;padding-left:0px">
                       <el-option
@@ -75,8 +76,8 @@
                 <el-col :span="10" class="el-col_MyPushRight">
                   <h2 class="h2title">Settings</h2>
                   <el-form-item label="Categorized" prop="Categorized">
-                    <el-radio v-model="AddMyPushForm.Categorized" label="1" style="margin-top:15px">Type1</el-radio>
-                    <el-radio v-model="AddMyPushForm.Categorized" label="2" style="margin-top:15px">Type2</el-radio>
+                    <el-radio v-model="AddMyPushForm.Categorized" :label="1" style="margin-top:15px">Type1</el-radio>
+                    <el-radio v-model="AddMyPushForm.Categorized" :label="2" style="margin-top:15px">Type2</el-radio>
                   </el-form-item>
                   <el-form-item label="Scheduled" prop="Scheduled">
                     <el-checkbox v-model="AddMyPushForm.Scheduled" ></el-checkbox>
@@ -98,20 +99,20 @@
               </el-row>
               <!-- request type title -->
               <el-row>
-                <h2 style="float:left;margin-left:5%">Please specify the request(choose one request type)</h2>
+                <h3 style="float:left;margin-left:5%;margin-top:1%;margin-bottom:0%">Please specify the request(choose one request type)</h3>
               </el-row>
               <!-- request type checkbox -->
               <el-row>
                 <div class = "myPushCheckBox">
                   <el-form-item>
                     <p>
-                      <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="4">Standing Request(s)</el-radio>
+                      <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" :label="4">Standing Request(s)</el-radio>
                     </p>
                     <p>
-                      <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="5">One Time Request(s)(Please privode below information)</el-radio>
+                      <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" :label="5">One Time Request(s)(Please privode below information)</el-radio>
                     </p>
                     <p>
-                      <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" label="6">Virtual Meeting Request(s)(Please privode below information)</el-radio>
+                      <el-radio v-model="AddMyPushForm.RequestType" style="float:left;margin-left:-60px" :label="6">Virtual Meeting Request(s)(Please privode below information)</el-radio>
                     </p>
                   </el-form-item>
                 </div>
@@ -130,17 +131,17 @@
                 style="margin-top:10px;width:95%;margin-left:3%;"
               >
                 <el-table-column min-width="10%" prop="SEID" label="SE"></el-table-column>
-                <el-table-column min-width="15%" prop="ContentCategory" label="Category" ></el-table-column>
+                <!-- <el-table-column min-width="15%" prop="ContentCategory" label="Category" ></el-table-column> -->
                 <el-table-column min-width="20%" prop="ShortTitle" label="Short Title"></el-table-column>
                 <!-- <el-table-column min-width="20%" prop="ShortTitle" label="Content Title"></el-table-column> -->
-                <el-table-column min-width="16%" prop="SearchTerm" label="Search Term"></el-table-column>
+                <el-table-column min-width="20%" prop="SearchTerm" label="Search Term"></el-table-column>
                 <!-- <el-table-column min-width="19%" prop="MLName" label="12EQueryName"></el-table-column> -->
-                <el-table-column min-width="15%" prop="CreateDt" label="Create Date">
+                <!-- <el-table-column min-width="15%" prop="CreateDt" label="Create Date">
                   <template scope="scope">
                     {{dateFormat(scope.row.CreateDt)}}
                   </template>
-                </el-table-column>
-                <el-table-column min-width="20%" label="Operation">
+                </el-table-column> -->
+                <el-table-column min-width="15%" label="Operation">
                   <template slot-scope="scope">
                     <el-button size="mini" type="info" style="width:12px;margin-left:5px" @click="handleMoveUp(scope.$index,scope.row)" :disabled="scope.$index===0" plain ><i class="el-icon-top" style="margin-left:-6px"></i></el-button>
                     <el-button size="mini" type="info" style="width:12px;margin-left:5px;margin-top:3px" @click="handleMoveDown(scope.$index,scope.row)" :disabled="scope.$index===(getChooseContentData.length-1)" plain ><i class="el-icon-bottom" style="margin-left:-6px"></i></el-button>
@@ -151,10 +152,10 @@
             </el-form>
           </el-scrollbar>
         </div> 
-          <div slot="footer" class="dialog-footer">
-            <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
-            <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
-         </div>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
+          <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
+        </div>
 
       </el-dialog>
 
@@ -164,7 +165,8 @@
       v-if="dialogChooseContentVisible" 
       @close="handleChooseContentClose" 
       :close-on-click-modal="false" 
-      class="dialogMyPush">
+      class="dialogMyPush"
+      style="width:120%;margin-left:-10%;min-width:1000px">
           <el-form 
           ref="ContentForm"
           :model="ContentForm" 
@@ -182,7 +184,7 @@
               </el-col>
             </el-row>
           </el-form>
-          <div style="margin-right:9.5%" slot="footer" >
+          <div style="margin-right:6%" slot="footer" >
             <el-button @click.native="contentConfirm" type="primary">Confirm</el-button>
          </div>
 
@@ -261,10 +263,10 @@ export default {
         PushID:"",
         SEID:"",
         Greeting:"",
-        Categorized: "",
+        Categorized: "1",
         Scheduled: "",
         Priority: "",
-        RequestType: "",
+        RequestType: "4",
         ScheduleDate:"",
         ScheduleTime:"",
         ContentId: ""
@@ -451,7 +453,7 @@ export default {
         return "Standing Request";
       } 
       else if (row.RequestType === 5){
-        return "One Time Request";
+        return "OneTime Request";
       }
       else{
         return "Meeting Request";
@@ -517,6 +519,8 @@ export default {
       this.formStatus = 1
       this.dialogCreateVisible = true; 
       this.getID(); 
+      this.AddMyPushForm.Categorized = 1;
+      this.AddMyPushForm.RequestType = 4;
     },
     handleEdit(row) {
       this.formStatus = 2
@@ -786,6 +790,7 @@ export default {
     margin-right:1%;
     font-weight:bold;
     border-color:#639eda;
+    
 }
 .buttonEdit{
   margin-right:3%;
@@ -828,6 +833,7 @@ body .el-table th.gutter{
 
   .el-dialog__title{
     color:#fff;
+    margin-left:-5%;
   };
   .el-dialog__close{
     color:#fff;
@@ -837,7 +843,8 @@ body .el-table th.gutter{
     text-align:left;
   }
   .h2title{
-    text-align:left
+    text-align:left;
+    font-size:17px;
   }
    .el-scrollbar__wrap {
     overflow-x: hidden;
@@ -846,6 +853,17 @@ body .el-table th.gutter{
   .el-scrollbar__thumb {
     overflow-x: hidden;
     height: 0%;
+  }
+  .el-dialog__body {
+    padding: 10px 20px;
+    color: #606266;
+    font-size: 14px;
+    word-break: break-all;
+  }
+  .el-dialog__footer {
+    padding: 0px 20px 20px;
+    text-align: right;
+    box-sizing: border-box;
   }
 }
  
@@ -916,4 +934,13 @@ body .el-table th.gutter{
 .dialog-footer{
   margin-right:2.1%;
 }
+.toptitle{
+    text-align:left;
+    font-size:17px;
+    margin-top:10px;
+}
+.el-form-item{
+  margin-bottom:15px;
+}
+
 </style>

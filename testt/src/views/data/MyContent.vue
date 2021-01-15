@@ -45,7 +45,7 @@
                   v-for="tag in getCategoryDesc(scope.row.ContentCategory)"
                   :closable="false"
                   effect="light"
-                  style="width:100px"
+                  style="width:100px;background-color:white;border-color:white;color:black;"
                   >
                   {{tag}}
                 </el-tag>
@@ -156,7 +156,7 @@
 
                   <el-form-item label="Upload PDF">
                     <el-row>
-                      <el-col :span="5">
+                      <el-col :span="12">
                         <el-upload
                           ref="upload"
                           action="/api/myContent/uploadPdf"
@@ -829,6 +829,8 @@ export default {
   width: 15%;
   color: white;
   //padding-left:5px;
+  min-width:250px;
+  margin-left: -10px;
   }
 
 .Button{
@@ -850,6 +852,8 @@ export default {
 
 /deep/.dialogContent{
   text-align: left;
+  width:120%;
+  margin-left:-10%;
   .el-dialog__header{
     text-align: left;
     padding-left:7%;
@@ -857,6 +861,7 @@ export default {
   };
   .el-dialog__title{
     color:#fff;
+    margin-left:-5%;
   };
   .el-dialog__close{
     color:#fff;
@@ -895,14 +900,14 @@ export default {
   .avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
+    width: 110px;
+    height: 110px;
+    line-height: 110px;
     text-align: center;
   }
   .avatar {
-    width: 178px;
-    height: 178px;
+    width: 110px;
+    height: 110px;
     display: block;
   }
   .el-scrollbar__wrap {
@@ -913,6 +918,16 @@ export default {
     overflow-x: hidden;
     height: 0%;
   }
+  .el-form-item__label {
+    text-align: left; 
+    vertical-align: middle;
+    float: left;
+    font-size: 14px;
+    color: #606266;
+    line-height: 40px;
+    padding: 0 12px 0 0;
+    box-sizing: border-box;
+}
 }
 .el-tag {
   margin-right: 10px;
@@ -944,8 +959,14 @@ export default {
 .el-col_Content{
   //margin-right:10px;
   padding-right:2%;
+  padding-left:4%;
 }
 .dialog-footer{
   margin-right:2.3%;
+  //margin-top:-10%;
 }
+.el-form-item{
+  margin-bottom:17px;
+}
+
 </style>
