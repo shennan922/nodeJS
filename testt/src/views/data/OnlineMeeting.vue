@@ -89,14 +89,14 @@
                   </el-form-item>
                   <el-row>
                     <p style="text-align:left;margin-top:2%"><span style="color:#F78875">*</span> 开始时间</p>
-                    <el-col :span="8">
+                    <el-col :span="9">
                       <el-form-item prop="StartDate">
-                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate" @change="changeStartTime()"></el-date-picker>
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate"  @change="changeStartTime()"></el-date-picker>
                       </el-form-item>
                     </el-col>
-                    <el-col :span="8">  
+                    <el-col :span="9">  
                       <el-form-item lable="开始时间" prop="StartTime">
-                        <el-time-select v-model="AddMeetingForm.StartTime" :picker-options="{start: '08:30',step: '00:15',end: '24:00'}" placeholder="选择时间" class="startTime" @change="changeStartTime()" ></el-time-select>
+                        <el-time-select v-model="AddMeetingForm.StartTime" :picker-options="{start: '08:30',step: '00:15',end: '24:00'}" placeholder="选择时间" class="startTime"  @change="changeStartTime()" ></el-time-select>
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -105,12 +105,12 @@
                   </el-row>    
                   <el-row>
                     <p style="text-align:left;margin-top:2%"><span style="color:#F78875">*</span> 结束时间</p>
-                    <el-col :span="8">
+                    <el-col :span="9">
                       <el-form-item lable ="结束时间" prop="EndDate">
                         <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.EndDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate" @change="changeEndTime()" ></el-date-picker>
                       </el-form-item>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="9">
                       <!-- ,minTime:AddMeetingForm.StartTime -->
                       <el-form-item lable ="结束时间" prop="EndTime">
                         <el-time-select v-model="AddMeetingForm.EndTime" :picker-options="{start: '08:30',step: '00:15',end: '24:00'}" placeholder="选择时间" class="startTime" @change="changeEndTime()"></el-time-select> 
@@ -120,7 +120,7 @@
                   <el-row style="float:left">
                     <p v-if="endTimeVisible" :visible.sync="endTimeVisible" class ="startP">会议结束时间应该晚于开始时间</p>  
                     <p v-if="endTimeVisible1" :visible.sync="endTimeVisible1" class ="startP">会议结束时间不能早于当前时间</p> 
-                    <p v-if="endTimeVisible2" :visible.sync="endTimeVisible2" class ="startP" style="padding-top:2px">会议开始时间和结束时间不能完全相同</p>
+                    <p v-if="endTimeVisible2" :visible.sync="endTimeVisible2" class ="startP" style="padding-top:2px">会议开始和结束时间不能相同</p>
                   </el-row>
                   <el-row style="float:left;width:100%;margin-top:3%"> 
                     <el-form-item prop="IsRecurrent" style="text-align:left">
@@ -343,13 +343,13 @@ export default {
           { required: true, message: '请输入开始日期', trigger: 'blur'}
         ], 
         StartTime: [
-          { required: true, message: '\xa0\xa0\xa0请输入开始时间', trigger: 'blur'}
+          { required: true, message: '\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0请输入开始时间', trigger: 'blur'}
         ], 
         EndDate: [
           { required: true, message: '请输入结束日期', trigger: 'blur'}
         ], 
         EndTime: [
-          { required: true, message: '\xa0\xa0\xa0请输入结束时间', trigger: 'blur'}
+          { required: true, message: '\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0请输入结束时间', trigger: 'blur'}
         ],  
       },
     };
@@ -694,7 +694,11 @@ export default {
                 var inputEndHS =  inputH+':'+inputS
               }
                 this.AddMeetingForm.EndTime = inputEndHS;
-              }
+                //this.$refs['addMeetingForm'].clearValidate('EndTime');
+                this.$nextTick( ()=> {
+                  this.$refs['AddMeetingForm'].clearValidate(['EndTime']);
+                })
+            }
           }
      
     },
@@ -1174,7 +1178,7 @@ body .el-table th.gutter{
 }
 
 .startDate{
-  width:99%;
+  width:110%;
   text-align:left;
   float:left;
   .el-input--suffix .el-input__inner {
@@ -1184,8 +1188,8 @@ body .el-table th.gutter{
 }
 
 .startTime{
-  width:99%;
-  margin-left:10%;
+  width:110%;
+  margin-left:16%;
   float:left;
   margin-top:-5%;
 }

@@ -316,9 +316,9 @@ export default {
       },
        //data: this.contentData,
         value: [],
-        filterMethod(query, item) {
-          return item.this.getContentIdData.indexOf(query) > -1;
-        }
+        // filterMethod(query, item) {
+        //   return item.this.getContentIdData.indexOf(query) > -1;
+        // }
     };
   },
 
@@ -374,18 +374,25 @@ export default {
       ContentService.getList("")
       .then((res) => {
         this.getContentData = res.data;
+        // for(var item of this.getContentData){
+        //     this.getContentIdData.push(item.ContentID);
+        //     this.getContentLableData.push(item.ContentID);
+        // }
+        // this.getContentLableData.forEach((contentId, index) => {
+        //   this.contentData.push({
+        //     label: ""+contentId+"",
+        //     key: ""+contentId+"",
+        //     value:""+contentId+"",
+        //     getContentIdData: ""+this.getContentIdData[index]+"",
+        //   });
+        // });
         for(var item of this.getContentData){
-            this.getContentIdData.push(item.ContentID);
-            this.getContentLableData.push(item.ContentID);
-        }
-        this.getContentLableData.forEach((contentId, index) => {
-          this.contentData.push({
-            label: ""+contentId+"",
-            key: ""+contentId+"",
-            value:""+contentId+"",
-            getContentIdData: ""+this.getContentIdData[index]+"",
+            this.contentData.push({
+            label: ""+item.ShortTitle+"",
+            key: ""+item.ContentID+"",
+            value:""+item.ContentID+"",
           });
-        });
+        }
       })
       .catch(function (err) {
         console.log("err"+err);
@@ -607,7 +614,14 @@ export default {
       this.changeFlag = false
     },
     handleChooseContentClose(){
-
+      if(this.getChooseContentData == "")
+      {
+        this.contentData ="";
+        this.getContentList();
+      }
+      else{
+   
+      }
     },
      getCurrentTime(){
       var myDate = new Date()
