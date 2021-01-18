@@ -17,6 +17,46 @@ Content.belongsTo(SEList, {
 
 
 module.exports = {
+  async getContentByPk (req, res) {
+    try {
+      var data = await Content.findByPk(req.query.id,{
+        attributes:['ContentID','SEID','SearchTerm','ContentCategory','ShortTitle','ContentMessage','CreateDt','ModifyDt','PhotoName','PhotoPath'],
+        include:[
+          {
+            model: SEList,
+            attributes: ['SEName'],
+            as: 'SE'
+          }
+        ],
+        order: [
+          ['CreateDt', 'DESC']
+        ],
+        raw: true
+      })
+      
+      if (data) {
+        data = JSON.parse(JSON.stringify(data).replace(/SE.SEName/g, 'SEName'))
+        res.status(200).send({
+          value: 'MyContentList',
+          data: data
+        })
+        logger.logger.info('Query MyContent: '+data.length+' records returned')
+      } else {
+        res.status(200).send({
+          code: 200,
+          error: '没有找到对应数据'
+        })
+        logger.logger.error('Query MyContent: No data found')
+      }
+    } catch (error) {
+      res.status(400).send({
+        code: 400,
+        error: '数据查询失败'
+      })
+      logger.logger.fatal('Query MyContent fail: '+error)
+    }
+  },
+  
   async getList (req, res) {
     try {
       var data = await Content.findAll({
@@ -117,7 +157,16 @@ module.exports = {
       return
     }
 
-    await weChat.uploadImage(token,pathNew).then(async mid =>{     
+    await weChat.uploadImage(token,pathNew).then(async mid =>{  
+      if(mid.media_id == undefined){
+        res.status(200).send({
+          code: 400,
+          message: 'media_id生成失败: '+mid.errmsg
+        })
+        logger.logger.error("media_id生成失败: ")  
+        return
+      } 
+
       let newContent = {
         ContentID: req.body.ContentID,
         SEID: req.body.SEID,
@@ -128,7 +177,8 @@ module.exports = {
         CreateDt: db.convertLocalTime(req.body.TimeStamp),
         PhotoName:req.body.PhotoName,
         PhotoPath:req.body.PhotoPath,
-        ImgID:mid,
+        ImgID:mid.media_id,
+        ImgUrl:mid.url,
         TextID:null
       }  
       await Content.create(newContent)

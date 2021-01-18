@@ -11,6 +11,7 @@ router.use(function(req, res, next)
     next() 
 })*/
 router.get('/getList', MyContentController.getList)
+router.get('/getContentByPk', MyContentController.getContentByPk)
 router.get('/getFileList', MyContentController.getFileList)
 router.get('/getCategory', MyContentController.getCategory)
 router.get('/delete',MyContentController.delete)

@@ -68,7 +68,7 @@
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
                 <el-button size="mini" type="info" @click="handleDelete(scope.row.ContentID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
-                <!-- <el-button size="mini" type="info" @click="handleID(scope.row.SEID)" plain >Test</el-button> -->
+                <el-button size="mini" type="info" @click="handleID(scope.row.ContentID)" plain >Test</el-button>
               </template>
             </el-table-column>
           </el-table> 
@@ -322,15 +322,13 @@ export default {
       };
   },
   methods: {
-    handleID(){
-      var fmRoutes 
-      var route ={
-        // path: '/contentForms/3456',
-        // name: 'test1111',
-        // meta: { auth: true, title: 'test1111' },
-        // component: () => import('../views/contentForms/Log111.vue')
-      }      
-      router.push(route)
+    handleID(id){
+      this.$router.push({
+        name: "ContentLink",
+        query:{
+          id: id
+        }
+      });
     },
     getID(){
       this.ContentID = Number(Math.random().toString().substr(3,6) );

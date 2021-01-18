@@ -2,6 +2,10 @@ import req from './index'
 
 
 export default {
+  async getContentByPk (id){
+    const response = await req.request.get('/MyContent/getContentByPk?id='+id)
+    return response.data
+  },
   async getList () {
     const response = await req.request.get('/MyContent/getList')
     return response.data

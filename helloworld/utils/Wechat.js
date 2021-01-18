@@ -191,7 +191,8 @@ module.exports = {
             reject(error);
           }else{
             console.log(JSON.parse(body))
-            resolve(JSON.parse(body).media_id);              
+            //resolve(JSON.parse(body).media_id);              
+            resolve(JSON.parse(body));              
           }
         });
       });
