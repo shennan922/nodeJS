@@ -117,7 +117,12 @@ export default {
         });
     },
   },
-  
+  created() {
+    document.getElementById("app").style.minWidth = "100px";
+  },
+  destroyed() {
+    document.getElementById("app").style.minWidth = "1024px";
+  },
 };
 </script>
 
