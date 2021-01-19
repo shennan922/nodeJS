@@ -1075,7 +1075,11 @@ body .el-table th.gutter{
   width: 100%;
   .el-table__body{
     table-layout: auto;
-  } 
+  }
+   .el-table__header {
+    table-layout: auto;
+    border-collapse: separate;
+ } 
 }
 /deep/.dialogMeeting{
   width:120%;
