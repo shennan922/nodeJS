@@ -33,6 +33,12 @@ const routes = [
     component: () => import('../views/data/ActiveUser.vue')
   },
   {
+    path: '/data/ContentLink',
+    name: 'ContentLink',
+    meta: { auth: false, title: 'ContentLink' },
+    component: () => import('../views/data/ContentLink.vue')
+  },
+  {
     path: '/data/InactiveUser',
     name: 'InactiveUser',
     // meta: { auth: true, title: 'InactiveUser' },
@@ -99,12 +105,7 @@ const routes = [
         meta: { auth: true, title: 'OnlineMeeting' },
         component: () => import('../views/data/OnlineMeeting.vue')
       },
-      {
-        path: '/data/ContentLink',
-        name: 'ContentLink',
-        meta: { auth: false, title: 'ContentLink' },
-        component: () => import('../views/data/ContentLink.vue')
-      },
+      
     ]
   },
 
