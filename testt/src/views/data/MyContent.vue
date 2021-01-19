@@ -359,7 +359,16 @@ export default {
       this.getCurrentTime()      
       this.uploadData.ContentID = this.ContentID
       this.uploadData.UploadTime = this.currentTime
+      //this.fileList.push({"name":file.name,"url":'/api/myContent/downloadpdf?ContentID='+this.ContentID+'&file='+file.name})
+
+      for(let i=0;i<this.fileList.length;i++){
+        if(this.fileList[i].name == file.name){
+          console.log(i)
+          this.fileList.splice(i,1)
+        }
+      }
       this.fileList.push({"name":file.name,"url":'/api/myContent/downloadpdf?ContentID='+this.ContentID+'&file='+file.name})
+      console.log(this.fileList)
     },    
     onTagClose(tag){
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag),1)

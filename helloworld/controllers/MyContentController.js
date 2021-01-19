@@ -250,7 +250,7 @@ module.exports = {
         }
       });
       fs.rename(files.file.path,pathFUll,(err)=>{if(err) {logger.logger.fatal("Create Content fail: "+fields.ContentID+'/'+error)}})
-      let maxID = await ContentFile.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('FileID')),'maxID']],where:{ContentID:fields.ContentID}})
+      let maxID = await ContentFile.findOne({attributes: [[db.Sequelize.fn('max', db.Sequelize.col('FileID')),'FileID']],where:{ContentID:fields.ContentID}})
 
       var newContentFile = {
         ContentID: fields.ContentID,
@@ -260,7 +260,15 @@ module.exports = {
         FileURL: config.host+'/myContent/downloadpdf?file='+files.file.name+'&ContentID='+fields.ContentID,
         CreateDt: db.convertLocalTime(fields.UploadTime)
       }
-      await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
+
+      let checkExist = await ContentFile.findOne({where:{ContentID:fields.ContentID,FileName:files.file.name}})
+      console.log(checkExist)
+      if(checkExist != undefined){
+        await ContentFile.update({ModifyDt:db.convertLocalTime(fields.UploadTime)},{where:{ContentID:fields.ContentID,FileName:files.file.name}})
+      }
+      else{
+        await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
+      }
 
       res.status(200).send({
         code: 200,

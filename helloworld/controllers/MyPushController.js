@@ -14,7 +14,7 @@ MyPush.belongsTo(SEList, {
   as: 'SE'
 });
 
-async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTitle,ContentMessage){
+async function generateContent11(ContentID,SEID,SearchTerm,ContentCategory,ShortTitle,ContentMessage){
   var files = await ContentFile.findAll({where:{ContentID:ContentID},raw:true})
   let text = []
   
@@ -36,6 +36,23 @@ async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTi
       //str += '<tr><td>Content</td><td><div style="width:80%; border:1px solid #000"><p>'+ContentMessage+'</p></div></td></tr>'
       str += '<tr><td>Content</td><td><div style="width:80%; border:1px solid #000"><p><img src="http://mmbiz.qpic.cn/mmbiz_jpg/QBmZfnm0uBfAcjSnnpDodSa9CwsgQrJ94juCMyVsfNNlVxVwmFzXL7DUZvDHTSuI1ibUzfUd4dITVItYCN9wWNg/0"></p></div></td></tr>'
       str += '</table>'
+      str += '</div></body></html>'
+  return str
+}
+
+async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTitle,ContentMessage){
+  var start = ContentMessage.indexOf('img')+9
+  var end = ContentMessage.indexOf('.jpg')+4
+  var img = ContentMessage.substr(start,end-start)
+  var msg = ContentMessage
+  if(start > 8){
+    msg = ContentMessage.replace(img,'http://mmbiz.qpic.cn/mmbiz_jpg/QBmZfnm0uBfAcjSnnpDodSa9CwsgQrJ94juCMyVsfNNlVxVwmFzXL7DUZvDHTSuI1ibUzfUd4dITVItYCN9wWNg/0')
+  }
+
+  let str = '<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>'
+      str += '<title>'+ShortTitle+'</title></head>'
+      str += '<body><div style="text-align:left">'
+      str += msg
       str += '</div></body></html>'
   return str
 }
@@ -100,7 +117,7 @@ module.exports = {
           content.ContentCategory,
           content.ShortTitle,
           content.ContentMessage)
-        console.log(material)
+        
         let showCover = 0
         if(i==0){
           //showCover = 1
@@ -113,12 +130,12 @@ module.exports = {
           "digest": 'zhaiyao',
           "show_cover_pic": showCover,
           "content":  material,
-          "content_source_url": '',
+          "content_source_url": config.front+'/data/ContentLink?id='+content.ContentID,
           "need_open_comment":1,
           "only_fans_can_comment":1
         })
       }      
-
+      console.log(materials)
       let textID = await weChat.uploadImageText(token,materials,0)
       weChat.pushContentPreview(token,textID,config.openID)
 
