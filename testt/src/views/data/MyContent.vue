@@ -822,7 +822,11 @@ export default {
   width: 100%;
   .el-table__body{
     table-layout: auto;
-  } 
+  }
+  .el-table__header {
+    table-layout: auto;
+    border-collapse: separate;
+ } 
 }
 .content{
   display: flex;

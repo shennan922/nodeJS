@@ -835,7 +835,11 @@ body .el-table th.gutter{
   //   }
   .el-table__body{
     table-layout: auto;
-  } 
+  }
+   .el-table__header {
+    table-layout: auto;
+    border-collapse: separate;
+ } 
   
 }
 /deep/.dialogMyPush{
