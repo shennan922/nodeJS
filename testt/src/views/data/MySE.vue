@@ -604,14 +604,13 @@ body .el-table th.gutter{
 }
 /deep/.formSE{
   width: 100%;
-  // .el-table__body-wrapper .el_table_body
-  // .table__header{
-  //     table-layout: auto;
-  //     // display: table-cell!important;
-  //   }
   .el-table__body{
     table-layout: auto;
   } 
+   .el-table__header {
+    table-layout: auto;
+    border-collapse: separate;
+ } 
   
 }
 

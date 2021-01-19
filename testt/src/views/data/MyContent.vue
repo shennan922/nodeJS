@@ -33,7 +33,7 @@
             :model="ContentForm"
             :data="getList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border
             :header-cell-style="tableHeaderColor" 
-            @sort-change="changeTableSort" class="formSE"
+            @sort-change="changeTableSort" class="formContent"
             ref="ContenTable"
             >
             <el-table-column min-width="12%" prop="ContentID" label="ContentID" sortable></el-table-column>
@@ -811,11 +811,15 @@ export default {
 
 <style  lang="scss" scoped>
 
-/deep/.formSE{
+/deep/.formContent{
   width: 100%;
   .el-table__body{
     table-layout: auto;
-  } 
+  }
+  .el-table__header {
+    table-layout: auto;
+    border-collapse: separate;
+ } 
 }
 .content{
   display: flex;
