@@ -68,6 +68,7 @@
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
                 <el-button size="mini" type="info" @click="handleDelete(scope.row.ContentID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
+                <!--测试contentlink用-->
                 <el-button size="mini" type="info" @click="handleID(scope.row.ContentID)" plain >Test</el-button>
               </template>
             </el-table-column>
@@ -351,7 +352,7 @@ export default {
       let link = document.createElement('a');
       link.style.display = 'none';
       link.href = file.url;
-      link.setAttribute('download', name);
+      link.setAttribute('download', file.name);
       document.body.appendChild(link);
       link.click();
     },    

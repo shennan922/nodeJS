@@ -29,7 +29,7 @@
               <el-col :span="10">
                 <el-form-item label="附件">
                   <ul class="pdfStyle" v-for="file in fileList" :key="file.url">
-                    <span><a :href="file.url">{{file.name}}</a></span>
+                    <span><a :href="file.url" :download="file.name">{{file.name}}</a></span>
                   </ul>
                 </el-form-item>
               </el-col>
