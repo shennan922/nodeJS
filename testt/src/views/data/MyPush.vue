@@ -127,9 +127,9 @@
                 :data="getChooseContentData" border 
                 :header-cell-style="contentTableHeaderColor"
                 class="formMyPush" 
-                ref="SeTable"
                 style="margin-top:10px;width:95%;margin-left:3%;"
               >
+               <!-- ref="SeTable" -->
                 <el-table-column min-width="10%" prop="SEID" label="SE"></el-table-column>
                 <!-- <el-table-column min-width="15%" prop="ContentCategory" label="Category" ></el-table-column> -->
                 <el-table-column min-width="20%" prop="ShortTitle" label="Short Title"></el-table-column>
@@ -636,97 +636,115 @@ export default {
     },
     async createSubmit(formStatus) {
       this.getCurrentTime();
-      this.$refs.AddMyPushForm.validate((valid) => {
-        if (valid) {
-          this.$confirm('确认提交？', '提示', {}).then(async() => {  
-            let content = []  
-            this.getChooseContentData.forEach(ct => {
-              content.push(ct.ContentID)
-            });
-            await MyPushService.myPushCreate(
-              {
-                  PushID:this.MyPushID,
-                  SEID: this.AddMyPushForm.SEID,   
-                  Greeting:this.AddMyPushForm.Greeting,
-                  Categorized: this.AddMyPushForm.Categorized,
-                  Priority:this.AddMyPushForm.Priority,
-                  IsScheduled: this.AddMyPushForm.Scheduled,
-                  ScheduleDate: this.AddMyPushForm.ScheduleDate,
-                  ScheduleTime: this.AddMyPushForm.ScheduleTime,
-                  RequestType: this.AddMyPushForm.RequestType,
-                  ContentID: content.toString(),//this.AddMyPushForm.ContentId,
-                  MeetingID: "",
-                  CreateDt: this.currentTime,
-                  ModifyDt: "",
-              }
-            ).then((res) => {
-              if (res.code == 400){
-                this.$message({
-                  type: 'info',
-                  message: res.message
-                });
-              } 
-              if (res.code == 200){
-                this.$message({
-                  type: 'success',
-                  message: '提交成功!'
-                });
-                this.dialogCreateVisible = false;
-                this.formStatus = 0
-                this.getDetailList()
-                this.handleMyPushClose()
-                this.currentContentID = ""
-                //this.getContentList();
-              }              
+      if(this.getChooseContentData==""){
+         this.$message({
+            type: 'info',
+            message: "请添加Content后保存"
+          });
+          return;
+      }
+      else{
+        this.$refs.AddMyPushForm.validate((valid) => {
+          if (valid) {
+            this.$confirm('确认提交？', '提示', {}).then(async() => {  
+              let content = []  
+              this.getChooseContentData.forEach(ct => {
+                content.push(ct.ContentID)
+              });
+              await MyPushService.myPushCreate(
+                {
+                    PushID:this.MyPushID,
+                    SEID: this.AddMyPushForm.SEID,   
+                    Greeting:this.AddMyPushForm.Greeting,
+                    Categorized: this.AddMyPushForm.Categorized,
+                    Priority:this.AddMyPushForm.Priority,
+                    IsScheduled: this.AddMyPushForm.Scheduled,
+                    ScheduleDate: this.AddMyPushForm.ScheduleDate,
+                    ScheduleTime: this.AddMyPushForm.ScheduleTime,
+                    RequestType: this.AddMyPushForm.RequestType,
+                    ContentID: content.toString(),//this.AddMyPushForm.ContentId,
+                    MeetingID: "",
+                    CreateDt: this.currentTime,
+                    ModifyDt: "",
+                }
+              ).then((res) => {
+                if (res.code == 400){
+                  this.$message({
+                    type: 'info',
+                    message: res.message
+                  });
+                } 
+                if (res.code == 200){
+                  this.$message({
+                    type: 'success',
+                    message: '提交成功!'
+                  });
+                  this.dialogCreateVisible = false;
+                  this.formStatus = 0
+                  this.getDetailList()
+                  this.handleMyPushClose()
+                  this.currentContentID = ""
+                  //this.getContentList();
+                }              
+              })
+            }).catch((err) => {
+              this.$message({
+                type: 'info',
+                message: '出错了: '+err
+              });
             })
-          }).catch((err) => {
-            this.$message({
-              type: 'info',
-              message: '出错了: '+err
-            });
-          })
-        }
-      })
+          }
+        })
+      }
     },
     async updateSubmit(formStatus) {
-      this.$refs.AddSEForm.validate((valid) => {
-        if (valid) {
-          this.$confirm('确认提交？', '提示', {}).then(async() => { 
-            await SEService.SEUpdate(
-              {
-                SEID: this.AddSEForm.SEID,
-                SEName: this.AddSEForm.SEName,
-                City: this.AddSEForm.CityID,
-                Department: this.AddSEForm.DepID,
-                MLName: this.AddSEForm.MLID,
-                Team:this.AddSEForm.TeamID
-              }
-            ).then((res) => {
-              if (res.code == 400){
-                this.$message({
-                  type: 'info',
-                  message: res.message
-                });
-              } 
-              if (res.code == 200){
-                this.$message({
-                  type: 'success',
-                  message: '提交成功!'
-                });
-                this.dialogCreateVisible = false;
-                this.formStatus = 0
-                this.getDetailList();
-                this.handleMyPushClose()
-              }                
+      if(this.getChooseContentData==""){
+         this.$message({
+            type: 'info',
+            message: "请添加Content后保存"
+          });
+          return;
+      }
+      else{
+        this.$refs.AddSEForm.validate((valid) => {
+          if (valid) {
+            this.$confirm('确认提交？', '提示', {}).then(async() => { 
+              await SEService.SEUpdate(
+                {
+                  SEID: this.AddSEForm.SEID,
+                  SEName: this.AddSEForm.SEName,
+                  City: this.AddSEForm.CityID,
+                  Department: this.AddSEForm.DepID,
+                  MLName: this.AddSEForm.MLID,
+                  Team:this.AddSEForm.TeamID
+                }
+              ).then((res) => {
+                if (res.code == 400){
+                  this.$message({
+                    type: 'info',
+                    message: res.message
+                  });
+                } 
+                if (res.code == 200){
+                  this.$message({
+                    type: 'success',
+                    message: '提交成功!'
+                  });
+                  this.dialogCreateVisible = false;
+                  this.formStatus = 0
+                  this.getDetailList();
+                  this.handleMyPushClose()
+                }                
+              })
+            }).catch(() => {
+              this.$message({
+                type: 'info',
+                message: '已取消新增'
+              });
             })
-          }).catch(() => {
-            this.$message({
-              type: 'info',
-              message: '已取消新增'
-            });
-          })
+          }
+        })
         }
-      })
     },
     getDetailList() {
       MyPushService.getMyPushList("")
