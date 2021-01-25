@@ -55,6 +55,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING(400),      
       field: 'TextID'
     },
+    ImgUrl: {
+      type: DataTypes.STRING(400),      
+      field: 'ImgUrl'
+    },
   },
     {
       sequelize,

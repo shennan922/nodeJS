@@ -147,15 +147,15 @@ module.exports = {
         })
         logger.logger.info('User login: '+req.params.id)
       } else {
-        res.status(403).send({
-          code: 403,
+        res.status(401).send({
+          code: 401,
           error: '用户名或密码错误'
         })
         logger.logger.error('User login error: user or password not correct')
       }
     } catch (error) {
-      res.status(403).send({
-        code: 404,
+      res.status(401).send({
+        code: 401,
         error: '登陆异常: '+error
       })
       logger.logger.fatal('User login fail: '+error.message)

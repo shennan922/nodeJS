@@ -7,6 +7,7 @@ const MyPush = db.MyPush
 const MyContent = db.MyContent
 const SEList = db.SEList
 const ContentFile = db.MyContentFile
+const MyContentCategory = db.MyContentCategory
 
 MyPush.belongsTo(SEList, {
   foreignKey: 'SEID',
@@ -14,7 +15,8 @@ MyPush.belongsTo(SEList, {
   as: 'SE'
 });
 
-async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTitle,ContentMessage){
+
+async function generateContent11(ContentID,SEID,SearchTerm,ContentCategory,ShortTitle,ContentMessage){
   var files = await ContentFile.findAll({where:{ContentID:ContentID},raw:true})
   let text = []
   
@@ -36,6 +38,23 @@ async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTi
       //str += '<tr><td>Content</td><td><div style="width:80%; border:1px solid #000"><p>'+ContentMessage+'</p></div></td></tr>'
       str += '<tr><td>Content</td><td><div style="width:80%; border:1px solid #000"><p><img src="http://mmbiz.qpic.cn/mmbiz_jpg/QBmZfnm0uBfAcjSnnpDodSa9CwsgQrJ94juCMyVsfNNlVxVwmFzXL7DUZvDHTSuI1ibUzfUd4dITVItYCN9wWNg/0"></p></div></td></tr>'
       str += '</table>'
+      str += '</div></body></html>'
+  return str
+}
+
+async function generateContent(ContentID,SEID,SearchTerm,ContentCategory,ShortTitle,ContentMessage){
+  var start = ContentMessage.indexOf('img')+9
+  var end = ContentMessage.indexOf('.jpg')+4
+  var img = ContentMessage.substr(start,end-start)
+  var msg = ContentMessage
+  if(start > 8){
+    msg = ContentMessage.replace(img,'http://mmbiz.qpic.cn/mmbiz_jpg/QBmZfnm0uBfAcjSnnpDodSa9CwsgQrJ94juCMyVsfNNlVxVwmFzXL7DUZvDHTSuI1ibUzfUd4dITVItYCN9wWNg/0')
+  }
+
+  let str = '<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>'
+      str += '<title>'+ShortTitle+'</title></head>'
+      str += '<body><div style="text-align:left">'
+      str += msg
       str += '</div></body></html>'
   return str
 }
@@ -91,19 +110,29 @@ module.exports = {
         "articles": []
       }
       let contentID = await req.body.ContentID.split(",")
+      let contentCate = await MyContentCategory.findAll({raw:true})
       for(i=0;i<contentID.length;i++){
         let content =  await MyContent.findByPk(contentID[i])
+        let category = []
+        content.ContentCategory.split(',').forEach(cat=>{
+          let cateDesc = contentCate.find((cate)=>{return cate.CategoryID == cat})
+          if(cateDesc != undefined){
+            category.push(cateDesc.CategoryDesc)
+          }
+        })
+        
 
         let material = await generateContent(content.ContentID,
           content.SEID,
           content.SearchTerm,
-          content.ContentCategory,
+          //content.ContentCategory,
+          category.toString(),
           content.ShortTitle,
           content.ContentMessage)
         console.log(material)
         let showCover = 0
         if(i==0){
-          //showCover = 1
+          showCover = 1
         }
 
         materials.articles.push({
@@ -120,8 +149,27 @@ module.exports = {
       }      
 
       let textID = await weChat.uploadImageText(token,materials,0)
-      weChat.pushContentPreview(token,textID,config.openID)
+      
+      if(textID.media_id == undefined){
+        res.status(200).send({
+          code: 400,
+          message: '图文消息media_id生成失败: '+textID.errmsg
+        })
+        logger.logger.error("图文消息media_id生成失败: "+textID.errmsg)  
+        return
+      } 
 
+      let Push = await weChat.pushContentPreview(token,textID.media_id,config.openID)
+      console.log(Push)
+      if(Push.errcode != 0){
+        res.status(200).send({
+          code: 400,
+          message: '图文消息推送失败: '+Push.errmsg
+        })
+        logger.logger.error('图文消息推送失败: '+Push.errmsg)  
+        return
+      } 
+      
       var newPush = {
         PushID: req.body.PushID,
         SEID: req.body.SEID,    
@@ -148,7 +196,7 @@ module.exports = {
     } catch (error) {
       res.status(200).send({
         code: 400,
-        error: '程序异常: ' + error
+        message: '程序异常: ' + error
       })
       logger.logger.fatal("Create MyPushList fail: "+req.body.PushID+'/'+error)
     }

@@ -191,7 +191,8 @@ module.exports = {
             reject(error);
           }else{
             console.log(JSON.parse(body))
-            resolve(JSON.parse(body).media_id);              
+            //resolve(JSON.parse(body).media_id);
+            resolve(JSON.parse(body));
           }
         });
       });
@@ -271,12 +272,14 @@ module.exports = {
         }
         resolve(JSON.parse(body));
       }); 
+      console.log(ticket)
       if(ticket.data.errcode==42001&&refresh==1){
         token = await updateAccessToken(config.appInfo.appID,config.appInfo.secret)
         return await this.uploadImageText(token, material,0)
       }
       else{
-        return ticket.data.media_id  
+        //return ticket.data.media_id  
+        return ticket.data  
       }                
     }catch (error)
     {

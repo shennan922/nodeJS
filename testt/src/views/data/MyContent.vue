@@ -68,7 +68,7 @@
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" right-padding="20px" class="buttonEdit" @click="handleEdit(scope.row)" plain><i class="el-icon-edit"></i>Edit</el-button>
                 <el-button size="mini" type="info" @click="handleDelete(scope.row.ContentID)" plain class="buttonDelete"><i class="el-icon-delete"></i>Delete</el-button>
-                <!-- <el-button size="mini" type="info" @click="handleID(scope.row.SEID)" plain >Test</el-button> -->
+                 <el-button size="mini" type="info" @click="handleID(scope.row.ContentID)" plain >Test</el-button> 
               </template>
             </el-table-column>
           </el-table> 
@@ -322,21 +322,25 @@ export default {
       };
   },
   methods: {
-    handleID(){
-      var fmRoutes 
-      var route ={
-        // path: '/contentForms/3456',
-        // name: 'test1111',
-        // meta: { auth: true, title: 'test1111' },
-        // component: () => import('../views/contentForms/Log111.vue')
-      }      
-      router.push(route)
+    handleID(id){
+      this.$router.push({
+        name: "ContentLink",
+        query:{
+          id: id
+        }
+      });
     },
     getID(){
       this.ContentID = Number(Math.random().toString().substr(3,6) );
     },
     uploadOnRemove(file){
-      console.log(file)
+      var temp = this.fileList
+      this.fileList = []
+      for(var i=0;i<temp.length;i++){
+        if(temp[i].name != file.name){
+          this.fileList.push(temp[i])
+        }
+      }
       ContentService.deleteFile({ContentID:this.ContentID,filePath:file.name})
     },
     uploadOnPreview(file){
@@ -351,7 +355,20 @@ export default {
       this.getCurrentTime()      
       this.uploadData.ContentID = this.ContentID
       this.uploadData.UploadTime = this.currentTime
-      this.fileList.push({"name":file.name,"url":'/api/myContent/downloadpdf?ContentID='+this.ContentID+'&file='+file.name})
+
+      /*
+      for(var i=0;i<temp.length;i++){
+        if(temp[i].name != file.name){
+          this.fileList.push(temp[i])
+        }
+      }
+      */
+      console.log(this.fileList.find((item)=>{return item.name === file.name}))
+      if(this.fileList.find((item)=>{return item.name === file.name}) == undefined){
+        console.log('111')
+        this.fileList.push({"name":file.name,"url":'/api/myContent/downloadpdf?ContentID='+this.ContentID+'&file='+file.name})
+      }
+      console.log(this.fileList)
     },    
     onTagClose(tag){
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag),1)
@@ -428,7 +445,6 @@ export default {
             //var content = ContentService.downloadFile({ContentID:data.ContentID,filePath:file.FileName})  
             this.fileList.push({"name":file.FileName,"url":'/api/myContent/downloadpdf?ContentID='+data.ContentID+'&file='+file.FileName})
           });
-          console.log(this.fileList)
         })
         .catch(function (err) {
           console.log(err);

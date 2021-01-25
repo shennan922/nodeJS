@@ -99,6 +99,12 @@ const routes = [
         meta: { auth: true, title: 'OnlineMeeting' },
         component: () => import('../views/data/OnlineMeeting.vue')
       },
+      {
+        path: '/data/ContentLink',
+        name: 'ContentLink',
+        meta: { auth: false, title: 'ContentLink' },
+        component: () => import('../views/data/ContentLink.vue')
+      },
     ]
   },
 
