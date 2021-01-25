@@ -54,6 +54,7 @@ module.exports = {
     expire_seconds:604800
   },
   host:'http://localhost:3000',
+  front: 'http://localhost:8080',
   openID:'oJVgv6ZH9l1Jq0BEO3K0QpYZD98I'
   //bochao2 - oxVS35xGeWkwUdhXch6m3-DJeG58
   //bochao - oJVgv6ZH9l1Jq0BEO3K0QpYZD98I

@@ -129,7 +129,7 @@ module.exports = {
           category.toString(),
           content.ShortTitle,
           content.ContentMessage)
-        console.log(material)
+        
         let showCover = 0
         if(i==0){
           showCover = 1
@@ -142,12 +142,12 @@ module.exports = {
           "digest": 'zhaiyao',
           "show_cover_pic": showCover,
           "content":  material,
-          "content_source_url": '',
+          "content_source_url": config.front+'/data/ContentLink?id='+content.ContentID,
           "need_open_comment":1,
           "only_fans_can_comment":1
         })
       }      
-
+      console.log(materials)
       let textID = await weChat.uploadImageText(token,materials,0)
       
       if(textID.media_id == undefined){

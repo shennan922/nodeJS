@@ -97,7 +97,18 @@ module.exports = {
         "Content-Disposition":"attachment; filename=xxx.jpg"//告诉浏览器这是一个需要下载的文件      
       });
       // fs.createReadStream('helloworld/public/images/'+req.params.ContentID).pipe(res); 
-      fs.createReadStream('public/images/'+req.params.ContentID).pipe(res); 
+
+      let imgPath = 'public/images/'+req.params.ContentID
+      if(fs.existsSync(imgPath)){
+        fs.createReadStream(imgPath).pipe(res); 
+      }
+      else{
+        res.status(400).send({
+          code: 400,
+          data:null,
+          message:'图片不存在'
+        })
+      }
       /*
       Content.findByPk(req.params.ContentID).then((img)=>{
         fs.createReadStream('.//contents//'+req.params.ContentID+'//'+img.PhotoName).pipe(res);   

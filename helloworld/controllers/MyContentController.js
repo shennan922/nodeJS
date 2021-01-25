@@ -8,6 +8,7 @@ const SEList = db.SEList
 var formidable = require('formidable')
 var weChat = require('../utils/Wechat')
 const config = require('../config')
+var urlencode = require('urlencode');
 
 Content.belongsTo(SEList, {
   foreignKey: 'SEID',
@@ -56,7 +57,7 @@ module.exports = {
       logger.logger.fatal('Query MyContent fail: '+error)
     }
   },
-
+  
   async getList (req, res) {
     try {
       var data = await Content.findAll({
@@ -260,9 +261,11 @@ module.exports = {
         FileURL: config.host+'/myContent/downloadpdf?file='+files.file.name+'&ContentID='+fields.ContentID,
         CreateDt: db.convertLocalTime(fields.UploadTime)
       }
-      let checkExist = await ContentFile.findOne({ContentID:fields.ContentID,FileName:files.file.name})
+
+      let checkExist = await ContentFile.findOne({where:{ContentID:fields.ContentID,FileName:files.file.name}})
+      console.log(checkExist)
       if(checkExist != undefined){
-        await ContentFile.update({ModifyDt:db.convertLocalTime(fields.UploadTime)},{ContentID:fields.ContentID,FileName:files.file.name})
+        await ContentFile.update({ModifyDt:db.convertLocalTime(fields.UploadTime)},{where:{ContentID:fields.ContentID,FileName:files.file.name}})
       }
       else{
         await ContentFile.create(newContentFile).catch((e)=>{console.log(e)})
@@ -326,12 +329,21 @@ module.exports = {
 
   async downloadPdf(req, res) {
     res.set({
-      //"Content-Type":"application/octet-stream;charset=base64",//告诉浏览器这是一个二进制文件
-      "Content-Type":"application/octet-stream",//告诉浏览器这是一个二进制文件
-      "Content-Disposition":"attachment; filename=xxx.pdf"//告诉浏览器这是一个需要下载的文件      
+      "Content-Type":"application/octet-stream;charset=base64",//告诉浏览器这是一个二进制文件
+      "Content-Disposition": "attachment; filename*=UTF-8''" + urlencode.encode(req.query.file, "UTF-8")//告诉浏览器这是一个需要下载的文件      
     });
     var path = './/contents//'+req.query.ContentID+'//'+req.query.file
-    fs.createReadStream(path).pipe(res);   
+    if(fs.existsSync(path)){
+      fs.createReadStream(path).pipe(res); 
+    }
+    else{
+      res.status(400).send({
+        code: 400,
+        data:null,
+        message:'文件不存在'
+      })
+    }
+      
   },
   
   async downloadImg(req, res) {    
@@ -340,7 +352,19 @@ module.exports = {
         "Content-Type":"application/jpeg",//告诉浏览器这是一个二进制文件
         "Content-Disposition":"attachment; filename="+req.params.ContentID+"\""//告诉浏览器这是一个需要下载的文件      
       });
-      fs.createReadStream('public/images/'+req.params.ContentID).pipe(res); 
+      
+      var path = 'public/images/'+req.params.ContentID
+      if(fs.existsSync(path)){
+        fs.createReadStream(path).pipe(res); 
+      }
+      else{
+        res.status(400).send({
+          code: 400,
+          data:null,
+          message:'封面图片不存在'
+        })
+      }
+      
       /*
       Content.findByPk(req.params.ContentID).then((img)=>{
         fs.createReadStream('.//contents//'+req.params.ContentID+'//'+img.PhotoName).pipe(res);   
