@@ -110,10 +110,10 @@
                   </el-form-item>
                 <el-form-item label="Content Category" prop="ContentCategory">
                     <div>
-                    <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:87%;padding-left:0px" ref="categorySelect">
-                      <el-option
-                        v-for="item in getCategoryList" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
-                      </el-option> 
+                      <el-select v-model="AddContentForm.ContentCategory"  placeholder="请选择" style="width:87%;padding-left:0px" ref="categorySelect">
+                        <el-option
+                          v-for="item in getCategoryList" :key="item.CategoryID" :label="item.CategoryDesc" :value="item.CategoryID">
+                        </el-option> 
                       </el-select> 
                       <el-button  class="button-new-tag" size="small" @click="showInput">+</el-button>
                     </div>
@@ -279,6 +279,9 @@ export default {
         ],
         SearchTerm: [
           { required: true, message: '请输入Search Team', trigger: 'blur'}
+        ],
+        UpdatePhotoData: [
+          { required: true, message: '请上传封面图片', trigger: 'blur'}
         ],
       },
       pickerOptions: {
@@ -495,18 +498,21 @@ export default {
       this.dialogCreateVisible = true;
       this.defaultMsg =row.ContentMessage;
       this.imageUrl = row.PhotoPath;
-      
+     
       this.AddContentForm = {
         ContentID:row.ContentID,
         SEID:row.SEID,
-        ContentCategory:row.ContentCategory,
+        //ContentCategory:row.ContentCategory,
+        ContentCategory:"",
         ShortTitle: row.ShortTitle,
         SearchTerm: row.SearchTerm,
         ContentMessage: row.ContentMessage,
         CreateDt:row.CreateDt,
           ModifyDt:row.ModifyDT,
           PhotoName:row.UpdatePhotoName,
+          //2020-01-25xintong
           PhotoPath:row.UpdatePhotoData,
+          UpdatePhotoData:row.PhotoPath,
       };
       
     },
@@ -607,6 +613,9 @@ export default {
       //上传成功之后清除历史记录  
       this.$refs.uploadImg.clearFiles();  
       //this.AddContentForm.UpdatePhotoPath = this.imageUrl;
+       this.$nextTick( ()=> {
+        this.$refs['AddContentForm'].clearValidate(['UpdatePhotoData']);
+      })
     },
     beforeAvatarUpload(UpdatePhoto) {
       const isJPG = UpdatePhoto.type === 'image/jpeg';
