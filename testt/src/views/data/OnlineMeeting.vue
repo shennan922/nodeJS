@@ -37,7 +37,7 @@
             </el-table-column>
             <el-table-column min-width="13%" prop="CreateDt" label="CreateDate">
               <template scope="scope">
-                {{dateFormatCreateDT(scope.row.CreateDt)}}
+                {{dateFormat(scope.row.CreateDt)}}
               </template>
             </el-table-column>
             <el-table-column min-width="18%" label="Operation">
@@ -85,32 +85,32 @@
                 </el-col>
                 <el-col :span="14" class="el-col_NewMetting">
                   <el-form-item label="会议名称" prop="MeetingDesc">
-                    <el-input v-model="AddMeetingForm.MeetingDesc"></el-input>
+                    <el-input v-model="AddMeetingForm.MeetingDesc" style="margin-top:-1%"></el-input>
                   </el-form-item>
                   <el-row>
-                    <p style="text-align:left"><span style="color:#F78875">*</span> 开始时间</p>
-                    <el-col :span="8">
+                    <p style="text-align:left;margin-top:2%"><span style="color:#F78875">*</span> 开始时间</p>
+                    <el-col :span="9">
                       <el-form-item prop="StartDate">
-                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate" @change="changeStartTime()"></el-date-picker>
+                        <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.StartDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate"  @change="changeStartTime()"></el-date-picker>
                       </el-form-item>
                     </el-col>
-                    <el-col :span="8">  
+                    <el-col :span="9">  
                       <el-form-item lable="开始时间" prop="StartTime">
-                        <el-time-select v-model="AddMeetingForm.StartTime" :picker-options="{start: '08:30',step: '00:15',end: '24:00'}" placeholder="选择时间" class="startTime" @change="changeStartTime()" ></el-time-select>
+                        <el-time-select v-model="AddMeetingForm.StartTime" :picker-options="{start: '08:30',step: '00:15',end: '24:00'}" placeholder="选择时间" class="startTime"  @change="changeStartTime()" ></el-time-select>
                       </el-form-item>
                     </el-col>
                   </el-row>
                   <el-row style="float:left">
-                    <p v-if="startTimeVisible" :visible.sync="startTimeVisible" class ="startP">开始时间不能早于当前时间</p>  
+                    <p v-if="startTimeVisible" :visible.sync="startTimeVisible" class ="startP">会议开始时间不能早于当前时间</p>  
                   </el-row>    
                   <el-row>
-                    <p style="text-align:left"><span style="color:#F78875">*</span> 结束时间</p>
-                    <el-col :span="8">
+                    <p style="text-align:left;margin-top:2%"><span style="color:#F78875">*</span> 结束时间</p>
+                    <el-col :span="9">
                       <el-form-item lable ="结束时间" prop="EndDate">
                         <el-date-picker value-format="yyyy-MM-dd" v-model="AddMeetingForm.EndDate" type="date" placeholder="选择日期" :picker-options="pickerOptions" class="startDate" @change="changeEndTime()" ></el-date-picker>
                       </el-form-item>
                     </el-col>
-                    <el-col :span="8">
+                    <el-col :span="9">
                       <!-- ,minTime:AddMeetingForm.StartTime -->
                       <el-form-item lable ="结束时间" prop="EndTime">
                         <el-time-select v-model="AddMeetingForm.EndTime" :picker-options="{start: '08:30',step: '00:15',end: '24:00'}" placeholder="选择时间" class="startTime" @change="changeEndTime()"></el-time-select> 
@@ -120,8 +120,9 @@
                   <el-row style="float:left">
                     <p v-if="endTimeVisible" :visible.sync="endTimeVisible" class ="startP">会议结束时间应该晚于开始时间</p>  
                     <p v-if="endTimeVisible1" :visible.sync="endTimeVisible1" class ="startP">会议结束时间不能早于当前时间</p> 
+                    <p v-if="endTimeVisible2" :visible.sync="endTimeVisible2" class ="startP" style="padding-top:2px">会议开始和结束时间不能相同</p>
                   </el-row>
-                  <el-row style="float:left;width:100%"> 
+                  <el-row style="float:left;width:100%;margin-top:3%"> 
                     <el-form-item prop="IsRecurrent" style="text-align:left">
                       <el-checkbox v-model="AddMeetingForm.IsRecurrent">周期性会议</el-checkbox>
                     </el-form-item>
@@ -144,7 +145,7 @@
 
               <el-row>
                 <el-col :span="6" class="el-col_NewMettingLeft">
-                  <p class="h2title">保密</p>
+                  <p class="toptitle">保密</p>
                   <p class="h4title">成员将需要密码入会</p>
                   <!-- <p class="h2title">会议人数上限</p> -->
                   <!-- <p class="h4title">同一场议会中允许参会的用户上限</p> -->
@@ -171,7 +172,7 @@
                     <p style="text-align:left">指定主持人0/10(选填)</p>
                     <el-input v-model="AddMeetingForm.AssignedHost" placeholder="请输入成员姓名搜索"></el-input>
                   </el-form-item>
-                  <el-form-item prop="WaitingRoom" style="text-align:left">
+                  <el-form-item prop="WaitingRoom" style="text-align:left;margin-top:5%">
                       <el-checkbox v-model="AddMeetingForm.WaitingRoom">开启等候室</el-checkbox>
                   </el-form-item>
                   <el-form-item prop="JoinBeforeHost" style="text-align:left">
@@ -257,6 +258,7 @@ export default {
       startTimeVisible:false,
       endTimeVisible:false,
       endTimeVisible1:false,
+      endTimeVisible2:false,
       SEForm: {                   //table数据源
         SEID:"",
         SEName:"",
@@ -341,13 +343,13 @@ export default {
           { required: true, message: '请输入开始日期', trigger: 'blur'}
         ], 
         StartTime: [
-          { required: true, message: '\xa0\xa0\xa0请输入开始时间', trigger: 'blur'}
+          { required: true, message: '\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0请输入开始时间', trigger: 'blur'}
         ], 
         EndDate: [
           { required: true, message: '请输入结束日期', trigger: 'blur'}
         ], 
         EndTime: [
-          { required: true, message: '\xa0\xa0\xa0请输入结束时间', trigger: 'blur'}
+          { required: true, message: '\xa0\xa0\xa0\xa0\xa0\xa0\xa0\xa0请输入结束时间', trigger: 'blur'}
         ],  
       },
     };
@@ -474,21 +476,23 @@ export default {
       //return year+"-"+month+"-"+day+" "+hours+":"+minutes;
       return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
   },
-    dateFormatCreateDT(time){
-      var date=new Date(time);
-      var year=date.getFullYear();
-      /* 在日期格式中，月份是从0开始的，因此要加0
-        * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
-        * */
-      var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
-      var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
-      var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours()-8;
-      var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
-      var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
-      // 拼接
-      //return year+"-"+month+"-"+day+" "+hours+":"+minutes;
-      return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
-    },
+    // dateFormatCreateDT(time){
+  
+    //   //return time.substring(0,19);
+    //   var date=new Date(time);
+    //   var year=date.getFullYear();
+    //   /* 在日期格式中，月份是从0开始的，因此要加0
+    //     * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+    //     * */
+    //   var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+    //   var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+    //   var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours();
+    //   var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+    //   var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+    //   // 拼接
+    //   //return year+"-"+month+"-"+day+" "+hours+":"+minutes;
+    //   return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
+    // },
     handleEdit(row) {
       if(row.Status !="1")
       {
@@ -604,6 +608,7 @@ export default {
       this.startTimeVisible = false;
       this.endTimeVisible = false;
       this.endTimeVisible1 = false;
+      this.endTimeVisible2 = false;
     },
     changeStartTime(){
      
@@ -612,37 +617,67 @@ export default {
       var currentHS = this.currentTime.substring(11,16);
       var inputDay = this.AddMeetingForm.StartDate;
       var inputHS = this.AddMeetingForm.StartTime;
-    
+      
       if(this.AddMeetingForm.StartTime!="" && currentDay == this.AddMeetingForm.StartDate && (this.AddMeetingForm.StartTime < currentHS))
       {
            //alert(1);
+           this.endTimeVisible2 = false;
            this.startTimeVisible = true;
-           this.AddMeetingForm.EndTime == "";
+           //this.AddMeetingForm.EndTime = "";
       }
       else if(this.AddMeetingForm.EndDate!="" && this.AddMeetingForm.StartDate > this.AddMeetingForm.EndDate)
       {
         //alert(2);
-          this.endTimeVisible = true;
-          this.AddMeetingForm.EndTime == "";
+        this.startTimeVisible = false;
+        this.endTimeVisible2 = false;
+        this.endTimeVisible1 = false;
+          if(this.endTimeVisible1 == true)
+          {
+
+          }
+          else{
+            this.endTimeVisible = true;
+          }
       }
-      else if(this.AddMeetingForm.EndDate!="" && this.AddMeetingForm.StartDate!="" && this.AddMeetingForm.EndDate == this.AddMeetingForm.StartDate && this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime)
+      else if(this.AddMeetingForm.EndDate!="" && this.AddMeetingForm.StartDate!="" && this.AddMeetingForm.EndDate == this.AddMeetingForm.StartDate && this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime
+      &&this.AddMeetingForm.StartDate!=null && this.AddMeetingForm.EndDate!=null)
       {
         //alert(3);
+        if(this.AddMeetingForm.StartTime > currentHS){
+          this.startTimeVisible = false;
+        }
+          this.endTimeVisible2 = false;
+          //this.endTimeVisible = true;
           this.endTimeVisible = true;
-          this.AddMeetingForm.EndTime == "";
+          //add
+          this.endTimeVisible1 = false;
+          //add end
+      }
+      else if(this.AddMeetingForm.StartDate != "" && this.AddMeetingForm.StartDate != null && this.AddMeetingForm.EndDate != "" && this.AddMeetingForm.StartDate != null &&
+      this.AddMeetingForm.StartTime != "" && this.AddMeetingForm.StartTime != null && this.AddMeetingForm.EndTime != "" && this.AddMeetingForm.EndTime != null &&
+      this.AddMeetingForm.StartDate == this.AddMeetingForm.EndDate && this.AddMeetingForm.StartTime == this.AddMeetingForm.EndTime)
+      {
+        //alert("11");
+
+          this.endTimeVisible = false;
+          this.endTimeVisible1 = false;
+          this.endTimeVisible2 = true;
       }
       else{
         //alert(4);
           this.startTimeVisible = false;
           this.endTimeVisible = false;
-
-          if(this.AddMeetingForm.StartTime != "")
+          this.endTimeVisible2 = false;
+          //if(this.AddMeetingForm.StartTime != "" && this.AddMeetingForm.EndTime == "" && this.AddMeetingForm.StartTime > currentHS )
+          if(((this.AddMeetingForm.StartDate == "" || this.AddMeetingForm.StartDate == null ) && (this.AddMeetingForm.EndTime == "" || this.AddMeetingForm.EndTime == null))||
+            (this.AddMeetingForm.StartDate == currentDay && this.AddMeetingForm.StartTime > currentHS && (this.AddMeetingForm.EndTime == "" || this.AddMeetingForm.EndTime == null))||
+            (this.AddMeetingForm.StartDate > currentDay) && this.AddMeetingForm.StartTime != "" && (this.AddMeetingForm.EndTime == ""|| this.AddMeetingForm.EndTime == null))
           {
               var inputH = this.AddMeetingForm.StartTime.substring(0,2);
               var inputS = this.AddMeetingForm.StartTime.substring(3,5);
 
-              if(inputH == "23"){
-
+              if(inputH == 24){
+           
               }
               else{
                 inputH = parseInt(inputH) + 1;
@@ -651,11 +686,19 @@ export default {
               {
                 var inputEndHS = '0'+ inputH+':'+inputS
               }
+              else if(inputH == 23 || inputH == 24)
+              {
+                var inputEndHS ="24:00";
+              }
               else{
                 var inputEndHS =  inputH+':'+inputS
               }
                 this.AddMeetingForm.EndTime = inputEndHS;
-              }
+                //this.$refs['addMeetingForm'].clearValidate('EndTime');
+                this.$nextTick( ()=> {
+                  this.$refs['AddMeetingForm'].clearValidate(['EndTime']);
+                })
+            }
           }
      
     },
@@ -663,31 +706,51 @@ export default {
       this.getCurrentTime();
       var currentDay = this.currentTime.substring(0,10);
       var currentHS = this.currentTime.substring(11,16);
-      // alert("this.AddMeetingForm.StartDate:" + this.AddMeetingForm.StartDate);
-      // alert("this.AddMeetingForm.StartTime:" + this.AddMeetingForm.StartTime);
-      // alert("this.AddMeetingForm.EndTime:" + this.AddMeetingForm.EndTime);
-      // alert("this.AddMeetingForm.EndDate:" + this.AddMeetingForm.EndDate);
-      // alert("currentDay:" + currentDay);
-      // alert("currentHS:" + currentHS);
+
       if(this.AddMeetingForm.EndDate != "" && this.AddMeetingForm.StartDate > this.AddMeetingForm.EndDate)
       {
         //alert(5);
+          this.endTimeVisible2 = false;
           this.endTimeVisible = true;
       }
-      else if(this.AddMeetingForm.EndDate == this.AddMeetingForm.StartDate && this.AddMeetingForm.EndTime!="" &&this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime)
+      else if(this.AddMeetingForm.EndDate == this.AddMeetingForm.StartDate && this.AddMeetingForm.EndTime!="" &&this.AddMeetingForm.StartTime > this.AddMeetingForm.EndTime
+      &&this.AddMeetingForm.EndDate !=null && this.AddMeetingForm.StartDate !=null &&this.AddMeetingForm.EndDate !="" && this.AddMeetingForm.StartDate !="")
       {
         //alert(6);
+        this.endTimeVisible2 = false;
+        if(this.endTimeVisible1 == true){
+
+        }else{
+
           this.endTimeVisible = true;
+        }
       }
-      else if(this.AddMeetingForm.StartDate =="" && this.AddMeetingForm.StartTime =="" && this.AddMeetingForm.EndTime !="" && this.AddMeetingForm.EndDate == currentDay && this.AddMeetingForm.EndTime < currentHS)
+      else if((this.AddMeetingForm.StartDate ==""|| this.AddMeetingForm.StartDate ==null) && (this.AddMeetingForm.StartTime =="" || this.AddMeetingForm.StartTime == null) && this.AddMeetingForm.EndTime !="" && this.AddMeetingForm.EndDate == currentDay && this.AddMeetingForm.EndTime < currentHS)
       {
         //alert(8);
-          this.endTimeVisible1 = true;
+        this.endTimeVisible2 = false;
+        this.endTimeVisible1 = true;
       }
-      else{
-        //alert(7);
+      else if(this.AddMeetingForm.EndDate == currentDay && this.AddMeetingForm.EndTime < currentHS && this.AddMeetingForm.EndTime!= "" && this.AddMeetingForm.EndTime !=null
+      && this.AddMeetingForm.StartDate!="" && this.AddMeetingForm.StartDate!= null && this.AddMeetingForm.StartTime!= "" && this.AddMeetingForm.StartTime!= null){
+        //alert(9);
+        this.endTimeVisible2 = false;
+        this.endTimeVisible1 = true;
+      }
+       else if(this.AddMeetingForm.StartDate != "" && this.AddMeetingForm.StartDate != null && this.AddMeetingForm.EndDate != "" && this.AddMeetingForm.StartDate != null &&
+      this.AddMeetingForm.StartTime != "" && this.AddMeetingForm.StartTime != null && this.AddMeetingForm.EndTime != "" && this.AddMeetingForm.EndTime != null &&
+      this.AddMeetingForm.StartDate == this.AddMeetingForm.EndDate && this.AddMeetingForm.StartTime == this.AddMeetingForm.EndTime)
+      {
+        //alert("10");
         this.endTimeVisible = false;
         this.endTimeVisible1 = false;
+          this.endTimeVisible2 = true;
+      }
+      else{
+          //alert(7);
+        this.endTimeVisible = false;
+        this.endTimeVisible1 = false;
+        this.endTimeVisible2 = false;
       }
     },
     statusFormat(row){
@@ -720,7 +783,7 @@ export default {
     },
     async createSubmit() {
       this.getCurrentTime();
-      if(this.startTimeVisible == true || this.endTimeVisible == true){
+      if(this.startTimeVisible == true || this.endTimeVisible == true || this.endTimeVisible1 == true || this.endTimeVisible2 == true){
         return;
       }
       // var totalStartDate= this.AddMeetingForm.StartDate + "  " +this.AddMeetingForm.StartTime;
@@ -934,7 +997,7 @@ export default {
       MeetingService.getMeetingList("")
         .then((res) => {
           this.getSearchInfo = res.data;
-          console.log("this.getSearchInfo:" + JSON.stringify(this.getSearchInfo));
+          //console.log("this.getSearchInfo:" + JSON.stringify(this.getSearchInfo));
         })
         .catch(function (err) {
           console.log("err"+err);
@@ -967,7 +1030,7 @@ export default {
     border:  #2daaf3;
     padding-top: 20px;
     margin:0px;
-    padding-left:5px;
+    //padding-left:5px;
 }
 
 .NewButton{
@@ -1012,10 +1075,15 @@ body .el-table th.gutter{
   width: 100%;
   .el-table__body{
     table-layout: auto;
+  }
+  .el-table__header {
+    table-layout: auto;
+    border-collapse: separate;
   } 
 }
 /deep/.dialogMeeting{
-
+  width:120%;
+  margin-left:-10%;
   .el-dialog__header{
     text-align: left;
     padding-left:7%;
@@ -1032,9 +1100,10 @@ body .el-table th.gutter{
   }
   .el-dialog__title{
     color:#fff;
+    margin-left:-5%;
   };
   .el-dialog__body {
-    padding: 30px 30px;
+    padding: 10px 30px;
     color: #606266;
     font-size: 14px;
     word-break: break-all;
@@ -1089,14 +1158,12 @@ body .el-table th.gutter{
   .el-select{
     width:100%
   }
-  .el-cascader{
-    width:100%
-  }
   .startP{
     font-size:12px;
     text-align:left;
-    margin-top:-13%;
+    margin-top:-7%;
     color:#F56C6C;
+    margin-bottom: 1%;
   }
 }
 .el-col_NewMettingLeft{
@@ -1115,18 +1182,20 @@ body .el-table th.gutter{
 }
 
 .startDate{
-  width:99%;
+  width:110%;
   text-align:left;
   float:left;
   .el-input--suffix .el-input__inner {
     padding-right: 0px!important;
   }
+  margin-top:-5%;
 }
 
 .startTime{
-  width:99%;
-  margin-left:10%;
+  width:110%;
+  margin-left:16%;
   float:left;
+  margin-top:-5%;
 }
 .lableAddMeeting{
   width:180%
@@ -1142,5 +1211,8 @@ body .el-table th.gutter{
 .el-scrollbar__wrap{
     overflow-x: hidden!important;
   }
+.el-form-item{
+  margin-bottom:12px;
+}
 
 </style>

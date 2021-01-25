@@ -39,9 +39,10 @@ module.exports = {
   },
   async create (req, res) {
     var hosts = []
-    req.body.AssignedHost.split(',').forEach(host => {
-      hosts.push({userid:host})
-    });
+    //req.body.AssignedHost.split(',').forEach(host => {
+    //  hosts.push({userid:host})
+    //});
+   hosts.push({userid:'admin'})
     var invitees = []
     req.body.AttendInvite.split(',').forEach(invitee => {
       invitees.push({userid:invitee})

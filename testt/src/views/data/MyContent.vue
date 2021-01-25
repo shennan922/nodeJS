@@ -33,7 +33,7 @@
             :model="ContentForm"
             :data="getList.slice((pageNum-1)*pageSize,pageNum*pageSize)" border
             :header-cell-style="tableHeaderColor" 
-            @sort-change="changeTableSort" class="formSE"
+            @sort-change="changeTableSort" class="formContent"
             ref="ContenTable"
             >
             <el-table-column min-width="12%" prop="ContentID" label="ContentID" sortable></el-table-column>
@@ -45,7 +45,7 @@
                   v-for="tag in getCategoryDesc(scope.row.ContentCategory)"
                   :closable="false"
                   effect="light"
-                  style="width:100px"
+                  style="width:100px;background-color:white;border-color:white;color:black;"
                   >
                   {{tag}}
                 </el-tag>
@@ -156,7 +156,7 @@
 
                   <el-form-item label="Upload PDF">
                     <el-row>
-                      <el-col :span="5">
+                      <el-col :span="12">
                         <el-upload
                           ref="upload"
                           action="/api/myContent/uploadPdf"
@@ -333,6 +333,10 @@ export default {
     getID(){
       this.ContentID = Number(Math.random().toString().substr(3,6) );
     },
+    // uploadOnRemove(file){
+    //   console.log(file)
+    //   ContentService.deleteFile({ContentID:this.ContentID,filePath:file.name})
+    // },
     uploadOnRemove(file){
       var temp = this.fileList
       this.fileList = []
@@ -771,20 +775,28 @@ export default {
       })
     },
     dateFormat(time) {
-      var date=new Date(time);
-      var year=date.getFullYear();
-      /* 在日期格式中，月份是从0开始的，因此要加0
-        * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
-        * */
-      var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
-      var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
-      var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours()-8;
-      var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
-      var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
-      // 拼接
-      //return year+"-"+month+"-"+day+" "+hours+":"+minutes;
-      return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
-  },
+      if(time == null)
+      {
+        return "";
+      }
+      else{
+
+        var date=new Date(time);
+        var year=date.getFullYear();
+        
+        /* 在日期格式中，月份是从0开始的，因此要加0
+          * 使用三元表达式在小于10的前面加0，以达到格式统一  如 09:11:05
+          * */
+        var month= date.getMonth()+1<10 ? "0"+(date.getMonth()+1) : date.getMonth()+1;
+        var day=date.getDate()<10 ? "0"+date.getDate() : date.getDate();
+        var hours=date.getHours()<10 ? "0"+date.getHours() : date.getHours();
+        var minutes=date.getMinutes()<10 ? "0"+date.getMinutes() : date.getMinutes();
+        var seconds=date.getSeconds()<10 ? "0"+date.getSeconds() : date.getSeconds();
+        // 拼接
+        //return year+"-"+month+"-"+day+" "+hours+":"+minutes;
+        return year+"-"+month+"-"+day+" "+hours+":"+minutes+":"+seconds
+      }
+    },
 
   },
   computed: {
@@ -809,11 +821,15 @@ export default {
 
 <style  lang="scss" scoped>
 
-/deep/.formSE{
+/deep/.formContent{
   width: 100%;
   .el-table__body{
     table-layout: auto;
-  } 
+  }
+  .el-table__header {
+    table-layout: auto;
+    border-collapse: separate;
+ } 
 }
 .content{
   display: flex;
@@ -836,7 +852,9 @@ export default {
 .title{
   width: 15%;
   color: white;
-  padding-left:5px;
+  //padding-left:5px;
+  min-width:250px;
+  margin-left: -10px;
   }
 
 .Button{
@@ -858,6 +876,8 @@ export default {
 
 /deep/.dialogContent{
   text-align: left;
+  width:120%;
+  margin-left:-10%;
   .el-dialog__header{
     text-align: left;
     padding-left:7%;
@@ -865,6 +885,7 @@ export default {
   };
   .el-dialog__title{
     color:#fff;
+    margin-left:-5%;
   };
   .el-dialog__close{
     color:#fff;
@@ -903,14 +924,14 @@ export default {
   .avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
-    width: 178px;
-    height: 178px;
-    line-height: 178px;
+    width: 110px;
+    height: 110px;
+    line-height: 110px;
     text-align: center;
   }
   .avatar {
-    width: 178px;
-    height: 178px;
+    width: 110px;
+    height: 110px;
     display: block;
   }
   .el-scrollbar__wrap {
@@ -921,6 +942,16 @@ export default {
     overflow-x: hidden;
     height: 0%;
   }
+  .el-form-item__label {
+    text-align: left; 
+    vertical-align: middle;
+    float: left;
+    font-size: 14px;
+    color: #606266;
+    line-height: 40px;
+    padding: 0 12px 0 0;
+    box-sizing: border-box;
+}
 }
 .el-tag {
   margin-right: 10px;
@@ -952,8 +983,14 @@ export default {
 .el-col_Content{
   //margin-right:10px;
   padding-right:2%;
+  padding-left:4%;
 }
 .dialog-footer{
   margin-right:2.3%;
+  //margin-top:-10%;
 }
+.el-form-item{
+  margin-bottom:17px;
+}
+
 </style>

@@ -2,7 +2,7 @@
   <div>
       <el-row>
         <el-col :span="24">
-          <h3 class="title" >Lilly Wechat - SE List
+          <h3 class="title">Lilly Wechat - SE List
               <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">New SE</el-button>
           </h3>
           <div class="searchBox">
@@ -70,7 +70,7 @@
                 <el-form-item label="SEID" prop="SEID">
                   <el-input v-model="AddSEForm.SEID" :disabled="formStatus==1?false:true"></el-input>
                 </el-form-item>
-                <el-form-item label="New SE" prop="SEName" >
+                <el-form-item label="New SE" prop="SEName">
                   <el-input v-model="AddSEForm.SEName"></el-input>
                 </el-form-item>
                 <el-form-item label="ML" prop="MLID">
@@ -96,14 +96,14 @@
                   </el-form-item>
                 <h2 class="h2">Hospital</h2>
                 <el-form-item label="Hospital" prop="HospitalID">
-                  <el-select v-model="AddSEForm.HospitalID" placeholder="请选择"  @change="handleChange('hos')">
+                  <el-select v-model="AddSEForm.HospitalID" placeholder="请选择"  @change="handleChange('hos')" @click.native="validCity()">
                     <el-option
                        v-for="item in getHosData" :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
                     </el-option>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="Department" prop="DepID">
-                   <el-select v-model="AddSEForm.DepID" placeholder="请选择" >
+                   <el-select v-model="AddSEForm.DepID" placeholder="请选择" @click.native="validHos()">
                     <el-option
                        v-for="item in getDepData" :key="item.NodeID" :label="item.NodeDesc" :value="item.NodeID">
                     </el-option>
@@ -112,7 +112,7 @@
               </el-col>
             </el-row>
           </el-form>
-          <div style="margin-right:10px" slot="footer" class="dialog-footer">
+          <div slot="footer" class="dialog-footer">
             <el-button @click.native="createSubmit" v-if="formStatus==1"  type="primary">Submit</el-button>
             <el-button @click.native="updateSubmit" v-if="formStatus!=1"  type="primary">Submit</el-button>
          </div>
@@ -143,6 +143,7 @@ export default {
   
   data() {
     return {
+      //LoadingImg: require("@/assets/Loading.png"),
       currentTime:"",
       dialogCreateVisible:false,  //详细页面显示/隐藏
       formStatus:0,               //详细页面状态: 0-隐藏/1-新增/2-编辑
@@ -153,7 +154,7 @@ export default {
       getSearchInfo:[],           //模糊搜索结果
       pageNum:1,                  //table第几页
       pageSize:5,                 //table每页几条数据
-      QRurl:'',                   //动态生成二维码链接     
+      QRurl:require("@/assets/Loading.png"),      //动态生成二维码链接     
       SEForm: {                   //table数据源
         SEID:"",
         SEName:"",
@@ -185,7 +186,7 @@ export default {
 
       addSEFormRules: {           //详细页面校验规则
         SEID: [
-          { required: true, message: 'SEID', trigger: 'change'},
+          { required: true, message: '请输入SEID', trigger: 'change'},
           { min: 6, max: 8, message: "长度在 6 到 8 个字符", trigger: "blur" }
         ],
         SEName: [
@@ -241,7 +242,7 @@ export default {
         this.AddSEForm.DepID = ''
       }
       if(flag=='hos'){
-        this.AddSEForm.DepID = ''
+        this.AddSEForm.DepID = '';
       }
     },
 
@@ -257,6 +258,7 @@ export default {
       {
          this.QRurl = url;
          console.log("this.QRurl:" + this.QRurl);
+         
       })
       console.log(ii);      
       //this.QRurl = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQHB7zwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyWl91b2dTQm9jTEYxVGpEQjF2Y24AAgRTLdxfAwSAOgkA'
@@ -524,6 +526,24 @@ export default {
         }
       }
     },
+    validCity(){
+      if(this.AddSEForm.CityID =="")
+      {
+       this.$message({
+          type: 'info',
+          message: '请先选择City！'
+        });
+      }
+    },
+     validHos(){
+       if(this.AddSEForm.HospitalID =="")
+       {
+        this.$message({
+            type: 'info',
+            message: '请先选择Hospital！'
+          });
+       }
+    },
   },
   computed: {
       getSEList () {
@@ -551,7 +571,7 @@ export default {
     border:  #2daaf3;
     padding-top: 20px;
     margin:0px;
-    padding-left:5px;
+    //padding-left:5px;
 }
 
 .NewButton{
@@ -584,23 +604,20 @@ body .el-table th.gutter{
 }
 /deep/.formSE{
   width: 100%;
-  // .el-table__body-wrapper .el_table_body
-  // .table__header{
-  //     table-layout: auto;
-  //     // display: table-cell!important;
-  //   }
   .el-table__body{
     table-layout: auto;
   } 
-    
+   .el-table__header {
+    table-layout: auto;
+    border-collapse: separate;
+ } 
   
-  // .table__header{
-  //   table-layout: auto;
-  // }
 }
 
 
 /deep/.dialogSE{
+  width:120%;
+  margin-left:-10%;
   .el-dialog__header{
   text-align: left;
   padding-left:7%;
@@ -608,16 +625,31 @@ body .el-table th.gutter{
   };
   .el-dialog__title{
     color:#fff;
+    margin-left:-5%;
   };
   .el-dialog__close{
     color:#fff;
   }
   .h2{
-    padding-top:9%;
+    padding-top:3%;
     text-align:left;
+    font-size:17px;
+    padding-bottom: 4%;
   }
   .h2title{
-    text-align:left
+    text-align:left;
+    font-size:17px;
+  }
+  .el-dialog__body {
+    padding: 10px 20px;
+    color: #606266;
+    font-size: 14px;
+    word-break: break-all;
+  }
+  .el-dialog__footer {
+    padding: 0px 20px 20px;
+    text-align: right;
+    box-sizing: border-box;
   }
 } 
 .block{
@@ -632,7 +664,6 @@ body .el-table th.gutter{
     width:100%
   }
 }
- 
 .searchBox{
   width: 19%;
   float: right;
@@ -640,5 +671,13 @@ body .el-table th.gutter{
   /deep/.el-input--prefix .el-input__inner {
     padding-left: 10px; 
   }
+}
+.dialog-footer{
+  margin-right:6.5%;
+  margin-top:-15%;
+}
+
+.el-form-item {
+    margin-bottom: 17px;
 }
 </style>
