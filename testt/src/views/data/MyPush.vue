@@ -487,13 +487,13 @@ export default {
       //按照降序排序
       if(sortingType == "descending"){
         this.getSearchInfo = this.getSearchInfo.sort((a, b) => //b[fieldName] - a[fieldName]
-          b[fieldName].localeCompare(a[fieldName])
+          b[fieldName].toString().localeCompare(a[fieldName].toString())
         );
       }
       //按照升序排序
       else{
         this.getSearchInfo = this.getSearchInfo.sort((a, b) => //a[fieldName] - b[fieldName]
-          a[fieldName].localeCompare(b[fieldName])
+          a[fieldName].toString().localeCompare(b[fieldName].toString())
         );
       }
 

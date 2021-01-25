@@ -17,6 +17,8 @@ Content.belongsTo(SEList, {
 });
 
 
+
+
 module.exports = {
   async getContentByPk (req, res) {
     try {

@@ -42,7 +42,7 @@
               <template slot-scope="scope" >
                 <el-tag
                   :key="tag"
-                  v-for="tag in getCategoryDesc(scope.row.ContentCategory)"
+                  v-for="tag in scope.row.CategoryDesc.split(',')"
                   :closable="false"
                   effect="light"
                   style="width:100px;background-color:white;border-color:white;color:black;"
@@ -54,7 +54,7 @@
             <el-table-column min-width="10%" prop="ShortTitle" label="ShortTitle"></el-table-column>
             <!-- <el-table-column min-width="5%" prop="ContentMessage" label="ContentMessage"></el-table-column> -->
             <el-table-column min-width="10%" prop="SEID" label="SEID" sortable></el-table-column>
-            <el-table-column min-width="15%" prop="CreateDt" label="CreateDate">
+            <el-table-column min-width="15%" prop="CreateDt" label="CreateDate" sortable>
               <template scope="scope">
                 {{dateFormat(scope.row.CreateDt)}}
               </template>
@@ -207,11 +207,10 @@ import ContentService from "../../services/ContentService";
 import router from '../../router'
 
 export default {
-  mounted() {
-    this.getDetailList();
+  mounted() {    
     this.getCategoryListData();
     this.getSEList();
-    
+    this.getDetailList();
   },  
   components: {UE},
   data(){
@@ -374,19 +373,7 @@ export default {
     onTagClose(tag){
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag),1)
       this.dynamicTagIDs.splice(this.dynamicTags.indexOf(tag),1)
-    },
-    getCategoryDesc(id){
-      let idx = id.split(",")
-      let desc = []
-      idx.forEach(id => {
-        for(var item of this.getCategoryList){
-          if(id==item.CategoryID){
-            desc.push(item.CategoryDesc)
-          }
-        }
-      })
-      return desc
-    },
+    },  
     handleFormClose(){          
       //resetFields将form重置到mounted之后的状态, 对于编辑页面不适用
       //this.$refs.AddSEForm.resetFields()
@@ -455,6 +442,21 @@ export default {
        ContentService.getList("")
         .then((res) => {
           this.getSearchInfo = res.data;
+
+          for(let i=0;i<this.getSearchInfo.length;i++){
+            let idx = this.getSearchInfo[i].ContentCategory.split(",")
+            let desc = []
+            console.log(idx)
+            idx.forEach(id => {
+              for(var item of this.getCategoryList){
+                if(id==item.CategoryID){
+                  desc.push(item.CategoryDesc)
+                }
+              }
+            })
+            console.log(desc)
+            this.getSearchInfo[i].CategoryDesc = desc.toString()
+          }
         })
         .catch(function (err) {
           console.log("err"+err);
@@ -527,6 +529,7 @@ export default {
       })
     },
     changeTableSort(column){
+      console.log(column)
       //获取字段名称和排序类型
       var fieldName = column.prop;
       var sortingType = column.order;
@@ -541,14 +544,14 @@ export default {
       //按照降序排序
       if(sortingType == "descending"){
         this.getSearchInfo = this.getSearchInfo.sort((a, b) => //b[fieldName] - a[fieldName]
-          b[fieldName].localeCompare(a[fieldName])
+          b[fieldName].toString().localeCompare(a[fieldName].toString())
         );
       }
       //按照升序排序
       else{
-        this.getSearchInfo = this.getSearchInfo.sort((a, b) => //a[fieldName] - b[fieldName]
-          a[fieldName].localeCompare(b[fieldName])
-        );
+        this.getSearchInfo = this.getSearchInfo.sort((a, b) =>{ //a[fieldName] - b[fieldName]
+          a[fieldName].toString().localeCompare(b[fieldName].toString())
+        });
       }
 
       //如果字段名称为“创建时间”，将时间戳格式的“创建时间”再转换为时间格式
@@ -801,7 +804,7 @@ export default {
         const searchTableInfo = this.searchTableInfo
         if (searchTableInfo) {
           return this.getSearchInfo.filter(data => {
-            console.log("success"+data)
+            console.log("success"+JSON.stringify(data))
             return Object.keys(data).some(key => {
               return String(data[key]).toLowerCase().indexOf(searchTableInfo) > -1
             })

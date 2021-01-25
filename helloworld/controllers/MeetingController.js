@@ -4,19 +4,35 @@ const config = require('../config')
 var meeting_api = require('../utils/Meetting')(config.meettingInfo.X_TC_Key, config.meettingInfo.secret, config.meettingInfo.AppId,config.meettingInfo.SDKId);
 
 const Meeting = db.Meeting
+const Params = db.Params
 
+Meeting.belongsTo(Params, {
+  foreignKey: 'Status',
+  targetKey: 'ParamID',
+  as: 'param'
+});
 
 module.exports = {
   async getList (req, res) {
     try {
       var data = await Meeting.findAll({
+        include:[
+          {
+            model: Params,
+            attributes: ['ParamValue'],
+            as: 'param',
+            where:{
+              ParamType:'MeetingStatus'
+            }
+          }
+        ],
         order: [
           ['CreateDt', 'DESC']
-        ],
+        ],        
         raw: true})
 
       if (data) {
-        //data = JSON.parse(JSON.stringify(data).replace(/NodeDesc/g, 'Hospital').replace(/NodeID/g, 'HospitalID').replace(/Department.Dep/g, 'Department').replace(/Geo.City/g, 'City'))
+        data = JSON.parse(JSON.stringify(data).replace(/param.ParamValue/g, 'StatusDesc'))
         res.status(200).send({
           value:'MyMeetingList',
           data:data
