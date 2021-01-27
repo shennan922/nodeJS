@@ -330,9 +330,16 @@ module.exports = {
   },
 
   async downloadPdf(req, res) {
+    let file = req.query.file
+    let reg = new RegExp("[\\u4E00-\\u9FFF]+","g");
+    if(reg.test(file)){
+      file = req.query.ContentID+'.pdf'
+    }
+
     res.set({
       "Content-Type":"application/octet-stream;charset=base64",//告诉浏览器这是一个二进制文件
-      "Content-Disposition": "attachment; filename*=UTF-8''" + urlencode.encode(req.query.file, "UTF-8")//告诉浏览器这是一个需要下载的文件      
+      //"Content-Disposition": "attachment; filename*=UTF-8''" + urlencode.encode(req.query.file, "UTF-8")//告诉浏览器这是一个需要下载的文件      
+      "Content-Disposition": "attachment; filename=" + file//告诉浏览器这是一个需要下载的文件      
     });
     var path = './/contents//'+req.query.ContentID+'//'+req.query.file
     if(fs.existsSync(path)){

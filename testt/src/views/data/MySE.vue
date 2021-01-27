@@ -338,7 +338,7 @@ export default {
       }).catch((error) => {
         this.$message({
           type: 'info',
-          message: '已取消新增'+error
+          message: '删除失败'+error
         });
       })
     },

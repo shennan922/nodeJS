@@ -162,23 +162,17 @@ module.exports = {
   },
   async delete (req, res) {
     try {
-      await SEList.destroy(
-        {
-          where: {
-            SEID: req.query.SEID
-          }
-        }
-      )
+      await SEList.destroy({where: {SEID: req.query.SEID}})
       res.status(200).send({
         message: '数据删除成功'
       })
-      logger.logger.info("Delete SE: "+newSE.SEID)
+      logger.logger.info("Delete SE: "+req.query.SEID)
     } catch (error) {
       res.status(500).send({
         code: 500,
         error: '数据删除失败: ' + error
       })
-      logger.logger.fatal("Delete SE fail: "+newSE.SEID+'/'+error)
+      logger.logger.fatal("Delete SE fail: "+req.query.SEID+'/'+error)
     }
   }
 }
