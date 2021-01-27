@@ -130,13 +130,14 @@ import SEService from "../../services/SEService";
 import MLService from "../../services/MLService";
 import GeneralService from "../../services/GeneralService";
 import WechatService from "../../services/WechatService";
+import Commons from "../../services/Commons";
 
 export default {
   inject:['reload'],
   name: "MySE",
   mounted() {
     this.getDetailList();
-    this.getMLListData();
+    //this.getMLListData();
     this.getTeamData();
     this.getGeoTreeData();
     this.getHospitalData();
@@ -314,9 +315,14 @@ export default {
     },
     handleAdd() {
       this.formStatus = 1
-      this.dialogCreateVisible = true;   
+      this.dialogCreateVisible = true;
+      this.getMLListData(); 
+      // this.getTeamData();
+      // this.getGeoTreeData();
+      // this.getHospitalData();     
     },
     handleEdit(row) {
+      this.getMLListData(); 
       this.formStatus = 2
       this.dialogCreateVisible = true;
       this.AddSEForm = {
@@ -331,11 +337,16 @@ export default {
     },
     handleDelete(SEID){
       SEService.SEDelete({SEID:SEID}).then((res) => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        });
-        this.getDetailList();
+        if (res.code == 403){
+          Commons.Message();
+        }
+        else{
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+          this.getDetailList();
+        }
       }).catch((error) => {
         this.$message({
           type: 'info',
@@ -375,6 +386,9 @@ export default {
                 CreateDt: this.currentTime
               }
             ).then((res) => {
+              if (res.code == 403){
+                Commons.Message();
+              } 
               if (res.code == 400){
                 this.$message({
                   type: 'info',
@@ -417,6 +431,9 @@ export default {
                 ModifyDt: this.currentTime
               }
             ).then((res) => {
+              if (res.code == 403){
+                Commons.Message();
+              }
               if (res.code == 400){
                 this.$message({
                   type: 'info',
@@ -459,7 +476,9 @@ export default {
       MLService.getMLList()
         .then((res) => {
           this.getMLList = res;
-          
+          if (res.code == 403){
+              Commons.Message();
+          }
         })
         .catch(function (err) {
           console.log(err);

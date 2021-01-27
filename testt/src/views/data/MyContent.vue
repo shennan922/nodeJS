@@ -205,12 +205,13 @@ import GeneralService from "../../services/GeneralService";
 import UE from '../../components/ue/ue.vue';
 // import MyContentService from "../../services/MyContentService";
 import ContentService from "../../services/ContentService";
-import router from '../../router'
+import router from '../../router';
+import Commons from "../../services/Commons";
 
 export default {
   mounted() {    
-    this.getCategoryListData();
-    this.getSEList();
+    //this.getCategoryListData();
+    //this.getSEList();
     this.getDetailList();
   },  
   components: {UE},
@@ -367,12 +368,12 @@ export default {
 
       for(let i=0;i<this.fileList.length;i++){
         if(this.fileList[i].name == file.name){
-          console.log(i)
+          //console.log(i)
           this.fileList.splice(i,1)
         }
       }
       this.fileList.push({"name":file.name,"url":'/api/myContent/downloadpdf?ContentID='+this.ContentID+'&file='+file.name})
-      console.log(this.fileList)
+      //console.log(this.fileList)
     },    
     onTagClose(tag){
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag),1)
@@ -450,7 +451,7 @@ export default {
           for(let i=0;i<this.getSearchInfo.length;i++){
             let idx = this.getSearchInfo[i].ContentCategory.split(",")
             let desc = []
-            console.log(idx)
+            //console.log(idx)
             idx.forEach(id => {
               for(var item of this.getCategoryList){
                 if(id==item.CategoryID){
@@ -458,7 +459,7 @@ export default {
                 }
               }
             })
-            console.log(desc)
+            //console.log(desc)
             this.getSearchInfo[i].CategoryDesc = desc.toString()
           }
         })
@@ -469,8 +470,11 @@ export default {
     getSEList() {
       SEService.getSEList("")
         .then((res) => {
-          this.getSEListAll = res.data;
-          //console.log("getSEListAll:" + JSON.stringify(this.getSEListAll));
+          if (res.code == 403){
+            Commons.Message();
+          }else{
+            this.getSEListAll = res.data; 
+          }
         })
         .catch(function (err) {
           console.log("err"+err);
@@ -521,13 +525,18 @@ export default {
     },
     handleDelete(ContentID){
       ContentService.myContentDelete({ContentID:ContentID}).then((res) => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        });
+        if (res.code == 403){
+          Commons.Message();
+        }
+        else{
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
         //this.dialogCreateVisible = false;
         this.getDetailList();
         // this.reload();
+        }
       }).catch((error) => {
         this.$message({
           type: 'info',
@@ -536,7 +545,7 @@ export default {
       })
     },
     changeTableSort(column){
-      console.log(column)
+      //console.log(column)
       //获取字段名称和排序类型
       var fieldName = column.prop;
       var sortingType = column.order;
@@ -574,6 +583,8 @@ export default {
       return "color:#0c0c0c;font-wight:100;font-size:15px;text-align:left";
     },
     handleAdd() {
+      this.getSEList();
+      this.getCategoryListData();
       this.imageUrl = '';
       this.getID();
       this.dynamicTags =[];
@@ -706,7 +717,10 @@ export default {
                 file: this.AddContentForm.UpdatePhotoData,
               })
               */
-              ).then((res) => {              
+              ).then((res) => {    
+                if (res.code == 403){
+                  Commons.Message();
+                }           
                 if (res.code == 200){
                   this.$message({
                     type: 'success',
@@ -765,6 +779,9 @@ export default {
               //     message: res.message
               //   });
               // } 
+              if (res.code == 403){
+                Commons.Message();
+              }
               if (res.code == 200){
                 this.$message({
                   type: 'success',
@@ -814,7 +831,7 @@ export default {
         const searchTableInfo = this.searchTableInfo
         if (searchTableInfo) {
           return this.getSearchInfo.filter(data => {
-            console.log("success"+JSON.stringify(data))
+            //console.log("success"+JSON.stringify(data))
             return Object.keys(data).some(key => {
               return String(data[key]).toLowerCase().indexOf(searchTableInfo) > -1
             })

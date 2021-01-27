@@ -159,7 +159,7 @@ router.beforeEach((to, from, next) => {
       Notification({
         title: '提示',
         type: 'warning',
-        message: '请登录后再访问该页面'
+        message: '登陆信息无效或已过期，请登陆后再访问'
       })
       next({
         name: 'login',

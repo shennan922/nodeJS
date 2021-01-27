@@ -18,7 +18,7 @@ module.exports = {
       if (tokenVerify(token)) {
         next()
       } else {
-        res.status(403).send({
+        res.status(200).send({
           code: 403,
           error: '登录凭证无效请重新登陆'
         })

@@ -205,6 +205,7 @@ import GeneralService from "../../services/GeneralService";
 import WechatService from "../../services/WechatService";
 import ContentService from "../../services/ContentService";
 import MyPushService from "../../services/MyPushService";
+import Commons from "../../services/Commons";
 
 
 export default {
@@ -212,8 +213,8 @@ export default {
   name: "MySE",
   mounted() {
     this.getDetailList();
-    this.getSEList();
-    this.getContentList(); 
+    //this.getSEList();
+    //this.getContentList(); 
   },  
 
   data() {
@@ -346,11 +347,16 @@ export default {
   methods: {  
     onPushDelete(pushID){
       MyPushService.myPushDelete(pushID).then((res) => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        });
-        this.getDetailList();
+        if (res.code == 403){
+          Commons.Message();
+        }
+        else{
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          });
+          this.getDetailList();
+        }
       }).catch((error) => {
         this.$message({
           type: 'info',
@@ -361,7 +367,12 @@ export default {
     getSEList() {
       SEService.getSEList("")
         .then((res) => {
-          this.getSEListAll = res.data;
+          if (res.code == 403){
+            Commons.Message();
+          }
+          else{
+            this.getSEListAll = res.data;
+          }
         })
         .catch(function (err) {
           console.log("err"+err);
@@ -374,6 +385,9 @@ export default {
       this.contentData =[];
       ContentService.getList("")
       .then((res) => {
+        if (res.code == 403){
+            Commons.Message();
+          }
         this.getContentData = res.data;
         // for(var item of this.getContentData){
         //     this.getContentIdData.push(item.ContentID);
@@ -403,6 +417,7 @@ export default {
       this.MyPushID = Number(Math.random().toString().substr(3,6) );
     },
     selectContent(){
+      this.getContentList();
       this.dialogChooseContentVisible=true;
     },
     contentConfirm(){
@@ -527,6 +542,8 @@ export default {
       this.formStatus = 1
       this.dialogCreateVisible = true; 
       this.getID(); 
+      this.getSEList();
+      //this.getContentList();
       this.AddMyPushForm.Categorized = 1;
       this.AddMyPushForm.RequestType = 4;
     },
@@ -669,6 +686,9 @@ export default {
                     ModifyDt: "",
                 }
               ).then((res) => {
+                if (res.code == 403){
+                  Commons.Message();
+                }
                 if (res.code == 400){
                   this.$message({
                     type: 'info',
@@ -720,6 +740,9 @@ export default {
                   Team:this.AddSEForm.TeamID
                 }
               ).then((res) => {
+                if (res.code == 403){
+                  Commons.Message();
+                }
                 if (res.code == 400){
                   this.$message({
                     type: 'info',
@@ -853,10 +876,6 @@ body .el-table th.gutter{
    .el-table__header {
     table-layout: auto;
     border-collapse: separate;
- } 
-  .el-table__header {
-  table-layout: auto;
-  border-collapse: separate;
  } 
 }
 /deep/.dialogMyPush{

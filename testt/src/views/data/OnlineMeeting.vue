@@ -233,6 +233,7 @@
 <script>
 import WechatService from "../../services/WechatService";
 import MeetingService from "../../services/OnlineMeetingService";
+import Commons from "../../services/Commons";
 
 export default {
   name: "OnlineMeeting",
@@ -373,12 +374,16 @@ export default {
         "ReasonDetail":"",
         "ModifyDt": this.currentTime
       })
-      .then((res) => {        
-        this.getDetailList()
-        this.$message({
-          type: 'success',
-          message: '取消成功!'
-        });
+      .then((res) => { 
+        if (res.code == 403){
+            Commons.Message();
+        }else{          
+          this.getDetailList();
+          this.$message({
+            type: 'success',
+            message: '取消成功!'
+          });
+        }
       })
       .catch(function (err) {
         console.log("err"+err);
@@ -859,6 +864,9 @@ export default {
                   ModifyDt: ""  
               }
             ).then((res) => {
+              if (res.code == 403){
+                Commons.Message();
+              }
               if (res.code == 400){
                 this.$message({
                   type: 'info',
@@ -966,6 +974,9 @@ export default {
                   ModifyDt: this.currentTime  
               }
             ).then((res) => {
+              if (res.code == 403){
+                Commons.Message();
+              }
               if (res.code == 400){
                 this.$message({
                   type: 'info',
