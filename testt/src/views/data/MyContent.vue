@@ -210,8 +210,8 @@ import Commons from "../../services/Commons";
 
 export default {
   mounted() {    
-    //this.getCategoryListData();
-    //this.getSEList();
+    this.getCategoryListData();
+    this.getSEList();
     this.getDetailList();
   },  
   components: {UE},
@@ -459,7 +459,7 @@ export default {
                 }
               }
             })
-            //console.log(desc)
+            console.log(desc)
             this.getSearchInfo[i].CategoryDesc = desc.toString()
           }
         })
@@ -831,9 +831,9 @@ export default {
         const searchTableInfo = this.searchTableInfo
         if (searchTableInfo) {
           return this.getSearchInfo.filter(data => {
-            //console.log("success"+JSON.stringify(data))
+            console.log("success"+JSON.stringify(data))
             return Object.keys(data).some(key => {
-              return String(data[key]).toLowerCase().indexOf(searchTableInfo) > -1
+              return String(data[key]).toLowerCase().indexOf(searchTableInfo.toLowerCase()) > -1
             })
           })
         }
