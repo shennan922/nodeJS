@@ -2,7 +2,8 @@
   <div>
       <el-row>
         <el-col :span="24">
-          <h3 class="title" >Lilly Wechat - My Push
+          <!-- <h3 class="title" >Lilly Wechat - My Push -->
+          <h3 class="title" > My Push
               <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">New My Push</el-button>
           </h3>
           <div class="searchBox">
