@@ -143,6 +143,10 @@ export default {
     padding-left:1%;
     padding-right:1%;
     text-align:left;
+    /deep/img,p{ 
+      max-width:100%;
+      height: auto;
+    }
   }
   .pdfStyle{
     text-align:left;

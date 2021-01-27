@@ -3,9 +3,10 @@
     <el-row>
       <el-col>
         <div class='top'>
-          <div class="title">
-            <h3>
-            Lilly Wechat - My Content
+          <div>
+            <h3 class="title">
+            <!-- Lilly Wechat - My Content -->
+            My Content
             </h3>
           </div>
           <div>
@@ -859,11 +860,18 @@ export default {
   padding-left: 0px;
 }
 .title{
-  width: 15%;
-  color: white;
-  //padding-left:5px;
-  min-width:250px;
-  margin-left: -10px;
+  // width: 15%;
+  // color: white;
+  // min-width:250px;
+  // margin-left: -10px;
+    width:100%;
+    height:40px;
+    background-color:#639eda;
+    text-align: left;
+    color: white;
+    border:  #2daaf3;
+    padding-top: 20px;
+    margin:0px;
   }
 
 .Button{

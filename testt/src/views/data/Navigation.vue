@@ -4,7 +4,7 @@
     <div class="headerStyle">
       <el-row>
         <el-col :span="3">
-          <img class="imgStyle" :src="lillyImg"/>
+          <img class="imgStyle" :src="xxxImg"/>
         </el-col>
         <el-col :span="19">
           <el-menu :default-active = 'defaultTab'
@@ -90,6 +90,7 @@ export default {
       searchCriteria: "",
       breadcrumbItems: "Overview",
       lillyImg: require("@/assets/Lilly.png"),
+      xxxImg: require("@/assets/blankPicture.png"),
       defaultTab: ""
     };
   },

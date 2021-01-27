@@ -2,7 +2,8 @@
   <div>
       <el-row>
         <el-col :span="24">
-          <h3 class="title">Lilly Wechat - SE List
+          <!-- <h3 class="title">Lilly Wechat - SE List -->
+          <h3 class="title">SE List
               <el-button class="NewButton" type="primary" icon="el-icon-plus" @click="handleAdd">New SE</el-button>
           </h3>
           <div class="searchBox">
